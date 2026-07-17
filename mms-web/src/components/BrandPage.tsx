@@ -69,7 +69,11 @@ const STATUS_OPTIONS = [
 
 /* ── Component ───────────────────────────────────────────────────── */
 
-const INITIAL_FILTERS = { scope: SCOPE_OPTIONS[0].value, query: '', status: '' };
+const INITIAL_FILTERS: { scope: string; query: string; status: string } = {
+  scope: SCOPE_OPTIONS[0].value,
+  query: '',
+  status: '',
+};
 const PAGE_SIZE_OPTIONS = [10, 25, 50];
 
 export default function BrandPage() {
