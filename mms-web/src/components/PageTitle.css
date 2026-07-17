@@ -1,0 +1,73 @@
+/*
+ * Tokens used in this component
+ * ─────────────────────────────────────────────────────────────────────
+ * CSS variable                          Token
+ * ─────────────────────────────────────────────────────────────────────
+ * --color-text-heading-primary          color/text-heading-primary
+ * --color-text-body-secondary           color/text-body-secondary
+ * --color-button-primary-bg             color/interactive-button-surface-primary-solid-default
+ * --color-button-primary-bg-hover       color/interactive-button-surface-primary-solid-hover
+ * --color-button-primary-label          color/interactive-button-label-primary-solid-default
+ * --space-gap-sm                        size/space-component-gap-sm
+ * --space-gap-xs                        size/space-component-gap-xs
+ * --space-pad-lg                        size/space-component-padding-lg
+ * --height-lg                           size/component-height-lg
+ * --radius-sm                           size/radius-sm
+ * --type-xl-size / --type-xl-lh         size/typography-xl-*
+ * --type-sm-size / --type-sm-lh         size/typography-sm-*
+ * --font-weight-bold                    font/english/typography-font-weight-bold
+ * --font-weight-medium                  font/english/typography-font-weight-medium
+ * --duration-fast                       motion/duration-fast
+ */
+
+.page-title {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap-sm);   /* size/space-component-gap-sm */
+}
+
+.page-title__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-gap-sm);   /* size/space-component-gap-sm */
+}
+
+.page-title__heading {
+  font-size: var(--type-xl-size);           /* size/typography-xl-font-size */
+  line-height: var(--type-xl-lh);           /* size/typography-xl-line-height */
+  font-weight: var(--font-weight-bold);     /* font/english/typography-font-weight-bold */
+  color: var(--color-text-heading-primary); /* color/text-heading-primary */
+  letter-spacing: -0.3px;
+}
+
+.page-title__desc {
+  font-size: var(--type-sm-size);           /* size/typography-sm-font-size */
+  line-height: var(--type-sm-lh);           /* size/typography-sm-line-height */
+  color: var(--color-text-body-secondary);  /* color/text-body-secondary */
+  max-width: 100%;
+}
+
+/* ── Primary action button ──────────────────────────────────────── */
+
+.page-title__action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-gap-xs);                  /* size/space-component-gap-xs */
+  flex-shrink: 0;
+  height: var(--height-lg);                  /* size/component-height-lg */
+  padding: 0 var(--space-pad-lg);            /* size/space-component-padding-lg */
+  border: none;
+  border-radius: var(--radius-sm);           /* size/radius-sm */
+  background: var(--color-button-primary-bg); /* color/interactive-button-surface-primary-solid-default */
+  color: var(--color-button-primary-label);  /* color/interactive-button-label-primary-solid-default */
+  font-size: var(--type-sm-size);            /* size/typography-sm-font-size */
+  font-weight: var(--font-weight-medium);    /* font/english/typography-font-weight-medium */
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--duration-fast) ease; /* motion/duration-fast */
+}
+
+.page-title__action:hover {
+  background: var(--color-button-primary-bg-hover); /* color/interactive-button-surface-primary-solid-hover */
+}

@@ -1,0 +1,98 @@
+/*
+ * Tokens used in this component
+ * ─────────────────────────────────────────────────────────────────────
+ * CSS variable                          Token
+ * ─────────────────────────────────────────────────────────────────────
+ * --color-surface-page                  color/surface-page
+ * --color-surface-card                  color/surface-card-surface
+ * --color-banner-warning-bg             color/feedback-toast-surface-warning
+ * --color-banner-warning-border         color/feedback-toast-border-warning
+ * --color-banner-warning-icon           color/feedback-toast-icon-warning
+ * --color-text-body-primary             color/text-body-primary
+ * --color-brand-primary                 color/brand-primary
+ * --space-section-gap-md                size/space-layout-section-gap-md
+ * --space-pad-xl / md / sm
+ * --space-gap-sm
+ * --radius-md
+ * --type-sm-size / --type-sm-lh
+ * --font-weight-medium
+ */
+
+.brand-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-section-gap-md);   /* size/space-layout-section-gap-md */
+  padding: var(--space-pad-xl);       /* size/space-component-padding-xl */
+  overflow-y: auto;
+  background: var(--color-surface-page);
+}
+
+/* ── Info banner ─────────────────────────────────────────────────── */
+
+.brand-page__banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-gap-sm);
+  height: var(--height-xl);            /* size/component-height-xl */
+  padding: var(--space-pad-md) var(--space-pad-lg);
+  border-radius: var(--radius-md);
+  background: var(--color-banner-info-bg);
+  border: 1px solid var(--color-banner-info-border);
+}
+
+.brand-page__banner-icon {
+  color: var(--color-banner-info-icon);
+  flex-shrink: 0;
+}
+
+.brand-page__banner-text {
+  flex: 1 0 0;
+  font-size: var(--type-sm-size);
+  line-height: var(--type-sm-lh);
+  color: var(--color-text-body-primary);
+}
+
+.brand-page__banner-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 24px;
+  padding: 2px var(--space-pad-sm);
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-brand-primary);
+  font-size: var(--type-sm-size);
+  line-height: var(--type-sm-lh);
+  font-family: var(--font-body);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--duration-fast) ease, color var(--duration-fast) ease;
+}
+
+.brand-page__banner-action:hover {
+  background: var(--color-chip-surface-default);
+  color: var(--color-brand-primary-hover);
+}
+
+.brand-page__banner-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-body-tertiary);
+  cursor: pointer;
+}
+
+.brand-page__banner-close:hover {
+  color: var(--color-text-body-secondary);
+}
+

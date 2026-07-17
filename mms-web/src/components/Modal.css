@@ -1,0 +1,105 @@
+/*
+ * Tokens used in this component
+ * ─────────────────────────────────────────────────────────────────────
+ * CSS variable                          Token
+ * ─────────────────────────────────────────────────────────────────────
+ * --color-overlay                       color/global-overlay-default
+ * --color-modal-surface                 color/surface-modal-surface-default
+ * --color-divider-light                 color/global-divider-neutral-light
+ * --color-text-heading-primary          color/text-heading-primary-neutral
+ * --color-text-body-secondary           color/text-body-secondary
+ * --color-icon-button-ghost-bg          color/interactive-icon-button-surface-primary-ghost-default
+ * --color-chip-surface-default          color/interactive-filter-chip-surface-default
+ * --color-brand-primary                 color/brand-primary
+ * --width-modal-sm                      size/component-width-modal-sm
+ * --height-2xl / --height-3xl
+ * --space-pad-lg / --space-gap-md / --space-gap-lg
+ * --radius-md
+ * --type-md-size / --type-md-lh
+ * --font-weight-medium
+ * --duration-fast
+ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-overlay);   /* color/global-overlay-default */
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-modal-surface);  /* color/surface-modal-surface-default */
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.modal--sm {
+  width: var(--width-modal-sm);  /* size/component-width-modal-sm */
+}
+
+/* ── Header ──────────────────────────────────────────────────────── */
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-gap-lg);
+  min-height: var(--height-2xl);
+  padding: var(--space-pad-lg);
+  border-bottom: 1px solid var(--color-divider-light);  /* color/global-divider-neutral-light */
+  flex-shrink: 0;
+}
+
+.modal__title {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--type-md-size);
+  line-height: var(--type-md-lh);
+  color: var(--color-text-heading-primary);
+}
+
+.modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-icon-button-ghost-bg);  /* color/interactive-icon-button-surface-primary-ghost-default */
+  color: var(--color-text-body-secondary);
+  cursor: pointer;
+  transition: background var(--duration-fast) ease;
+}
+
+.modal__close:hover {
+  background: var(--color-chip-surface-default);
+  color: var(--color-brand-primary);
+}
+
+/* ── Body ────────────────────────────────────────────────────────── */
+
+.modal__body {
+  padding: var(--space-pad-lg);
+  overflow-y: auto;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────── */
+
+.modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-gap-md);
+  height: var(--height-3xl);
+  padding: var(--space-pad-lg);
+  flex-shrink: 0;
+}

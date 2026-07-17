@@ -1,0 +1,250 @@
+/* ─── Design Tokens ──────────────────────────────────────────────── */
+:root {
+  /* Colors — Brand */
+  --color-brand-primary: #5244ee;
+  --color-brand-primary-hover: #7d73f2;    /* color/interactive-button-surface-primary-solid-hover-ish */
+  --color-brand-secondary: #ffa000;
+  --color-brand-danger: #ff4d4f;
+  --color-brand-success: #52c41a;
+  --color-brand-warning: #fa8c16;   /* color/feedback-toast-icon-warning */
+  --color-brand-info: #1890ff;      /* color/feedback-toast-icon-info */
+
+  /* Colors — Button (Primary Solid) */
+  --color-button-primary-bg: #5244ee;         /* color/interactive-button-surface-primary-solid-default */
+  --color-button-primary-bg-hover: #7d73f2;   /* color/interactive-button-surface-primary-solid-hover */
+  --color-button-primary-label: #ffffff;      /* color/interactive-button-label-primary-solid-default */
+
+  /* Colors — Button (Secondary Solid) */
+  --color-button-secondary-solid-bg: #fff7e6;    /* color/interactive-button-surface-secondary-solid-default */
+  --color-button-secondary-solid-label: #996100; /* color/interactive-button-label-secondary-solid-default */
+
+  /* Colors — Feedback tags (status pills) */
+  --color-tag-info-bg: #e6f7ff;      /* color/feedback-toast-surface-info */
+  --color-tag-info-label: #1890ff;   /* color/feedback-toast-icon-info */
+  --color-tag-success-bg: #f6ffed;   /* color/feedback-toast-surface-success */
+  --color-tag-success-label: #52c41a; /* color/feedback-toast-icon-success */
+  --color-tag-danger-bg: #fff1f0;    /* color/feedback-toast-surface-danger */
+  --color-tag-danger-label: #ff4d4f; /* color/brand-danger-500 */
+
+  /* Colors — Banner */
+  --color-banner-warning-bg: #fff7e6;     /* color/feedback-toast-surface-warning */
+  --color-banner-warning-border: #ffd591; /* color/feedback-toast-border-warning */
+  --color-banner-warning-icon: #fa8c16;   /* color/feedback-toast-icon-warning */
+  --color-banner-info-bg: #e6f7ff;        /* color/feedback-banner-surface-info */
+  --color-banner-info-border: #91d5ff;    /* color/feedback-banner-border-info */
+  --color-banner-info-icon: #1890ff;      /* color/feedback-banner-icon-info */
+
+  /* Colors — Text */
+  --color-text-heading-primary: #1e1e1e;
+  --color-text-heading-secondary: #5c5c5c;
+  --color-text-heading-on-primary: #ffffff;
+  --color-text-body-primary: #1e1e1e;
+  --color-text-body-secondary: #5c5c5c;
+  --color-text-body-tertiary: #a6a6a6;
+  --color-text-caption: #a6a6a6;
+  --color-text-link: #5244ee;
+
+  /* Colors — Surface */
+  --color-surface-page: #f5f6fa;
+  --color-surface-card: #ffffff;
+  --color-surface-sidebar: #110964;
+  --color-surface-thumbnail: #f7f6ff;
+
+  /* Colors — Sidebar items */
+  --color-sidebar-item-surface-hover: rgba(125, 115, 242, 0.4);  /* color/interactive-sidebar-item-surface-hover */
+  --color-sidebar-item-surface-active: #7d73f2;                  /* color/interactive-sidebar-item-surface-active */
+  --color-sidebar-item-label-default: #d4d0fb;                   /* color/interactive-sidebar-item-label-default */
+  --color-sidebar-item-label-hover: #ffffff;                     /* color/interactive-sidebar-item-label-hover */
+  --color-sidebar-item-label-active: #ffffff;                    /* color/interactive-sidebar-item-label-active */
+  --color-sidebar-item-icon-default: #d4d0fb;                    /* color/interactive-sidebar-item-icon-default */
+  --color-sidebar-item-icon-hover: #ffffff;                      /* color/interactive-sidebar-item-icon-hover */
+  --color-sidebar-item-icon-active: #ffffff;                     /* color/interactive-sidebar-item-icon-active */
+  --color-sidebar-header-label: #ffffff;                         /* color/interactive-sidebar-header-label-default */
+  --color-sidebar-header-icon: #ffffff;                          /* color/interactive-sidebar-header-icon-default */
+
+  /* Colors — Input */
+  --color-input-border-default: #d9d9d9;
+  --color-input-border-focused: #5244ee;
+  --color-input-placeholder: #bfbfbf;
+  --color-input-shadow-focused: rgba(82, 68, 238, 0.2);
+  --color-input-label: #1e1e1e;              /* color/interactive-input-label-default */
+  --color-input-surface-disabled: #f5f5f5;   /* color/interactive-input-surface-disabled */
+  --color-input-label-disabled: #a6a6a6;     /* color/interactive-input-label-disabled */
+  --color-input-border-error: #ff4d4f;       /* color/interactive-input-border-error */
+
+  /* Colors — Modal */
+  --color-overlay: #22222299;         /* color/global-overlay-default */
+  --color-modal-surface: #ffffff;     /* color/surface-modal-surface-default */
+  --color-divider-light: #f4f4f4;     /* color/global-divider-neutral-light */
+
+  /* Colors — Button (Primary Outline) */
+  --color-button-primary-outline-bg: #ffffff;      /* color/interactive-button-surface-primary-outline-default */
+  --color-button-primary-outline-border: #5244ee;  /* color/interactive-button-border-primary-outline-default */
+  --color-button-primary-outline-label: #5244ee;   /* color/interactive-button-label-primary-outline-default */
+
+  /* Colors — Icon button (ghost) */
+  --color-icon-button-ghost-bg: #5244ee00;  /* color/interactive-icon-button-surface-primary-ghost-default */
+
+  /* Colors — Breadcrumb */
+  --color-breadcrumb-item-label-default: #a6a6a6;  /* color/interactive-breadcrumb-item-label-default */
+  --color-breadcrumb-item-label-hover:   #5c5c5c;  /* color/interactive-breadcrumb-item-label-hover */
+
+  /* Colors — Filter chip (toolbar dropdown chips) */
+  --color-filter-chip-surface-default: #fbfbfb;  /* color/interactive-filter-chip-surface-default */
+
+  /* Colors — Filter chip */
+  --color-chip-surface-default: #f7f6ff;
+  --color-chip-surface-selected: #d4d0fb;
+  --color-chip-border-default: #d4d0fb;
+  --color-chip-border-hover: #7d73f2;
+  --color-chip-border-focused: #5244ee;
+  --color-chip-label-default: #5244ee;
+  --color-chip-shadow: rgba(82, 68, 238, 0.2);
+
+  /* Colors — Borders */
+  --color-border-default: #d9d9d9;
+  --color-divider: #f0f0f0;
+
+  /* Colors — List / Flyout */
+  --color-list-item-hover: #f1ecff;  /* color/interactive-list-background-hover */
+  --color-list-item-active: #d4d0fb; /* color/interactive-dropdown-option-surface-selected */
+
+  /* Colors — Neutral hover surface (menu-trigger style controls) */
+  --color-surface-hover-neutral: #f5f5f5; /* ⚠ no exact token — closest matches (surface-tag-background-neutral-default / global-background-page) are semantically unrelated; flagging per menu-trigger hover states in Topbar */
+
+  /* Colors — Dropdown panel */
+  --color-dropdown-option-selected: #f1ecff; /* color/interactive-dropdown-option-surface-selected */
+  --shadow-dropdown-panel: 0 8px 24px rgba(217, 217, 217, 0.45); /* color/interactive-dropdown-panel-shadow-default */
+  --shadow-topbar: 0 2px 4px rgba(217, 217, 217, 0.45); /* color/interactive-dropdown-panel-shadow-default (reused, topbar-specific offset) */
+
+  /* Colors — Table */
+  --color-table-border: #f4f4f4;            /* color/interactive-list-divider-on-surface */
+  --color-table-header-surface: #f7f6ff;    /* reuses color/surface-thumbnail (same value) */
+  --color-table-header-label: #5c5c5c;      /* color/text-body-secondary */
+  --color-table-row-highlighted: #fffbf2;   /* ⚠ no token — suggest color/surface-table-row-highlighted */
+
+  /* Size — Spacing (component) */
+  --space-gap-xs: 4px;
+  --space-gap-sm: 8px;
+  --space-gap-md: 12px;
+  --space-gap-lg: 16px;
+  --space-pad-sm: 8px;
+  --space-pad-md: 12px;
+  --space-pad-lg: 16px;
+  --space-pad-xl: 24px;
+  --space-pad-2xl: 32px; /* size/space-component-padding-2xl */
+
+  /* Size — Spacing (layout) */
+  --space-section-gap-sm: 16px;
+  --space-section-gap-md: 24px;
+
+  /* Size — Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Size — Component heights */
+  --height-sm: 28px;
+  --height-md: 32px;
+  --height-lg: 40px;
+  --height-xl: 48px;
+  --height-2xl: 56px;
+  --height-3xl: 64px; /* size/component-height-3xl */
+
+  /* Size — Icons */
+  --icon-xs: 12px;   /* size/component-icon-xs */
+  --icon-sm: 16px;   /* size/component-icon-sm */
+  --icon-md: 20px;   /* ⚠ no token — suggest size/component-icon-nav: 20 */
+  --icon-lg: 24px;   /* size/component-icon-md */
+
+  /* Size — Borders */
+  --border-sm: 1px;  /* size/border-sm */
+  --border-md: 2px;  /* size/border-md */
+
+  /* Size — Widths */
+  --width-sidebar: 260px;
+  --width-modal-sm: 432px; /* size/component-width-modal-sm */
+
+  /* Typography */
+  --font-body: 'Roboto', sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 600;
+
+  --type-xxs-size: 10px; /* size/typography-xxs-font-size */
+  --type-xxs-lh: 14px;   /* size/typography-xxs-line-height */
+  --type-xs-size: 12px;
+  --type-xs-lh: 16px;
+  --type-sm-size: 14px;
+  --type-sm-lh: 20px;
+  --type-md-size: 16px;
+  --type-md-lh: 22px;
+  --type-lg-size: 20px;
+  --type-lg-lh: 28px;
+  --type-xl-size: 24px;
+  --type-xl-lh: 28px;
+
+  /* Motion */
+  --duration-fast: 100ms;
+  --duration-normal: 200ms;
+}
+
+/* ─── Reset & Base ───────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--type-sm-size);
+  line-height: var(--type-sm-lh);
+  color: var(--color-text-body-primary);
+  background: var(--color-surface-page);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* ─── Material Symbols utility ───────────────────────────────────── */
+.icon {
+  font-family: 'Material Symbols Rounded';
+  font-weight: normal;
+  font-style: normal;
+  font-size: var(--icon-md);
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+  flex-shrink: 0;
+}
+
+.icon--filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.icon--sm {
+  font-size: var(--icon-sm);
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+}
+
+.icon--xs {
+  font-size: var(--icon-xs); /* size/component-icon-xs */
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+}
+
+.icon--lg {
+  font-size: var(--icon-lg); /* size/component-icon-md (--icon-md is already used for nav at 20px) */
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+}

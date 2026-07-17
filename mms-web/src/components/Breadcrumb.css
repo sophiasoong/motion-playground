@@ -1,0 +1,68 @@
+/*
+ * Tokens used in this component
+ * ─────────────────────────────────────────────────────────────────────
+ * CSS variable                              Token
+ * ─────────────────────────────────────────────────────────────────────
+ * --color-breadcrumb-item-label-default     color/interactive-breadcrumb-item-label-default
+ * --color-breadcrumb-item-label-hover       color/interactive-breadcrumb-item-label-hover
+ * --color-text-body-primary                 color/text-body-primary
+ * --color-text-body-secondary               color/text-body-secondary
+ * --space-gap-xs                            size/space-component-gap-xs  (4px — item horiz padding)
+ * --space-pad-sm                            size/space-component-padding-sm (8px — separator horiz padding)
+ * --height-xs                               size/component-height-xs (24px)
+ * --type-sm-size                            size/typography-sm-font-size
+ * --type-sm-lh                              size/typography-sm-line-height
+ * --font-weight-regular                     font/english/typography-font-weight-regular
+ * --duration-fast                           motion/duration-fast
+ */
+
+/* ── Container ───────────────────────────────────────────────────── */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  height: 24px;                        /* size/component-height-xs */
+}
+
+/* ── Crumb item ──────────────────────────────────────────────────── */
+
+.breadcrumb__crumb {
+  display: flex;
+  align-items: center;
+  padding: 2px var(--space-gap-xs);    /* 2px vertical, 4px horizontal (size/space-component-gap-xs) */
+  font-size: var(--type-sm-size);      /* size/typography-sm-font-size */
+  line-height: var(--type-sm-lh);      /* size/typography-sm-line-height */
+  font-weight: var(--font-weight-regular); /* font/english/typography-font-weight-regular */
+  white-space: nowrap;
+}
+
+.breadcrumb__crumb--link {
+  color: var(--color-breadcrumb-item-label-default); /* color/interactive-breadcrumb-item-label-default */
+  cursor: pointer;
+  transition: color var(--duration-fast) ease;
+}
+
+.breadcrumb__crumb--link:hover {
+  color: var(--color-breadcrumb-item-label-hover);   /* color/interactive-breadcrumb-item-label-hover */
+}
+
+.breadcrumb__crumb--active {
+  color: var(--color-text-body-primary);             /* color/text-body-primary */
+}
+
+/* ── Separator ───────────────────────────────────────────────────── */
+
+.breadcrumb__sep {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;                        /* size/component-height-xs */
+  padding: 0 var(--space-pad-sm);      /* size/space-component-padding-sm (8px) */
+  font-size: var(--type-sm-size);      /* size/typography-sm-font-size */
+  line-height: 1.2;
+  color: var(--color-text-body-secondary); /* color/text-body-secondary */
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-regular);
+  overflow: hidden;
+  flex-shrink: 0;
+}

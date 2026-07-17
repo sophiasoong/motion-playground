@@ -1,0 +1,64 @@
+/*
+ * Tokens used in this component
+ * ─────────────────────────────────────────────────────────────────────
+ * CSS variable                          Token
+ * ─────────────────────────────────────────────────────────────────────
+ * --color-text-body-secondary           color/text-body-secondary
+ * --color-text-link                     color/text-link
+ * --color-button-primary-bg             color/interactive-button-surface-primary-solid-default
+ * --color-button-primary-bg-hover       color/interactive-button-surface-primary-solid-hover
+ * --color-button-primary-label          color/interactive-button-label-primary-solid-default
+ * --space-gap-xs
+ * --height-md
+ * --space-pad-md
+ * --radius-md
+ * --type-sm-size / --type-sm-lh
+ * --font-weight-medium
+ * --duration-fast
+ */
+
+.brand-submitted-modal__desc {
+  font-family: var(--font-body);
+  font-size: var(--type-sm-size);
+  line-height: var(--type-sm-lh);
+  color: var(--color-text-body-secondary);   /* color/text-body-secondary */
+}
+
+.brand-submitted-modal__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-gap-xs);
+  margin-top: var(--space-gap-xs);
+  color: var(--color-text-link);   /* color/text-link */
+  font-family: var(--font-body);
+  font-size: var(--type-sm-size);
+  line-height: var(--type-sm-lh);
+  text-decoration: none;
+}
+
+.brand-submitted-modal__link:hover {
+  text-decoration: underline;
+}
+
+.brand-submitted-modal__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--height-md);
+  padding: 0 var(--space-pad-md);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-button-primary-bg);     /* interactive/button/surface/primary/solid/default */
+  color: var(--color-button-primary-label);        /* interactive/button/label/primary/solid/default */
+  font-family: var(--font-body);
+  font-size: var(--type-sm-size);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--type-sm-lh);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--duration-fast) ease;
+}
+
+.brand-submitted-modal__btn:hover {
+  background: var(--color-button-primary-bg-hover);  /* interactive/button/surface/primary/solid/hover */
+}
