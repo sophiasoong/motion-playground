@@ -42,6 +42,7 @@
  * --font-weight-medium                  font/english/typography-font-weight-medium
  * --font-weight-regular                 font/english/typography-font-weight-regular
  * --duration-fast                       motion/duration-fast
+ * --duration-slow                       motion/duration-slow
  */
 
 /* ── Sidebar shell ────────────────────────────────────────────────── */
@@ -56,6 +57,13 @@
   padding: 0 var(--space-pad-md);           /* size/space-component-padding-md */
   overflow-y: auto;
   overflow-x: hidden;
+  transition: width var(--duration-slow) ease; /* motion/duration-slow */
+}
+
+.sidebar--collapsed {
+  width: 0;
+  padding: 0;
+  border: none;
 }
 
 /* ── Section ─────────────────────────────────────────────────────── */

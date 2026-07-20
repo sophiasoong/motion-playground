@@ -75,7 +75,11 @@ interface FlyoutState {
   label: string;
 }
 
-export default function Sidebar() {
+interface SidebarProps {
+  collapsed: boolean;
+}
+
+export default function Sidebar({ collapsed }: SidebarProps) {
   const [activeId, setActiveId] = useState('order-management');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
     main: true,
@@ -126,7 +130,7 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside className="sidebar">
+      <aside className={`sidebar${collapsed ? ' sidebar--collapsed' : ''}`}>
         {SECTIONS.map(section => (
           <div key={section.id} className="sidebar__section">
             <button

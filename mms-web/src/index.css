@@ -189,6 +189,7 @@
   /* Motion */
   --duration-fast: 100ms;
   --duration-normal: 200ms;
+  --duration-slow: 300ms;  /* motion/duration-slow */
 }
 
 /* ─── Reset & Base ───────────────────────────────────────────────── */
