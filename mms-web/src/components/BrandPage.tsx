@@ -56,10 +56,10 @@ const COLUMNS: TableColumn<Brand>[] = [
 
 const SCOPE_OPTIONS = [
   { value: 'code', label: 'Brand Code' },
-  { value: 'nameEn', label: 'Brand Name (English)' },
-  { value: 'nameZh', label: 'Brand Name (Chinese)' },
-  { value: 'nameZhSimpl', label: 'Brand Name (Simpl. Chinese)' },
+  { value: 'name', label: 'Brand Name' },
 ] as const;
+
+const NAME_SEARCH_KEYS = ['nameEn', 'nameZh', 'nameZhSimpl'] as const satisfies readonly (keyof Brand)[];
 
 const STATUS_OPTIONS = [
   { value: 'New', label: 'New' },
@@ -91,7 +91,9 @@ export default function BrandPage() {
   const filteredBrands = useMemo(() => {
     return brandList.filter(brand => {
       const matchesQuery = applied.query
-        ? String(brand[applied.scope as keyof Brand]).toLowerCase().includes(applied.query.toLowerCase())
+        ? applied.scope === 'name'
+          ? NAME_SEARCH_KEYS.some(key => brand[key].toLowerCase().includes(applied.query.toLowerCase()))
+          : String(brand[applied.scope as keyof Brand]).toLowerCase().includes(applied.query.toLowerCase())
         : true;
       const matchesStatus = applied.status ? brand.status === applied.status : true;
       return matchesQuery && matchesStatus;

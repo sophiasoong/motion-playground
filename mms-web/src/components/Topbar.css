@@ -28,6 +28,7 @@
  * --color-input-border-default          color/interactive-searchbar-border-default
  * --color-input-placeholder             color/interactive-searchbar-placeholder-default
  * --color-brand-success                 color/brand-success
+ * --type-xxs-size / --font-weight-medium (mode toggle labels)
  */
 
 .topbar {
@@ -324,6 +325,38 @@
 
 .topbar__lang-btn:hover {
   background: var(--color-surface-hover-neutral);
+}
+
+/* ── Color mode toggle ── */
+.topbar__mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  height: 24px; /* ⚠ no --height-* token matches 24px, matches sibling controls in this row */
+  padding: 2px;
+  gap: 2px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--color-chip-surface-default);   /* color/interactive-filter-chip-surface-default */
+  cursor: pointer;
+}
+
+.topbar__mode-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  padding: 0 var(--space-pad-sm);
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: var(--type-xxs-size);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-body-secondary);
+  transition: background var(--duration-fast) ease, color var(--duration-fast) ease;
+}
+
+.topbar__mode-option--active {
+  background: var(--color-brand-primary);
+  color: var(--color-text-heading-on-primary);
 }
 
 /* ── Divider ── */

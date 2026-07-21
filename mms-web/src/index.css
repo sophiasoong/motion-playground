@@ -77,6 +77,9 @@
   --color-modal-surface: #ffffff;     /* color/surface-modal-surface-default */
   --color-divider-light: #f4f4f4;     /* color/global-divider-neutral-light */
 
+  /* Colors — Dialog (alert-style) */
+  --color-card-shadow: #d9d9d9;       /* color/surface-card-shadow-default */
+
   /* Colors — Button (Primary Outline) */
   --color-button-primary-outline-bg: #ffffff;      /* color/interactive-button-surface-primary-outline-default */
   --color-button-primary-outline-border: #5244ee;  /* color/interactive-button-border-primary-outline-default */
@@ -190,6 +193,43 @@
   --duration-fast: 100ms;
   --duration-normal: 200ms;
   --duration-slow: 300ms;  /* motion/duration-slow */
+}
+
+/* ─── Color mode override — MMA ──────────────────────────────────────
+ * :root carries the MMS palette by default. Setting
+ * data-color-mode="mma" on <html> (see src/colorMode.ts) swaps in the
+ * MMA-mode values resolved from tokens.json's color.mma. Only variables
+ * whose MMA value actually differs from MMS are listed here — everything
+ * else falls through to the :root declaration above.
+ * ───────────────────────────────────────────────────────────────── */
+:root[data-color-mode='mma'] {
+  --color-brand-primary: #a47c4e;                          /* color.mma.brandPrimary */
+  --color-button-primary-bg: #a47c4e;                       /* color.mma.interactiveButtonSurfacePrimarySolidDefault */
+  --color-text-link: #8d6341;                                /* color.mma.textLinkDefault */
+  --color-surface-sidebar: #a47c4e;                          /* color.mma.surfaceSidebarSurface */
+  --color-surface-thumbnail: #f7f4ef;                        /* color.mma.surfaceThumbnailSurface */
+  --color-sidebar-item-surface-hover: rgba(141, 99, 65, 1);  /* color.mma.interactiveSidebarItemSurfaceHover */
+  --color-sidebar-item-surface-active: #f7f4ef;              /* color.mma.interactiveSidebarItemSurfaceActive */
+  --color-sidebar-item-label-default: #ece5d5;               /* color.mma.interactiveSidebarItemLabelDefault */
+  --color-sidebar-item-icon-default: #ece5d5;                /* color.mma.interactiveSidebarItemIconDefault */
+  --color-sidebar-item-label-active: #8d6341;                /* color.mma.interactiveSidebarItemLabelActive */
+  --color-sidebar-item-icon-active: #8d6341;                 /* color.mma.interactiveSidebarItemIconActive */
+  --color-input-border-focused: #a47c4e;                     /* color.mma.interactiveInputBorderFocused */
+  --color-button-primary-outline-border: #a47c4e;            /* color.mma.interactiveButtonBorderPrimaryOutlineDefault */
+  --color-button-primary-outline-label: #a47c4e;             /* color.mma.interactiveButtonLabelPrimaryOutlineDefault */
+  --color-chip-border-default: #ece5d5;                      /* color.mma.interactiveFilterChipBorderDefault */
+  --color-chip-border-focused: #a47c4e;                      /* color.mma.interactiveFilterChipBorderFocused */
+  --color-chip-label-default: #a47c4e;                       /* color.mma.interactiveFilterChipLabelDefault */
+  --color-chip-shadow: rgba(164, 124, 78, 0.2);               /* color.mma.interactiveFilterChipShadow */
+  --color-list-item-hover: #eee8dd;                          /* color.mma.interactiveListBackgroundHover */
+  --color-dropdown-option-selected: #eee8dd;                 /* color.mma.interactiveDropdownOptionSurfaceSelected */
+  --color-table-header-surface: #f7f4ef;                     /* color.mma.surfaceTableHeaderSurfaceDefault */
+  --color-chip-surface-default: #f7f4ef;                      /* color.mma.interactiveFilterChipSurfaceDefault */
+  --color-chip-surface-selected: #ece5d5;                     /* color.mma.interactiveFilterChipSurfaceSelected */
+  --color-chip-border-hover: #c5ab7f;                         /* color.mma.interactiveFilterChipBorderHover */
+  --color-button-primary-bg-hover: #c5ab7f;                   /* color.mma.interactiveButtonSurfacePrimarySolidHover */
+  --color-brand-primary-hover: #c5ab7f;                       /* color.mma.interactiveButtonSurfacePrimarySolidHover */
+  --color-input-shadow-focused: rgba(164, 124, 78, 0.2);      /* color.mma.interactiveInputShadowFocused */
 }
 
 /* ─── Reset & Base ───────────────────────────────────────────────── */

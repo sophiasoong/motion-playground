@@ -1,25 +1,44 @@
 import './Topbar.css';
+import type { ColorMode } from '../colorMode';
 
 interface TopbarProps {
   sidebarCollapsed: boolean;
   onToggleSidebar: () => void;
+  colorMode: ColorMode;
+  onToggleColorMode: () => void;
 }
 
-export default function Topbar({ sidebarCollapsed, onToggleSidebar }: TopbarProps) {
+export default function Topbar({ sidebarCollapsed, onToggleSidebar, colorMode, onToggleColorMode }: TopbarProps) {
   return (
     <header className="topbar">
       {/* Brand logo — 260px, aligned with sidebar width. Dark by default, light when sidebar is collapsed */}
       <div className={`topbar__logo-area${sidebarCollapsed ? ' topbar__logo-area--light' : ''}`}>
         {sidebarCollapsed ? (
           <>
-            <img src="/hktv-logo-round.svg" alt="" className="topbar__logo-icon" />
+            <img
+              src={colorMode === 'mma' ? '/mma-icon.png' : '/hktv-logo-round.svg'}
+              alt=""
+              className="topbar__logo-icon"
+            />
             <div className="topbar__logo-text">
-              <img src="/mms-wordmark-merchant.svg" alt="Merchant" className="topbar__logo-title" />
-              <img src="/mms-wordmark-subtitle.svg" alt="Management System" className="topbar__logo-subtitle" />
+              <img
+                src={colorMode === 'mma' ? '/mma-wordmark-merchant.png' : '/mms-wordmark-merchant.svg'}
+                alt="Merchant"
+                className="topbar__logo-title"
+              />
+              <img
+                src={colorMode === 'mma' ? '/mma-wordmark-subtitle.png' : '/mms-wordmark-subtitle.svg'}
+                alt="Management System"
+                className="topbar__logo-subtitle"
+              />
             </div>
           </>
         ) : (
-          <img src="/mms-logo.png" alt="Merchant Management System" className="topbar__logo-img" />
+          <img
+            src={colorMode === 'mma' ? '/mma-logo.png' : '/mms-logo.png'}
+            alt="Merchant Management System"
+            className="topbar__logo-img"
+          />
         )}
       </div>
 
@@ -75,6 +94,16 @@ export default function Topbar({ sidebarCollapsed, onToggleSidebar }: TopbarProp
           <button className="topbar__lang-btn" aria-label="Language">
             English
             <span className="icon icon--sm topbar__chevron" aria-hidden="true">expand_more</span>
+          </button>
+
+          {/* Color mode toggle */}
+          <button
+            className="topbar__mode-toggle"
+            onClick={onToggleColorMode}
+            aria-label={`Switch to ${colorMode === 'mms' ? 'MMA' : 'MMS'} color mode`}
+          >
+            <span className={`topbar__mode-option${colorMode === 'mms' ? ' topbar__mode-option--active' : ''}`}>MMS</span>
+            <span className={`topbar__mode-option${colorMode === 'mma' ? ' topbar__mode-option--active' : ''}`}>MMA</span>
           </button>
 
           {/* Divider */}

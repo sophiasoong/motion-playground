@@ -1,0 +1,69 @@
+/*
+ * Tokens used in this component
+ * ─────────────────────────────────────────────────────────────────────
+ * CSS variable                          Token
+ * ─────────────────────────────────────────────────────────────────────
+ * --color-overlay                       color/global-overlay-default
+ * --color-modal-surface                 color/surface-card-surface-default
+ * --color-card-shadow                   color/surface-card-shadow-default
+ * --color-text-heading-primary          color/text-heading-primary-neutral
+ * --width-modal-sm                      size/component-width-modal-sm
+ * --space-pad-2xl / --space-gap-lg / --space-gap-sm / --space-gap-md
+ * --radius-md
+ * --type-md-size / --type-md-lh
+ * --font-weight-medium
+ */
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-overlay);   /* color/global-overlay-default */
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-gap-lg);
+  padding: var(--space-pad-2xl);
+  background: var(--color-modal-surface);  /* color/surface-card-surface-default */
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 1px var(--color-card-shadow);  /* color/surface-card-shadow-default */
+}
+
+.dialog--sm {
+  width: var(--width-modal-sm);
+}
+
+.dialog__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-gap-sm);
+  width: 100%;
+}
+
+.dialog__title {
+  width: 100%;
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--type-md-size);
+  line-height: var(--type-md-lh);
+  color: var(--color-text-heading-primary);
+}
+
+.dialog__body {
+  width: 100%;
+}
+
+.dialog__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-gap-md);
+  width: 100%;
+}
