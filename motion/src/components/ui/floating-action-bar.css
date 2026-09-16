@@ -1,0 +1,165 @@
+/* FloatingActionBar — token declarations (tokens.json → CSS custom properties).
+ * Every value used below resolves to one of these. Anything not covered by a
+ * token is marked FLAGGED with the reason. */
+.fab {
+  /* size */
+  --size-component-height-xl: 48px;              /* size/componentHeightXl */
+  --size-component-height-2xl: 56px;             /* size/componentHeight2xl */
+  --size-component-icon-md: 24px;                /* size/componentIconMd */
+  --size-space-component-gap-xs: 4px;            /* size/spaceComponentGapXs */
+  --size-space-component-gap-md: 12px;           /* size/spaceComponentGapMd */
+  --size-space-component-padding-xs: 4px;        /* size/spaceComponentPaddingXs */
+  --size-space-component-padding-lg: 16px;       /* size/spaceComponentPaddingLg */
+  --size-space-layout-section-gap-md: 24px;      /* size/spaceLayoutSectionGapMd */
+  --size-radius-full: 9999px;                    /* size/radiusFull */
+  --size-border-md: 2px;                         /* size/borderMd */
+  --size-typography-xxs-font-size: 10px;         /* size/typographyXxsFontSize */
+  --size-typography-xxs-line-height: 14px;       /* size/typographyXxsLineHeight */
+
+  /* typography */
+  --font-english-typography-font-family-body: "Roboto";  /* font/english/typographyFontFamilyBody */
+  --font-english-typography-font-weight-medium: 500;     /* font/english/typographyFontWeightMedium */
+
+  /* motion */
+  --motion-duration-fast: 100ms;                 /* motion/durationFast */
+  --motion-duration-normal: 200ms;               /* motion/durationNormal */
+
+  /* opacity */
+  --opacity-20: 0.2;                             /* opacity/20 */
+  --opacity-60: 0.6;                             /* opacity/60 */
+
+  /* color */
+  --color-mms-text-heading-on-primary: #ffffff;                 /* color/mms/textHeadingOnPrimary */
+  --color-mms-interactive-input-border-focused: #5244ee;        /* color/mms/interactiveInputBorderFocused */
+  --color-mms-interactive-input-shadow-focused: #5244ee33;      /* color/mms/interactiveInputShadowFocused */
+
+  /* FLAGGED — no token exists for these. */
+  --fab-ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);  /* FLAGGED overshoot for the sliding lens; tokens.json has no easing curves */
+  --fab-z: 10;                                          /* FLAGGED z-index; no layering tokens */
+
+  /* derived */
+  --fab-item-min-w: var(--size-component-height-2xl);
+  --fab-item-h: var(--size-component-height-xl);
+  --fab-item-pad-x: var(--size-space-component-padding-lg);
+  --fab-gap: var(--size-space-component-gap-xs);
+  --fab-ink: var(--color-mms-text-heading-on-primary);
+  --fab-surface: color-mix(in srgb, var(--fab-ink) calc(var(--opacity-20) * 100%), transparent);
+
+  position: fixed;
+  left: 50%;
+  bottom: var(--size-space-layout-section-gap-md);
+  transform: translateX(-50%);
+  z-index: var(--fab-z);
+  display: flex;
+  align-items: center;
+  gap: var(--size-space-component-gap-md);
+  font-family: var(--font-english-typography-font-family-body), system-ui, sans-serif;
+}
+
+/* ---------- bar ---------- */
+.fab__bar {
+  --lq-tint: var(--fab-surface);
+  --lq-tint-deep: var(--fab-surface);
+  position: relative;
+  height: var(--size-component-height-2xl);
+  border-radius: var(--size-radius-full);
+}
+.fab__bar-content {
+  position: relative;
+  /* Equal-width items: every column is 1fr, and under the bar's intrinsic
+   * (shrink-to-fit) sizing each 1fr track resolves to the widest item. */
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  align-items: center;
+  gap: var(--fab-gap);
+  height: 100%;
+  padding: var(--size-space-component-padding-xs);
+}
+
+/* ---------- lens (selection indicator) ---------- */
+.fab__lens {
+  --lq-tint: var(--fab-surface);
+  --lq-tint-deep: var(--fab-surface);
+  position: absolute;
+  top: var(--size-space-component-padding-xs);
+  left: 0;
+  width: var(--fab-lens-w, var(--fab-item-min-w));
+  height: var(--fab-item-h);
+  border-radius: var(--size-radius-full);
+  pointer-events: none;
+  /* Items share one width (widest label + 16px side padding), which the lens
+   * takes from the measured selected item; x slides on transform. */
+  transform: translateX(var(--fab-lens-x, var(--size-space-component-padding-xs)));
+  transition:
+    transform var(--motion-duration-normal) var(--fab-ease-spring),
+    width var(--motion-duration-normal) var(--fab-ease-spring);
+}
+
+/* ---------- items ---------- */
+.fab__item {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--fab-item-min-w);
+  height: var(--fab-item-h);
+  padding: 0 var(--fab-item-pad-x);
+  border: 0;
+  border-radius: var(--size-radius-full);
+  background: transparent;
+  color: var(--fab-ink);
+  opacity: var(--opacity-60);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    opacity var(--motion-duration-fast) ease-out,
+    transform var(--motion-duration-normal) var(--fab-ease-spring);
+}
+.fab__item:hover,
+.fab__item[data-selected="true"] {
+  opacity: 1;
+}
+.fab__item:active {
+  transform: scale(0.94);
+}
+.fab__item:focus-visible {
+  outline: var(--size-border-md) solid var(--color-mms-interactive-input-border-focused);
+  outline-offset: var(--size-border-md);
+  box-shadow: 0 0 0 var(--size-border-md) var(--color-mms-interactive-input-shadow-focused);
+}
+
+.fab__icon {
+  font-family: "Material Symbols Rounded";
+  font-size: var(--size-component-icon-md);
+  line-height: 1;
+  font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
+  transition: font-variation-settings var(--motion-duration-normal) ease-out;
+}
+.fab__item[data-selected="true"] .fab__icon {
+  font-variation-settings: "FILL" 1, "wght" 500, "GRAD" 0, "opsz" 24;
+}
+
+.fab__label {
+  font-size: var(--size-typography-xxs-font-size);
+  line-height: var(--size-typography-xxs-line-height);
+  font-weight: var(--font-english-typography-font-weight-medium);
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+/* ---------- detached action slot ---------- */
+.fab__action {
+  display: flex;
+  align-items: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fab__lens,
+  .fab__item,
+  .fab__icon {
+    transition: none;
+  }
+}

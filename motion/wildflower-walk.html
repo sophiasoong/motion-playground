@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Wildflower Walk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Playfair:opsz,wght@5..1200,400&family=GFS+Didot&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+<!--
+  Wildflower walk — M3 hero carousel with a masked, spring-snapped drag.
+  Figma: r8MI9SosgRWLnZ9fnpXCmO  · Screen 1 = 48:12637 (item 1 active) · Screen 2 = 50:14465 (item 2 active)
+
+  Motion: measured frame-by-frame from moia3ex3-blog_video3.mp4 (30fps). The gap between the two
+  photos travels from rest to rest in ~0.9s with no overshoot; a critically damped spring,
+  ω = 9 rad/s (stiffness 81, damping 18, mass 1), reproduces the measured curve to within 0.3%.
+  Photos keep their full large-item size and stay centred inside a shrinking/growing rounded
+  mask, so they slide past each other with a gentle parallax instead of squashing.
+-->
+<style>
+  :root {
+    /* ---- tokens.json ---- */
+    --size-space-component-padding-lg: 16px;    /* size/spaceComponentPaddingLg — screen gutter, carousel side padding */
+    --size-space-component-padding-xl: 24px;    /* size/spaceComponentPaddingXl — status bar side padding */
+    --size-space-component-gap-sm: 8px;         /* size/spaceComponentGapSm — carousel item gap, carousel top/bottom padding */
+    --size-space-component-gap-xs: 4px;         /* size/spaceComponentGapXs — status bar → controls, headline → date */
+    --size-space-component-gap-lg: 16px;        /* size/spaceComponentGapLg — date → carousel, between journal blocks */
+    --size-space-layout-section-gap-md: 24px;   /* size/spaceLayoutSectionGapMd — carousel → journal text */
+    --size-component-height-xs: 24px;           /* size/componentHeightXs — gesture-nav bar, camera cutout */
+    --size-component-height-xl: 48px;           /* size/componentHeightXl — icon-button touch target */
+    --size-component-icon-md: 24px;             /* size/componentIconMd — icon-button glyph */
+    --size-component-height-md: 32px;           /* size/componentHeightMd — icon-button container width */
+    --size-component-height-lg: 40px;           /* size/componentHeightLg — icon-button container height */
+    --size-radius-full: 9999px;                 /* size/radiusFull — icon-button container, nav handle */
+    --size-typography-xs-font-size: 12px;       /* size/typographyXsFontSize — presentation hint */
+    --size-typography-sm-font-size: 14px;       /* size/typographySmFontSize — status time, date (= M3 body-medium size) */
+    --size-typography-sm-line-height: 20px;     /* size/typographySmLineHeight — status time, date (= M3 body-medium line) */
+    --font-english-typography-font-family-body: "Roboto", system-ui, sans-serif;  /* font/english/typographyFontFamilyBody — status bar */
+    --font-english-typography-font-weight-regular: 400;                           /* font/english/typographyFontWeightRegular */
+    --font-english-typography-font-weight-medium: 500;                            /* font/english/typographyFontWeightMedium */
+    --motion-duration-fast: 100ms;              /* motion/durationFast — icon-button state layer */
+
+    /* ---- ⚠ Not in tokens.json — taken from the Figma M3 file (flagged, not guessed) ---- */
+    --wf-font-headline: Didot, "GFS Didot", "Bodoni 72", serif;  /* Figma headline font "Didot Regular" (macOS system font; GFS Didot web fallback) */
+    --wf-font-text: "Playfair", Georgia, serif; /* Figma date + journal font "Playfair Regular" */
+    --wf-font-text-variation: "opsz" 12, "wdth" 100; /* Figma Playfair axes */
+    --m3-surface: #fcf5fd;                      /* Figma frame fill (M3 surface) */
+    --m3-on-surface: #1d1b20;                   /* Schemes/On Surface — status bar, nav handle */
+    --wf-headline-color: #1c1b1f;               /* Figma headline fill */
+    --m3-on-surface-variant: #49454f;           /* Figma date + journal text colour (M3 on-surface-variant) */
+    --m3-secondary-container: #e8def8;          /* M3/sys/light/secondary-container — tonal button, illustration shape */
+    --m3-on-secondary-container: #4a4459;       /* M3/sys/light/on-secondary-container */
+    --m3-state-hover: 8%;                       /* M3 hover state-layer opacity */
+    --m3-corner-extra-large: 28px;              /* Corner/Extra-large — carousel items */
+    --m3-headline-large-size: 32px;             /* Static/Headline Large/Size */
+    --m3-headline-large-line: 40px;             /* Static/Headline Large/Line Height */
+    --m3-body-medium-tracking: 0.25px;          /* Static/Body Medium/Tracking */
+    --m3-body-large-size: 16px;                 /* Static/Body Large/Size */
+    --m3-body-large-line: 24px;                 /* Static/Body Large/Line Height (tokens' typographyMdLineHeight is 22) */
+    --m3-body-large-tracking: 0.5px;            /* Static/Body Large/Tracking */
+    --m3-status-time-tracking: 0.14px;          /* status-bar time tracking */
+    --wf-screen-width: 412px;                   /* Figma frame "Android Compact" width */
+    --wf-screen-height: 917px;                  /* Figma frame "Android Compact" height */
+    --wf-status-bar-height: 52px;               /* Building Blocks/status-bar height */
+    --wf-status-bar-padding-block: 10px;        /* Building Blocks/status-bar vertical padding */
+    --wf-status-icon: 17px;                     /* status-bar wifi / signal glyphs */
+    --wf-nav-handle-width: 108px;               /* Building Blocks/navigation handle */
+    --wf-nav-handle-height: 4px;                /* Building Blocks/navigation handle */
+    --wf-carousel-height: 221px;                /* Figma Carousel (50:14498) height, incl. 8px top/bottom padding */
+    --wf-carousel-item-small: 56px;             /* Figma Item-2 width — the collapsed "peek" item */
+    --wf-gap-title: 6px;                        /* top-controls → headline box (y 104 → 110) */
+    --wf-figure-size: 167px;                    /* Shape Set (50:14538) */
+    --wf-sketch-scale: 109.2%;                  /* lupine.png scallop (84.1% of the image) → Figma scallop (91.8% of the box) */
+    --wf-figure-gap: 10px;                      /* illustration → side paragraph (380 − 167 − 203) */
+    --wf-page-canvas: #e7e1ec;                  /* presentation backdrop behind the device (not part of the design) */
+    --wf-page-hint: #6d6577;                    /* presentation hint text (not part of the design) */
+    --wf-device-shadow: 0 1px 2px rgb(0 0 0 / .06), 0 12px 40px rgb(40 20 60 / .14); /* presentation device shadow */
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--wf-page-canvas);
+    font-family: var(--font-english-typography-font-family-body);
+    display: grid;
+    place-items: center;
+    gap: var(--size-space-component-padding-lg);
+    padding-block: var(--size-space-component-padding-lg);
+    padding-inline: var(--size-space-component-padding-lg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Screen ---------- */
+  .screen {
+    position: relative;
+    width: var(--wf-screen-width);
+    max-width: 100%;
+    height: var(--wf-screen-height);
+    background: var(--m3-surface);
+    overflow: hidden;
+    border-radius: var(--m3-corner-extra-large);
+    box-shadow: var(--wf-device-shadow);
+    display: flex;
+    flex-direction: column;
+  }
+  /* Everything between the status bar and gesture bar scrolls; the carousel keeps horizontal. */
+  .content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    padding-bottom: var(--size-space-layout-section-gap-md);
+  }
+  .content::-webkit-scrollbar { display: none; }
+
+  /* Status bar */
+  .status-bar {
+    position: relative;
+    flex: none;
+    height: var(--wf-status-bar-height);
+    padding: var(--wf-status-bar-padding-block) var(--size-space-component-padding-xl);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    color: var(--m3-on-surface);
+    font-family: var(--font-english-typography-font-family-body);
+    font-size: var(--size-typography-sm-font-size);
+    line-height: var(--size-typography-sm-line-height);
+    font-weight: var(--font-english-typography-font-weight-medium);
+    letter-spacing: var(--m3-status-time-tracking);
+  }
+  .status-bar .camera {
+    position: absolute;
+    left: 50%;
+    top: calc(var(--wf-status-bar-height) - var(--wf-status-bar-padding-block) - var(--size-component-height-xs));
+    width: var(--size-component-height-xs);
+    height: var(--size-component-height-xs);
+    border-radius: var(--size-radius-full);
+    background: var(--m3-on-surface);
+    transform: translateX(-50%);
+  }
+  .status-icons { display: block; height: var(--wf-status-icon); width: auto; }
+
+  /* Gesture navigation bar */
+  .nav-bar {
+    flex: none;
+    height: var(--size-component-height-xs);
+    display: grid;
+    place-items: center;
+  }
+  .nav-bar::before {
+    content: "";
+    width: var(--wf-nav-handle-width);
+    height: var(--wf-nav-handle-height);
+    border-radius: var(--size-radius-full);
+    background: var(--m3-on-surface);
+  }
+
+  /* Top controls */
+  .top-controls {
+    margin-top: var(--size-space-component-gap-xs);
+    padding-inline: var(--size-space-component-padding-lg);
+    display: flex;
+    justify-content: space-between;
+  }
+  .icon-button {
+    width: var(--size-component-height-xl);
+    height: var(--size-component-height-xl);
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    color: var(--m3-on-secondary-container);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .icon-button .container {
+    position: relative;
+    width: var(--size-component-height-md);
+    height: var(--size-component-height-lg);
+    border-radius: var(--size-radius-full);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .icon-button .container::after {            /* M3 state layer */
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+    opacity: 0;
+    transition: opacity var(--motion-duration-fast) linear;
+  }
+  .icon-button:hover .container::after { opacity: var(--m3-state-hover); }
+  .icon-button:focus-visible { outline: none; }
+  .icon-button:focus-visible .container { outline: 2px solid var(--m3-on-secondary-container); outline-offset: 2px; }
+  .icon-button.tonal .container { background: var(--m3-secondary-container); }
+  .material-symbols-rounded {
+    font-family: "Material Symbols Rounded";
+    font-size: var(--size-component-icon-md);
+    font-weight: var(--font-english-typography-font-weight-regular);
+    line-height: 1;
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    user-select: none;
+  }
+
+  /* Text */
+  .headline {
+    margin: var(--wf-gap-title) 0 0;
+    padding-inline: var(--size-space-component-padding-lg);
+    color: var(--wf-headline-color);
+    font-family: var(--wf-font-headline);
+    font-size: var(--m3-headline-large-size);
+    line-height: var(--m3-headline-large-line);
+    font-weight: var(--font-english-typography-font-weight-regular);
+  }
+  .date {
+    display: block;
+    margin: var(--size-space-component-gap-xs) 0 0;
+    padding-inline: var(--size-space-component-padding-lg);
+    color: var(--m3-on-surface-variant);
+    font-family: var(--wf-font-text);
+    font-variation-settings: var(--wf-font-text-variation);
+    font-size: var(--size-typography-sm-font-size);
+    line-height: var(--size-typography-sm-line-height);
+    letter-spacing: var(--m3-body-medium-tracking);
+  }
+
+  /* Journal text */
+  .journal {
+    margin-top: var(--size-space-layout-section-gap-md);
+    padding-inline: var(--size-space-component-padding-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-space-component-gap-lg);
+    color: var(--m3-on-surface-variant);
+    font-family: var(--wf-font-text);
+    font-variation-settings: var(--wf-font-text-variation);
+    font-size: var(--m3-body-large-size);
+    line-height: var(--m3-body-large-line);
+    letter-spacing: var(--m3-body-large-tracking);
+  }
+  .journal p { margin: 0; }
+  .journal-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wf-figure-gap);
+  }
+  .journal-row p { flex: 1; min-width: 0; }
+  .sketch {
+    position: relative;
+    flex: none;
+    width: var(--wf-figure-size);
+    height: var(--wf-figure-size);
+    margin: 0;
+  }
+  .sketch img {
+    /* Artwork includes its own scallop, which fills 673 of 800 px (84.1%). Scale it so the scallop
+       matches Figma's Shape Set (153.3 of 167 px); the transparent margin overhangs the box. */
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--wf-sketch-scale);
+    height: var(--wf-sketch-scale);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    -webkit-user-drag: none;
+  }
+
+  /* ---------- Carousel ---------- */
+  .carousel {
+    margin-top: var(--size-space-component-gap-lg);
+    height: var(--wf-carousel-height);
+    padding: var(--size-space-component-gap-sm) var(--size-space-component-padding-lg);
+    display: flex;
+    overflow: hidden;
+    touch-action: pan-y;             /* we own horizontal gestures; vertical still scrolls the page */
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: grab;
+    outline: none;
+  }
+  .carousel.is-dragging { cursor: grabbing; }
+  .carousel:focus-visible .carousel-item.is-active { outline: 2px solid var(--m3-on-secondary-container); outline-offset: 2px; }
+
+  .carousel-track {
+    display: flex;
+    height: 100%;
+    will-change: transform;
+  }
+  .carousel-item {
+    position: relative;
+    flex: none;
+    height: 100%;
+    border-radius: var(--m3-corner-extra-large);
+    overflow: hidden;                /* the mask */
+    width: var(--wf-carousel-item-small);
+    contain: paint;
+  }
+  .carousel-item img {
+    /* Full large-item size, centred in the mask → parallax slide rather than squash. */
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: var(--full, 100%);
+    height: 100%;
+    object-fit: cover;
+    transform: translateX(-50%);
+    pointer-events: none;
+    -webkit-user-drag: none;
+  }
+
+  /* ---------- Presentation hint ---------- */
+  .hint {
+    margin: 0;
+    color: var(--wf-page-hint);
+    font-size: var(--size-typography-xs-font-size);
+    letter-spacing: var(--m3-body-medium-tracking);
+    text-align: center;
+  }
+  kbd {
+    font: inherit;
+    padding-inline: var(--size-space-component-gap-xs);
+    border-radius: var(--size-space-component-gap-xs);
+    background: var(--m3-surface);
+  }
+
+  /* Phone-width viewers: the page *is* the device. */
+  @media (max-width: 443px) {
+    body { padding: 0; place-items: stretch; background: var(--m3-surface); }
+    .screen { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
+    .hint { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<main class="screen" data-node-id="48:12637">
+  <div class="status-bar" aria-hidden="true" data-node-id="63:14557">
+    <span>9:30</span>
+    <span class="camera"></span>
+    <!-- Wifi · Signal · Battery, placed as in Figma's "right icons" group (0 / 16 / 38) -->
+    <svg class="status-icons" viewBox="0 0 46 17" fill="currentColor">
+      <path opacity=".1" d="M8.5 1.41667C5.1 1.41667 2.125 2.90417 0 5.24167L8.5 15.5833L17 5.24167C14.875 2.90417 11.9 1.41667 8.5 1.41667Z"/>
+      <path transform="translate(16 0)" d="M15.5833 1.41667L1.41667 15.5833H15.5833V1.41667Z"/>
+      <g transform="translate(38 1)">
+        <path opacity=".3" d="M5.5 0H2.5V1.5H1C.447715 1.5 0 2.00368 0 2.625V13.875C0 14.4963.447715 15 1 15H7C7.55228 15 8 14.4963 8 13.875V2.625C8 2.00368 7.55228 1.5 7 1.5H5.5V0Z"/>
+        <path d="M0 8V13.95C0 14.5299.447715 15 1 15H7C7.55228 15 8 14.5299 8 13.95V8H0Z"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="content">
+  <nav class="top-controls">
+    <button class="icon-button" type="button" aria-label="Back">
+      <span class="container"><span class="material-symbols-rounded" aria-hidden="true">arrow_back</span></span>
+    </button>
+    <button class="icon-button tonal" type="button" aria-label="Edit entry">
+      <span class="container"><span class="material-symbols-rounded" aria-hidden="true">edit</span></span>
+    </button>
+  </nav>
+
+  <h1 class="headline">Wildflower walk</h1>
+  <time class="date" datetime="2026-09-15">Tuesday, Sep 15, 2026</time>
+
+  <section class="carousel" tabindex="0" aria-roledescription="carousel" aria-label="Photos from the walk. Use left and right arrow keys to browse.">
+    <div class="carousel-track">
+      <div class="carousel-item" role="group" aria-roledescription="slide" aria-label="1 of 2">
+        <img src="wildflower/blossom.jpg" alt="Pink cherry blossoms and fresh green leaves against a pale blue sky" draggable="false" />
+      </div>
+      <div class="carousel-item" role="group" aria-roledescription="slide" aria-label="2 of 2">
+        <img src="wildflower/flowers.jpg" alt="Roses, daisies and small wildflowers floating against a soft cream background" draggable="false" />
+      </div>
+    </div>
+  </section>
+
+  <article class="journal" data-node-id="63:14579">
+    <p>Went for a walk in Miller Park today. Needed to get out of the house, and it was actually pretty nice out. Plus, I wanted to see if any wildflowers were popping up.</p>
+    <div class="journal-row">
+      <figure class="sketch" data-node-id="50:14541">
+        <img src="wildflower/lupine.png" alt="Pencil sketch of a lupine on a lavender scalloped shape" draggable="false" />
+      </figure>
+      <p>I ended up finding a few patches of lupine and a single purple iris tucked away near the creek. The light was soft, so I snapped a few photos to use later when I’m painting.</p>
+    </div>
+    <p>Today the creek was louder than the birds, which surprised me. I stood still for a minute near the bend where the water slows down, and the sound of the current became a steady hum. A red-winged blackbird called out from the reeds, and for a few seconds, everything else went quiet. It was the kind of stillness that feels like a pause, not an absence of sound. I noticed how the light changed when the breeze picked up—shifting from warm to cool in a way that made the whole walk feel more alive.</p>
+  </article>
+  </div>
+
+  <div class="nav-bar" aria-hidden="true" data-node-id="63:14574"></div>
+</main>
+
+<p class="hint">Drag or flick the photos · tap the small one · <kbd>←</kbd> <kbd>→</kbd> when focused</p>
+
+<script>
+(() => {
+  const carousel = document.querySelector(".carousel");
+  const track = carousel.querySelector(".carousel-track");
+  const items = [...track.querySelectorAll(".carousel-item")];
+  const n = items.length;
+  const last = n - 1;
+
+  /* Spring fitted to the reference video: critically damped, ω = 9 rad/s (k 81, c 18, m 1). */
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  const omega = () => (reduceMotion.matches ? 30 : 9);
+
+  const FLICK_PX_PER_S = 400;   // release speed that always advances one photo
+  const DRAG_SLOP_PX = 6;       // movement before we decide horizontal vs vertical
+  const EDGE_RESIST = 2, EDGE_MAX = 0.18; // rubber-band past the first/last photo, in item units
+
+  // Geometry — derived from the live container so it holds at any screen width (412 → L 316 / S 56).
+  let L = 0, S = 0, gap = 0, step = 1;
+  function measure() {
+    const cs = getComputedStyle(carousel);
+    const inner = carousel.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    S = parseFloat(cs.getPropertyValue("--wf-carousel-item-small"));
+    gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--size-space-component-gap-sm"));
+    L = Math.max(S, inner - gap - S);
+    step = L - S; // the photo boundary moves exactly this far per item → it tracks the finger 1:1
+    for (const it of items) it.style.setProperty("--full", L + "px");
+  }
+
+  // Keylines: widths when item k is active — large, with the neighbour peeking as a small pill.
+  function keyline(k) {
+    const w = new Array(n).fill(0);
+    w[k] = L;
+    if (k < last) w[k + 1] = S;
+    else if (k > 0) w[k - 1] = S;
+    return w;
+  }
+
+  let pos = 0;          // continuous position, in items (0 = first photo active)
+  let active = 0;       // settled index
+
+  function render() {
+    const c = Math.min(Math.max(pos, 0), last);
+    const k = Math.min(Math.floor(c), Math.max(last - 1, 0));
+    const t = c - k;
+    const a = keyline(k), b = n > 1 ? keyline(k + 1) : a;
+    const w = a.map((v, i) => v + (b[i] - v) * t);
+
+    items.forEach((it, i) => {
+      it.style.width = w[i].toFixed(2) + "px";
+      it.style.visibility = w[i] < 0.5 ? "hidden" : "";
+      // Gap collapses with a vanishing neighbour so the row always fills the frame.
+      const g = i === 0 ? 0 : gap * Math.min(1, w[i - 1] / S, w[i] / S);
+      it.style.marginLeft = g.toFixed(2) + "px";
+    });
+
+    // Rubber-band: past either end the whole row drifts, resisted, and springs back.
+    const over = pos - c;
+    track.style.transform = over ? `translate3d(${(-over * step).toFixed(2)}px,0,0)` : "";
+  }
+
+  /* ---------- Spring (closed-form, frame-rate independent) ---------- */
+  let anim = null;
+  function animateTo(target, v0 = 0) {
+    target = Math.min(Math.max(target, 0), last);
+    const w = omega();
+    const x0 = pos - target;
+    // Critically damped never overshoots from rest; cap incoming fling speed so it can't either.
+    if (Math.sign(v0) === -Math.sign(x0)) v0 = Math.sign(v0) * Math.min(Math.abs(v0), w * Math.abs(x0));
+    else v0 = Math.max(-3, Math.min(3, v0));
+    const start = performance.now();
+    cancelAnimationFrame(anim?.raf);
+    anim = { target };
+    const tick = (now) => {
+      const t = (now - start) / 1000;
+      const e = Math.exp(-w * t);
+      pos = target + (x0 + (v0 + w * x0) * t) * e;
+      const vel = (v0 - w * (v0 + w * x0) * t) * e;
+      anim.vel = vel;
+      if (Math.abs(pos - target) * step < 0.1 && Math.abs(vel) * step < 1) {
+        pos = target; anim = null; render(); settle(target); return;
+      }
+      render();
+      anim.raf = requestAnimationFrame(tick);
+    };
+    anim.raf = requestAnimationFrame(tick);
+  }
+  function stop() { if (anim) { cancelAnimationFrame(anim.raf); anim = null; } }
+
+  function settle(i) {
+    active = i;
+    items.forEach((it, j) => {
+      it.classList.toggle("is-active", j === i);
+      it.setAttribute("aria-current", j === i ? "true" : "false");
+    });
+    document.querySelector(".screen").dataset.nodeId = i === 0 ? "48:12637" : "50:14465";
+  }
+
+  /* ---------- Velocity tracking ---------- */
+  let samples = [];
+  const sample = (t) => { samples.push({ t, p: pos }); while (samples.length > 2 && t - samples[0].t > 100) samples.shift(); };
+  function velocity() { // items per second, over the last ~100ms
+    if (samples.length < 2) return 0;
+    const a = samples[0], b = samples[samples.length - 1];
+    const dt = (b.t - a.t) / 1000;
+    return dt > 0 ? (b.p - a.p) / dt : 0;
+  }
+
+  function resist(raw) {
+    const c = Math.min(Math.max(raw, 0), last);
+    const o = raw - c;
+    if (!o) return raw;
+    return c + Math.sign(o) * EDGE_MAX * (1 - 1 / (Math.abs(o) * EDGE_RESIST / EDGE_MAX + 1));
+  }
+
+  function release(v) {
+    let target;
+    if (Math.abs(v * step) > FLICK_PX_PER_S) target = v > 0 ? Math.floor(pos) + 1 : Math.ceil(pos) - 1;
+    else target = Math.round(pos);
+    animateTo(target, v);
+  }
+
+  /* ---------- Pointer drag ---------- */
+  let drag = null;
+  carousel.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0) return;
+    stop(); // catch the photo mid-flight
+    drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, raw0: pos, dragging: false };
+    samples = []; sample(e.timeStamp);
+  });
+
+  carousel.addEventListener("pointermove", (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+    if (!drag.dragging) {
+      if (Math.abs(dx) < DRAG_SLOP_PX && Math.abs(dy) < DRAG_SLOP_PX) return;
+      if (Math.abs(dy) > Math.abs(dx)) { endDrag(e, true); return; } // vertical — let the page scroll
+      drag.dragging = true;
+      drag.x0 = e.clientX; // start from here so the photo doesn't jump by the slop
+      try { carousel.setPointerCapture(e.pointerId); } catch {} // pointer may already be gone
+      carousel.classList.add("is-dragging");
+      return;
+    }
+    pos = resist(drag.raw0 - (e.clientX - drag.x0) / step);
+    sample(e.timeStamp);
+    render();
+  });
+
+  function endDrag(e, cancelled) {
+    if (!drag || e.pointerId !== drag.id) return;
+    const wasDragging = drag.dragging;
+    drag = null;
+    carousel.classList.remove("is-dragging");
+    if (wasDragging && !cancelled) { sample(e.timeStamp); release(velocity()); return; }
+    // A tap: bring the tapped photo forward (M3 behaviour), or finish an interrupted snap.
+    const hit = !cancelled && e.target.closest?.(".carousel-item");
+    const i = hit ? items.indexOf(hit) : -1;
+    animateTo(i >= 0 ? i : Math.round(pos));
+  }
+  carousel.addEventListener("pointerup", (e) => endDrag(e, false));
+  carousel.addEventListener("pointercancel", (e) => endDrag(e, true));
+  carousel.addEventListener("lostpointercapture", (e) => drag && endDrag(e, false));
+
+  /* ---------- Trackpad horizontal scroll ---------- */
+  let wheelRaw = null, wheelTimer = 0;
+  carousel.addEventListener("wheel", (e) => {
+    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+    e.preventDefault();
+    if (wheelRaw === null) { stop(); wheelRaw = pos; samples = []; }
+    wheelRaw += e.deltaX / step;
+    wheelRaw = Math.min(Math.max(wheelRaw, -0.5), last + 0.5);
+    pos = resist(wheelRaw);
+    sample(e.timeStamp);
+    render();
+    clearTimeout(wheelTimer);
+    wheelTimer = setTimeout(() => { wheelRaw = null; release(velocity() * 0.5); }, 90);
+  }, { passive: false });
+
+  /* ---------- Keyboard ---------- */
+  carousel.addEventListener("keydown", (e) => {
+    const base = anim ? anim.target : active;
+    const to = { ArrowRight: base + 1, ArrowLeft: base - 1, Home: 0, End: last }[e.key];
+    if (to === undefined) return;
+    e.preventDefault();
+    animateTo(to, anim?.vel ?? 0); // retarget mid-flight without a velocity jolt
+  });
+
+  new ResizeObserver(() => { measure(); render(); }).observe(carousel);
+  measure(); render(); settle(0);
+})();
+</script>
+</body>
+</html>

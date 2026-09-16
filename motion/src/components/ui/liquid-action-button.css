@@ -1,0 +1,382 @@
+/* LiquidActionButton — token declarations (tokens.json → CSS custom properties).
+ * Every value used below resolves to one of these. Anything not covered by a
+ * token is marked FLAGGED with the reason. */
+.lab {
+  /* size */
+  --size-component-height-xl: 48px;              /* size/componentHeightXl */
+  --size-component-icon-md: 24px;                /* size/componentIconMd */
+  --size-space-component-gap-xs: 4px;            /* size/spaceComponentGapXs */
+  --size-space-component-gap-sm: 8px;            /* size/spaceComponentGapSm */
+  --size-space-component-gap-md: 12px;           /* size/spaceComponentGapMd */
+  --size-space-component-padding-xs: 4px;        /* size/spaceComponentPaddingXs */
+  --size-space-component-padding-sm: 8px;        /* size/spaceComponentPaddingSm */
+  --size-space-component-padding-md: 12px;       /* size/spaceComponentPaddingMd */
+  --size-radius-full: 9999px;                    /* size/radiusFull */
+  --size-border-md: 2px;                         /* size/borderMd */
+  /* font */
+  --font-english-typography-font-family-body: Roboto;     /* font/english/typographyFontFamilyBody */
+  --font-english-typography-font-weight-medium: 500;      /* font/english/typographyFontWeightMedium */
+  /* motion */
+  --motion-duration-fast: 100ms;                 /* motion/durationFast */
+  --motion-duration-normal: 200ms;               /* motion/durationNormal */
+  --motion-duration-slow: 300ms;                 /* motion/durationSlow */
+  /* opacity */
+  --opacity-20: 0.2;                             /* opacity/20 */
+  --opacity-60: 0.6;                             /* opacity/60 */
+  /* color */
+  --color-mms-brand-primary: #5244ee;                                   /* color/mms/brandPrimary */
+  --color-mms-text-heading-primary: #1e1e1e;                            /* color/mms/textHeadingPrimary */
+  --color-mms-text-heading-on-primary: #ffffff;                         /* color/mms/textHeadingOnPrimary */
+  --color-mms-interactive-input-border-focused: #5244ee;                /* color/mms/interactiveInputBorderFocused */
+  --color-mms-interactive-input-shadow-focused: #5244ee33;              /* color/mms/interactiveInputShadowFocused */
+  --color-mms-interactive-button-surface-primary-ghost-hover: #f7f6ff;  /* color/mms/interactiveButtonSurfacePrimaryGhostHover */
+  --color-mms-interactive-button-icon-primary-ghost-default: #5244ee;    /* color/mms/interactiveButtonIconPrimaryGhostDefault */
+
+  /* FLAGGED — no token exists for these; values come from the reference video.
+   *   easing: tokens.json has durations only, no easing curves.
+   *   glass density: the tint alpha of a liquid-glass surface (liqui's own --lq-tint is 0.48). */
+  --lab-ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);   /* FLAGGED overshoot (option icons) */
+  --lab-ease-sticky: cubic-bezier(0.85, 0, 0.75, 0.6);   /* FLAGGED surface-tension curve: near-still start, rips free, fast finish */
+  --lab-glass-density: 0.55;                            /* FLAGGED tint alpha (tone="primary") */
+  --lab-rim-strength: 0.4;                              /* FLAGGED merged-outline brightness (tone="primary") */
+  --lab-goo-bleed: 24px;                                /* FLAGGED filter overscan so blur isn't clipped */
+  --lab-ripple-scale: 2.6;                              /* FLAGGED ripple ring end size (× trigger) */
+  --lab-ripple-duration: var(--motion-duration-slow);  /* motion/durationSlow */
+  --lab-droplet-seed: 0.5;                              /* FLAGGED droplet scale while inside the trigger */
+  --lab-light-angle: -45deg;                            /* FLAGGED requested key-light angle (tone="glass"); no angle tokens */
+  --lab-light-angle-native: -26.57deg;                  /* liqui's built-in key light: atan2(-0.9, -0.45) from vertical */
+  --lab-glass-rim: 0.1;                                 /* FLAGGED merged-outline opacity (tone="glass"); no opacity/10 token, tokens.json has 0|20|60 */
+
+  /* tone — resolved per instance below (data-tone) */
+  --lab-trigger-fill: var(--color-mms-brand-primary);
+  --lab-trigger-ink: var(--color-mms-text-heading-on-primary);
+  --lab-option-ink: var(--color-mms-interactive-button-icon-primary-ghost-default);
+  --lab-option-hover: var(--color-mms-interactive-button-surface-primary-ghost-hover);
+  --lab-density: var(--lab-glass-density);
+  --lab-rim: var(--lab-rim-strength);
+
+  /* derived */
+  --lab-size: var(--size-component-height-xl);
+  --lab-gap: var(--size-space-component-gap-md);
+  --lab-tray-w: var(--lab-size); /* overwritten by ResizeObserver */
+  /* One clock for everything that is liquid (pill, goo, droplets, glyph). */
+  --lab-liquid-duration: var(--motion-duration-slow);
+  /* Collapsed: the tray's left edge sits on the trigger's centre, scaled to a seed. */
+  --lab-tray-closed: translateX(calc(-1 * (var(--lab-size) / 2 + var(--lab-gap)))) scale(0.1);
+
+  /* The root's footprint is just the trigger circle; the tray is positioned
+     absolutely so the circle never shifts when the pill emerges (as in the
+     reference video). */
+  position: relative;
+  display: inline-block;
+  width: var(--lab-size);
+  height: var(--lab-size);
+  font-family: var(--font-english-typography-font-family-body), system-ui, sans-serif;
+  isolation: isolate;
+}
+/* tone="glass": translucent white surface, fill at opacity/20 and merged
+   outline at 10%, white glyphs on both the trigger and the option buttons. */
+.lab[data-tone="glass"] {
+  --lab-trigger-fill: var(--color-mms-text-heading-on-primary);
+  --lab-trigger-ink: var(--color-mms-text-heading-on-primary);
+  --lab-option-ink: var(--color-mms-text-heading-on-primary);
+  --lab-option-hover: var(--color-mms-text-heading-on-primary);
+  --lab-density: var(--opacity-20);
+  /* Fill at opacity/20, merged outline at 10% (FLAGGED, no token); the
+     refraction/specular optics carry the liquid motion instead of the rim. */
+  --lab-rim: var(--lab-glass-rim);
+}
+
+/* tone="glass" key light. LiquiGlass bakes its light direction into the
+   specular map, so the angle is re-aimed by rotating the specular and shine
+   layers. Exact on the circular trigger only; the pill keeps the native angle
+   (rotating a non-circular rim would misalign it — FLAGGED). */
+.lab[data-tone="glass"] .lab__trigger > .liqui-glass__specular,
+.lab[data-tone="glass"] .lab__trigger > .liqui-glass__shine {
+  transform: rotate(calc(var(--lab-light-angle) - var(--lab-light-angle-native)));
+}
+
+/* ---------- goo layer (tint + merged silhouette) ---------- */
+.lab__defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.lab__goo {
+  position: absolute;
+  top: calc(-1 * var(--lab-goo-bleed));
+  left: calc(-1 * var(--lab-goo-bleed));
+  height: calc(var(--lab-size) + var(--lab-goo-bleed) * 2);
+  /* wide enough for circle + gap + open tray, so the filter region never clips */
+  width: calc(var(--lab-size) + var(--lab-gap) + var(--lab-tray-w) + var(--lab-goo-bleed) * 2);
+  padding: var(--lab-goo-bleed);
+  z-index: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: var(--lab-gap);
+  box-sizing: border-box;
+}
+
+.lab__goo-shape {
+  height: var(--lab-size);
+  border-radius: var(--size-radius-full);
+  flex: none;
+}
+
+.lab__goo-shape--trigger {
+  width: var(--lab-size);
+  background: var(--lab-trigger-fill);
+}
+
+/* ---------- droplets ---------- */
+/* Small blobs of the trigger's liquid that ride with the tray on the same
+   sticky clock: while the pill is still clinging to the circle they stretch
+   the neck between the two, then all of it rips free together and the
+   droplets are swallowed by the pill (open) or the circle (close). Inside
+   either surface they are invisible.
+   Each droplet has its own size (size/spaceComponentGap*), lane
+   (± size/spaceComponentGapXs) and landing point along the tray. */
+.lab__droplet {
+  position: absolute;
+  top: calc(var(--lab-goo-bleed) + var(--lab-size) / 2);
+  left: calc(var(--lab-goo-bleed) + var(--lab-size) / 2);
+  width: var(--lab-drop-size);
+  height: var(--lab-drop-size);
+  margin: calc(-1 * var(--lab-drop-size) / 2);
+  border-radius: var(--size-radius-full);
+  background: var(--lab-trigger-fill);
+  /* open: sit inside the pill at --lab-drop-land (0..1 along its width) */
+  transform:
+    translate(
+      calc(var(--lab-size) / 2 + var(--lab-gap) + var(--lab-tray-w) * var(--lab-drop-land)),
+      var(--lab-drop-lane)
+    )
+    scale(1);
+  transition: transform var(--lab-liquid-duration) var(--lab-ease-sticky);
+}
+.lab__droplet--1 { --lab-drop-size: var(--size-space-component-gap-md); --lab-drop-land: 0.3;  --lab-drop-lane: calc(-1 * var(--size-space-component-gap-xs)); }
+.lab__droplet--2 { --lab-drop-size: var(--size-space-component-gap-sm); --lab-drop-land: 0.55; --lab-drop-lane: var(--size-space-component-gap-xs); }
+.lab__droplet--3 { --lab-drop-size: var(--size-space-component-gap-sm); --lab-drop-land: 0.8;  --lab-drop-lane: 0px; }
+.lab[data-open="false"] .lab__droplet {
+  /* closed: tucked inside the trigger */
+  transform: translate(0px, 0px) scale(var(--lab-droplet-seed));
+  transition: transform var(--lab-liquid-duration) var(--lab-ease-sticky);
+}
+
+.lab__goo-shape--tray {
+  width: var(--lab-tray-w);
+  background: var(--color-mms-text-heading-on-primary);
+}
+
+/* fill and rim share geometry; only their opacity differs */
+.lab__goo--fill {
+  opacity: var(--lab-density);
+}
+.lab__goo--rim {
+  opacity: var(--lab-rim);
+}
+
+/* ---------- glass surfaces ---------- */
+/* The goo layer already paints the tint, so the glass surfaces keep only their
+   backdrop blur / refraction / specular rim. */
+.lab__trigger,
+.lab__tray {
+  --lq-tint: transparent;
+  --lq-tint-deep: transparent;
+  position: relative;
+  z-index: 1;
+  height: var(--lab-size);
+  border-radius: var(--size-radius-full);
+}
+
+.lab__trigger {
+  display: block;
+  width: var(--lab-size);
+  cursor: default;
+  outline: none;
+  user-select: none;
+  color: var(--lab-trigger-ink);
+  transition: transform var(--motion-duration-fast) ease-out;
+}
+.lab__trigger:active,
+.lab__trigger[data-pressed] {
+  transform: scale(0.96);
+}
+.lab__trigger:focus-visible {
+  box-shadow:
+    0 0 0 var(--size-border-md) var(--color-mms-interactive-input-border-focused),
+    0 0 0 calc(var(--size-border-md) * 3) var(--color-mms-interactive-input-shadow-focused);
+}
+
+.lab__trigger-content {
+  display: flex;
+  width: var(--lab-size);
+  height: var(--lab-size);
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  transition: background-color var(--motion-duration-normal) ease-out;
+}
+.lab__trigger:hover .lab__trigger-content {
+  background-color: color-mix(
+    in srgb,
+    var(--color-mms-text-heading-on-primary) calc(var(--opacity-20) * 100%),
+    transparent
+  );
+}
+
+/* ---------- ripple (fires on every open/close) ---------- */
+/* A ring expands from the trigger's centre underneath the glass surfaces and
+   fades out; it remounts on each toggle so the animation always restarts. */
+.lab__ripple {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: var(--size-radius-full);
+  border: var(--size-border-md) solid var(--color-mms-brand-primary);
+  background: color-mix(
+    in srgb,
+    var(--color-mms-brand-primary) calc(var(--opacity-20) * 100%),
+    transparent
+  );
+  pointer-events: none;
+  animation: lab-ripple var(--lab-ripple-duration) ease-out forwards;
+}
+@keyframes lab-ripple {
+  from {
+    transform: scale(1);
+    opacity: var(--opacity-60);
+  }
+  to {
+    transform: scale(var(--lab-ripple-scale));
+    opacity: 0;
+  }
+}
+/* An open instance floats above its neighbours so the tray is never covered. */
+.lab[data-open="true"] {
+  z-index: 1;
+}
+
+.lab__glyph {
+  font-family: "Material Symbols Rounded";
+  font-size: var(--size-component-icon-md);
+  line-height: 1;
+  font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
+  display: inline-block;
+  transition: transform var(--lab-liquid-duration) var(--lab-ease-sticky);
+}
+.lab[data-open="true"] .lab__glyph--trigger {
+  transform: rotate(45deg);
+}
+
+/* ---------- tray (the options pill) ---------- */
+.lab__tray {
+  position: absolute;
+  top: 0;
+  left: calc(100% + var(--lab-gap));
+  transform-origin: left center;
+  will-change: transform;
+}
+.lab__tray-content {
+  display: flex;
+  align-items: center;
+  height: var(--lab-size);
+  gap: var(--size-space-component-gap-xs);
+  padding: 0 var(--size-space-component-padding-sm);
+  border-radius: inherit;
+}
+
+/* Shared motion: goo shape and glass tray animate with identical curves so the
+   silhouette and the lens never drift apart. */
+.lab__goo-shape--tray,
+.lab__tray {
+  transition: transform var(--lab-liquid-duration) var(--lab-ease-sticky);
+}
+.lab[data-open="false"] .lab__goo-shape--tray,
+.lab[data-open="false"] .lab__tray {
+  transform: var(--lab-tray-closed);
+}
+
+/* The lens (blur + refraction + rim) fades at the tail of the collapse so a
+   pin-sized refractor doesn't linger inside the trigger; the goo silhouette
+   carries the melt instead. */
+.lab__tray {
+  opacity: 1;
+  transition:
+    transform var(--lab-liquid-duration) var(--lab-ease-sticky),
+    opacity var(--motion-duration-fast) ease-out;
+}
+.lab[data-open="false"] .lab__tray {
+  opacity: 0;
+  pointer-events: none;
+  /* the lens fades only in the final fast stretch of the collapse */
+  transition:
+    transform var(--lab-liquid-duration) var(--lab-ease-sticky),
+    opacity var(--motion-duration-fast) ease-in calc(var(--lab-liquid-duration) - var(--motion-duration-fast)),
+    visibility 0s linear var(--lab-liquid-duration);
+  visibility: hidden;
+}
+
+/* Options pop in during the fast tail of the motion (staggered by
+   motion/durationFast), and leave first on close. */
+.lab__option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(var(--lab-size) - var(--size-space-component-padding-sm) * 2);
+  width: calc(var(--lab-size) - var(--size-space-component-padding-sm) * 2);
+  padding: 0;
+  border: 0;
+  border-radius: var(--size-radius-full);
+  background: transparent;
+  color: var(--color-mms-text-heading-primary);
+  font: inherit;
+  cursor: default;
+  outline: none;
+  opacity: 1;
+  transform: none;
+  --lab-option-delay: calc(
+    var(--lab-liquid-duration) - var(--motion-duration-fast) + var(--motion-duration-fast) * var(--lab-i, 0)
+  );
+  transition:
+    opacity var(--motion-duration-fast) ease-out var(--lab-option-delay),
+    transform var(--motion-duration-normal) var(--lab-ease-spring) var(--lab-option-delay),
+    background-color var(--motion-duration-normal) ease-out;
+}
+.lab[data-open="false"] .lab__option {
+  opacity: 0;
+  transform: scale(0.8);
+  transition:
+    opacity var(--motion-duration-fast) ease-in,
+    transform var(--motion-duration-fast) ease-in;
+}
+.lab__option:hover {
+  background-color: color-mix(in srgb, var(--lab-option-hover) calc(var(--opacity-60) * 100%), transparent);
+}
+.lab[data-tone="glass"] .lab__option:hover {
+  background-color: color-mix(in srgb, var(--lab-option-hover) calc(var(--opacity-20) * 100%), transparent);
+}
+.lab__option:active,
+.lab__option[data-pressed] {
+  transform: scale(0.96);
+}
+.lab__option:focus-visible {
+  box-shadow: 0 0 0 var(--size-border-md) var(--color-mms-interactive-input-border-focused);
+}
+.lab__glyph--option {
+  font-size: var(--size-component-icon-md);
+  font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
+  color: var(--lab-option-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab *,
+  .lab {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+    animation: none !important;
+  }
+}

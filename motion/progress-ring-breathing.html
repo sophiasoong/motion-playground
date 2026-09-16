@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Breathing Progress Ring</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
+<style>
+  :root {
+    /* ---- tokens.json ---- */
+    --size-radius-full: 9999px;                 /* size/radiusFull */
+    --size-space-component-gap-lg: 16px;        /* size/spaceComponentGapLg — fill→track gap */
+    --motion-duration-slow: 300ms;              /* motion/durationSlow — hold at 100% before restart */
+    --motion-duration-normal: 200ms;            /* motion/durationNormal — button hover */
+    --color-text-heading-primary: #1e1e1e;      /* color/mms/textHeadingPrimary — pause glyph */
+    --color-button-ghost-hover: #f7f6ff;        /* color/mms/interactiveButtonSurfacePrimaryGhostHover */
+
+    /* ---- FLAGGED: no matching token in tokens.json (values specified in the brief) ---- */
+    --ring-color-track: #BAC3FF;                /* NO TOKEN — brief: Track */
+    --ring-color-fill: #394379;                 /* NO TOKEN — brief: Fill */
+    --ring-size: 500px;                         /* NO TOKEN — brief: ring size */
+    --ring-stroke-track: 36px;                  /* NO TOKEN — measured from video (~7% of ring diameter) */
+    --ring-stroke-fill: 40px;                   /* NO TOKEN — measured from video (~8% of ring diameter) */
+    --ring-wave-amplitude: 14px;                /* NO TOKEN — matched to 12-lobe reference (~6.5% of radius) */
+    --ring-cycle-duration: 8000ms;              /* NO TOKEN — motion tokens top out at 300ms; one breath cycle */
+    --surface-page: #E5E1F6;                    /* NO TOKEN — lavender surface sampled from video */
+    --ring-control-icon: 120px;                 /* NO TOKEN — pause glyph ≈ 24% of ring diameter in video */
+    --ring-control-size: 160px;                 /* NO TOKEN — pause button hit area */
+  }
+
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    display: grid;
+    place-items: center;
+    background: var(--surface-page);
+  }
+
+  .stage { display: grid; place-items: center; }
+
+  .ring {
+    position: relative;
+    width: var(--ring-size);
+    height: var(--ring-size);
+  }
+  .ring svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .ring__track {
+    fill: none;
+    stroke: var(--ring-color-track);
+    stroke-width: var(--ring-stroke-track);
+    stroke-linecap: round;
+  }
+  .ring__fill {
+    fill: none;
+    stroke: var(--ring-color-fill);
+    stroke-width: var(--ring-stroke-fill);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .ring__toggle {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    translate: -50% -50%;
+    width: var(--ring-control-size);
+    height: var(--ring-control-size);
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: var(--size-radius-full);
+    background: transparent;
+    color: var(--color-text-heading-primary);
+    cursor: pointer;
+    transition: background-color var(--motion-duration-normal) ease;
+  }
+  .ring__toggle:hover { background: var(--color-button-ghost-hover); }
+  .ring__toggle .material-symbols-rounded {
+    font-size: var(--ring-control-icon);
+    font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+  }
+
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="ring" id="ring">
+      <svg viewBox="0 0 500 500" aria-hidden="true">
+        <path class="ring__track" id="track" d="" />
+        <path class="ring__fill"  id="fill"  d="" />
+      </svg>
+      <button class="ring__toggle" id="toggle" aria-label="Pause">
+        <span class="material-symbols-rounded" id="toggleIcon">pause</span>
+      </button>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const css = getComputedStyle(document.documentElement);
+  const px = (name) => parseFloat(css.getPropertyValue(name));
+
+  // ---- geometry (all derived from the CSS variables above) ----
+  const SIZE       = px('--ring-size');            // 500
+  const STROKE     = px('--ring-stroke-fill');     // 40
+  const AMP        = px('--ring-wave-amplitude');  // 14
+  const CYCLE_MS   = px('--ring-cycle-duration');  // 8000
+  const HOLD_MS    = px('--motion-duration-slow');  // 300 — pause at 100% before the loop restarts
+  const GAP_PX     = px('--size-space-component-gap-lg'); // 16 — edge-to-edge gap between fill and track caps
+  const STROKE_TRK = px('--ring-stroke-track');    // 36
+  const CX = SIZE / 2, CY = SIZE / 2;
+  // Base radius sits so that crest + half stroke stays inside the 500px box.
+  const R = SIZE / 2 - STROKE / 2 - AMP;
+
+  // ---- wave parameters (measured from the reference video) ----
+  const WAVES_PER_TURN = 12;          // 12-lobe reference shape, 30° per wavelength → closes seamlessly
+  // Angular gap so the round caps of fill and track sit GAP_PX apart edge to edge.
+  const GAP_RAD        = (GAP_PX + STROKE / 2 + STROKE_TRK / 2) / (SIZE / 2 - STROKE / 2 - AMP);
+  const WAVE_DRIFT     = 0;           // rad/s of phase drift along the path (0 = stationary wave)
+  const START          = -Math.PI / 2; // 12 o'clock
+
+  const trackEl = document.getElementById('track');
+  const fillEl  = document.getElementById('fill');
+  const toggle  = document.getElementById('toggle');
+  const icon    = document.getElementById('toggleIcon');
+
+  const deg = (d) => d * Math.PI / 180;
+  const pt = (angle, r) => [CX + r * Math.cos(angle), CY + r * Math.sin(angle)];
+
+  // Plain circular arc for the track.
+  function arcPath(a0, a1) {
+    if (a1 - a0 <= 1e-4) return '';
+    const [x0, y0] = pt(a0, R), [x1, y1] = pt(a1, R);
+    const large = a1 - a0 > Math.PI ? 1 : 0;
+    return `M ${x0.toFixed(2)} ${y0.toFixed(2)} A ${R} ${R} 0 ${large} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+  }
+
+  // Sine wave riding on the circle: r(θ) = R + A·sin(k·θ + φ).
+  // No fade-in envelope: k is an integer, so the wave is exactly periodic over
+  // one turn and the head meets the start with an identical tangent (no kink).
+  function wavePath(sweep, phase) {
+    const full  = sweep >= 2 * Math.PI - 1e-6;
+    const steps = Math.max(2, Math.ceil(sweep / deg(0.75)));
+    let d = '';
+    for (let i = 0; i <= steps; i++) {
+      const t = sweep * (i / steps);
+      let [x, y] = pt(START + t, R + AMP * Math.sin(WAVES_PER_TURN * t + phase));
+      // At 100% the head lands exactly on the starting point.
+      if (full && i === steps) [x, y] = pt(START, R + AMP * Math.sin(phase));
+      d += (i ? ' L ' : 'M ') + x.toFixed(2) + ' ' + y.toFixed(2);
+    }
+    if (full) d += ' Z';
+    // A zero-length path still renders as a round-capped dot.
+    if (sweep < 1e-4) { const [x, y] = pt(START, R + AMP * Math.sin(phase)); d = `M ${x} ${y} L ${x + 0.01} ${y}`; }
+    return d;
+  }
+
+  function render(progress, phase) {
+    const sweep = progress * 2 * Math.PI;
+    fillEl.setAttribute('d', wavePath(sweep, phase));
+    const a0 = START + sweep + GAP_RAD;
+    const a1 = START + 2 * Math.PI - GAP_RAD;
+    trackEl.setAttribute('d', arcPath(a0, a1));
+  }
+
+  // ---- loop ----
+  let playing = true, progress = 0, phase = 0, hold = 0, last = performance.now();
+  function frame(now) {
+    const dt = now - last; last = now;
+    if (playing) {
+      if (hold > 0) {
+        hold -= dt;                       // sit on the closed ring for a beat
+        if (hold <= 0) progress = 0;
+      } else {
+        progress = Math.min(1, progress + dt / CYCLE_MS);
+        if (progress >= 1) hold = HOLD_MS;
+      }
+      phase += WAVE_DRIFT * dt / 1000;
+    }
+    render(progress, phase);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  toggle.addEventListener('click', () => {
+    playing = !playing;
+    icon.textContent = playing ? 'pause' : 'play_arrow';
+    toggle.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+  });
+})();
+</script>
+</body>
+</html>
