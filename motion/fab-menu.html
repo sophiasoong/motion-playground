@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FAB Menu Motion</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" />
+<style>
+  :root {
+    /* ---- tokens.json ---- */
+    --size-component-height-2xl: 56px;          /* size/componentHeight2xl — FAB + segment height */
+    --size-radius-xl: 16px;                     /* size/radiusXl — FAB corner, closed */
+    --size-radius-full: 9999px;                 /* size/radiusFull — FAB open + segments */
+    --size-space-component-gap-xs: 4px;         /* size/spaceComponentGapXs — between segments */
+    --size-space-component-gap-sm: 8px;         /* size/spaceComponentGapSm — menu→FAB, icon→label */
+    --size-space-component-padding-xl: 24px;    /* size/spaceComponentPaddingXl — segment side padding */
+    --size-component-icon-md: 24px;             /* size/componentIconMd */
+    --size-typography-md-font-size: 16px;       /* size/typographyMdFontSize — M3 title/medium */
+    --size-typography-md-line-height: 22px;     /* size/typographyMdLineHeight (M3 title/medium is 24px) */
+    --font-family-body: "Roboto";               /* font/english/typographyFontFamilyBody */
+    --font-weight-medium: 500;                  /* font/english/typographyFontWeightMedium */
+    --motion-duration-fast: 100ms;              /* motion/durationFast — FAB color/shape, segment fades */
+
+    /* ---- FLAGGED: no matching token in tokens.json (values from Figma M3 kit / measured from video) ---- */
+    --m3-primary-container: #EADDFF;            /* NO TOKEN — Figma M3/sys/light/primary-container */
+    --m3-on-primary-container: #4F378A;         /* NO TOKEN — Figma M3/sys/light/on-primary-container */
+    --m3-primary: #6750A4;                      /* NO TOKEN — Figma M3/sys/light/primary */
+    --m3-on-primary: #FFFFFF;                   /* NO TOKEN — Figma M3/sys/light/on-primary */
+    --m3-elevation-3: 0 1px 3px 0 #0000004D, 0 4px 8px 3px #00000026; /* NO TOKEN — Figma M3/Elevation Light/3 */
+    --surface-page: #CDC9F3;                    /* NO TOKEN — stage lavender sampled from reference video */
+    --fab-stagger-open: 50ms;                   /* NO TOKEN — measured: segments appear bottom→top ~3 frames apart */
+    --fab-stagger-close: 33ms;                  /* NO TOKEN — measured: segments fade top→bottom ~2 frames apart */
+    --fab-spring-stiffness: 800;                /* NO TOKEN — segment rise spring, measured ~5% overshoot */
+    --fab-spring-damping-ratio: 0.7;            /* NO TOKEN — segment rise spring */
+    --fab-shape-spring-stiffness: 500;          /* NO TOKEN — FAB corner morph + pill right→left width spring (softer) */
+    --fab-shape-spring-damping-ratio: 0.75;     /* NO TOKEN — FAB corner morph spring, ~3% overshoot */
+    --fab-segment-expand-lead: 120ms;           /* NO TOKEN — pill rises as a circle this long before its width expands leftward */
+    --fab-segment-sink: 0.3;                    /* NO TOKEN — on close, pills drop this fraction of the way back to the FAB */
+    /* --fab-shape-easing / --fab-shape-duration are written by the script from the spring above */
+  }
+
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    display: grid;
+    place-items: center;
+    background: var(--surface-page);
+    font-family: var(--font-family-body), system-ui, sans-serif;
+  }
+
+  /* Anchored by the FAB (centered on the stage) so the FAB never shifts while pills change width. */
+  .fab-menu {
+    position: fixed;
+    right: calc(50% - var(--size-component-height-2xl) / 2);
+    bottom: calc(50% - var(--size-component-height-2xl) / 2);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--size-space-component-gap-sm);
+  }
+
+  .fab-menu__list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--size-space-component-gap-xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .fab-menu:not(.is-open):not(.is-closing) .fab-menu__list { visibility: hidden; }
+
+  /* Segment: pill that grows leftward from the FAB edge; content is right-anchored and clipped. */
+  .segment {
+    display: flex;
+    justify-content: flex-end;
+    overflow: hidden;
+    height: var(--size-component-height-2xl);
+    border: 0;
+    border-radius: var(--size-radius-full);
+    padding: 0;
+    background: var(--m3-primary-container);
+    color: var(--m3-on-primary-container);
+    font: var(--font-weight-medium) var(--size-typography-md-font-size) / var(--size-typography-md-line-height) var(--font-family-body), system-ui, sans-serif;
+    cursor: pointer;
+    opacity: 0;
+  }
+  .segment__content {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--size-space-component-gap-sm);
+    padding: 0 var(--size-space-component-padding-xl);
+    white-space: nowrap;
+  }
+  .segment svg { width: var(--size-component-icon-md); height: var(--size-component-icon-md); flex: none; }
+
+  .fab {
+    display: grid;
+    place-items: center;
+    width: var(--size-component-height-2xl);
+    height: var(--size-component-height-2xl);
+    border: 0;
+    padding: 0;
+    border-radius: var(--size-radius-xl);
+    background: var(--m3-primary-container);
+    color: var(--m3-on-primary-container);
+    box-shadow: var(--m3-elevation-3);
+    cursor: pointer;
+    transition:
+      background-color var(--motion-duration-fast) ease-out,
+      color var(--motion-duration-fast) ease-out,
+      border-radius var(--fab-shape-duration, var(--motion-duration-fast)) var(--fab-shape-easing, ease-out);
+  }
+  /* Both icons share one grid cell and cross-fade in place, so the FAB is never empty mid-transition. */
+  .fab svg {
+    grid-area: 1 / 1;
+    width: var(--size-component-icon-md);
+    height: var(--size-component-icon-md);
+    transition: opacity var(--motion-duration-fast) linear;
+  }
+  .fab .icon-close { opacity: 0; }
+  .fab-menu.is-open .fab {
+    /* Figma open-state FAB is a 56px circle (half of componentHeight2xl) */
+    border-radius: calc(var(--size-component-height-2xl) / 2);
+    background: var(--m3-primary);
+    color: var(--m3-on-primary);
+  }
+  .fab-menu.is-open .fab .icon-edit { opacity: 0; }
+  .fab-menu.is-open .fab .icon-close { opacity: 1; }
+
+  .segment:focus-visible, .fab:focus-visible { outline: 2px solid var(--m3-primary); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fab, .fab svg { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="fab-menu" id="fabMenu">
+    <ul class="fab-menu__list" id="fabMenuList" role="menu" aria-label="Create">
+      <li role="none">
+        <button class="segment" role="menuitem" tabindex="-1">
+          <span class="segment__content">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path transform="translate(5.75 2)" fill="currentColor" d="M12.5 13.75C12.5 15.4833 11.8917 16.9583 10.675 18.175C9.45833 19.3917 7.98333 20 6.25 20C4.51667 20 3.04167 19.3917 1.825 18.175C0.608333 16.9583 0 15.4833 0 13.75V4.5C0 3.25 0.4375 2.1875 1.3125 1.3125C2.1875 0.4375 3.25 0 4.5 0C5.75 0 6.8125 0.4375 7.6875 1.3125C8.5625 2.1875 9 3.25 9 4.5V13.25C9 14.0167 8.73333 14.6667 8.2 15.2C7.66667 15.7333 7.01667 16 6.25 16C5.48333 16 4.83333 15.7333 4.3 15.2C3.76667 14.6667 3.5 14.0167 3.5 13.25V4H5.5V13.25C5.5 13.4667 5.57083 13.6458 5.7125 13.7875C5.85417 13.9292 6.03333 14 6.25 14C6.46667 14 6.64583 13.9292 6.7875 13.7875C6.92917 13.6458 7 13.4667 7 13.25V4.5C6.98333 3.8 6.7375 3.20833 6.2625 2.725C5.7875 2.24167 5.2 2 4.5 2C3.8 2 3.20833 2.24167 2.725 2.725C2.24167 3.20833 2 3.8 2 4.5V13.75C1.98333 14.9333 2.39167 15.9375 3.225 16.7625C4.05833 17.5875 5.06667 18 6.25 18C7.41667 18 8.40833 17.5875 9.225 16.7625C10.0417 15.9375 10.4667 14.9333 10.5 13.75V4H12.5V13.75Z"/></svg>
+            Document
+          </span>
+        </button>
+      </li>
+      <li role="none">
+        <button class="segment" role="menuitem" tabindex="-1">
+          <span class="segment__content">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path transform="translate(2 2)" fill="currentColor" d="M0 20V2C0 1.45 0.195833 0.979167 0.5875 0.5875C0.979167 0.195833 1.45 0 2 0H18C18.55 0 19.0208 0.195833 19.4125 0.5875C19.8042 0.979167 20 1.45 20 2V14C20 14.55 19.8042 15.0208 19.4125 15.4125C19.0208 15.8042 18.55 16 18 16H4L0 20ZM3.15 14H18V2H2V15.125L3.15 14Z"/></svg>
+            Message
+          </span>
+        </button>
+      </li>
+      <li role="none">
+        <button class="segment" role="menuitem" tabindex="-1">
+          <span class="segment__content">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path transform="translate(2 4)" fill="currentColor" d="M2 16C1.45 16 0.979167 15.8042 0.5875 15.4125C0.195833 15.0208 0 14.55 0 14V2C0 1.45 0.195833 0.979167 0.5875 0.5875C0.979167 0.195833 1.45 0 2 0H8L10 2H18C18.55 2 19.0208 2.19583 19.4125 2.5875C19.8042 2.97917 20 3.45 20 4V14C20 14.55 19.8042 15.0208 19.4125 15.4125C19.0208 15.8042 18.55 16 18 16H2ZM2 14H18V4H9.175L7.175 2H2V14Z"/></svg>
+            Folder
+          </span>
+        </button>
+      </li>
+    </ul>
+
+    <button class="fab" id="fab" aria-label="Open create menu" aria-haspopup="menu" aria-expanded="false" aria-controls="fabMenuList">
+      <svg class="icon-edit" viewBox="0 0 24 24" aria-hidden="true"><path transform="translate(3 3)" fill="currentColor" d="M0 18V13.75L13.2 0.575C13.4 0.391667 13.6208 0.25 13.8625 0.15C14.1042 0.05 14.3583 0 14.625 0C14.8917 0 15.15 0.05 15.4 0.15C15.65 0.25 15.8667 0.4 16.05 0.6L17.425 2C17.625 2.18333 17.7708 2.4 17.8625 2.65C17.9542 2.9 18 3.15 18 3.4C18 3.66667 17.9542 3.92083 17.8625 4.1625C17.7708 4.40417 17.625 4.625 17.425 4.825L4.25 18H0ZM14.6 4.8L16 3.4L14.6 2L13.2 3.4L14.6 4.8Z"/></svg>
+      <svg class="icon-close" viewBox="0 0 24 24" aria-hidden="true"><path transform="translate(6.1667 6.1667)" fill="currentColor" d="M1.16667 11.6667L0 10.5L4.66667 5.83333L0 1.16667L1.16667 0L5.83333 4.66667L10.5 0L11.6667 1.16667L7 5.83333L11.6667 10.5L10.5 11.6667L5.83333 7L1.16667 11.6667Z"/></svg>
+    </button>
+  </div>
+
+<script>
+(() => {
+  const menu = document.getElementById('fabMenu');
+  const fab = document.getElementById('fab');
+  const segments = [...menu.querySelectorAll('.segment')];
+  const css = getComputedStyle(document.documentElement);
+  const ms = (name) => parseFloat(css.getPropertyValue(name));
+  const num = (name) => parseFloat(css.getPropertyValue(name));
+
+  const FAST = ms('--motion-duration-fast');
+  const STAGGER_OPEN = ms('--fab-stagger-open');
+  const STAGGER_CLOSE = ms('--fab-stagger-close');
+  const EXPAND_LEAD = ms('--fab-segment-expand-lead');
+  const COLLAPSED = ms('--size-component-height-2xl');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+
+  // Damped spring (mass 1) sampled into a CSS linear() easing, so WAAPI can play it.
+  function springEasing(stiffness, dampingRatio) {
+    const w0 = Math.sqrt(stiffness);
+    const wd = w0 * Math.sqrt(1 - dampingRatio * dampingRatio);
+    const x = (t) => 1 - Math.exp(-dampingRatio * w0 * t) *
+      (Math.cos(wd * t) + (dampingRatio * w0 / wd) * Math.sin(wd * t));
+    const settle = -Math.log(0.001) / (dampingRatio * w0); // seconds until within 0.1%
+    const steps = 60;
+    const pts = Array.from({ length: steps + 1 }, (_, i) => +x((i / steps) * settle).toFixed(4));
+    pts[steps] = 1;
+    return { easing: `linear(${pts.join(', ')})`, duration: settle * 1000 };
+  }
+  const spring = springEasing(num('--fab-spring-stiffness'), num('--fab-spring-damping-ratio'));
+  const shapeSpring = springEasing(num('--fab-shape-spring-stiffness'), num('--fab-shape-spring-damping-ratio'));
+  document.documentElement.style.setProperty('--fab-shape-easing', shapeSpring.easing);
+  document.documentElement.style.setProperty('--fab-shape-duration', `${shapeSpring.duration}ms`);
+
+  let open = false;
+  let running = [];
+
+  function cancelRunning() {
+    running.forEach((a) => a.cancel());
+    running = [];
+  }
+
+  function setOpen(next) {
+    if (next === open) return;
+    open = next;
+    cancelRunning();
+
+    // FAB stays in place: only its corners morph (spring) while color + icon cross-fade (durationFast).
+    // All CSS transitions, so an interrupted toggle retargets from wherever the morph currently is.
+    menu.classList.toggle('is-open', open);
+    menu.classList.toggle('is-closing', !open);
+    fab.setAttribute('aria-expanded', String(open));
+    fab.setAttribute('aria-label', open ? 'Close create menu' : 'Open create menu');
+    segments.forEach((s) => (s.tabIndex = open ? 0 : -1));
+
+    if (reduced.matches) {
+      segments.forEach((s) => (s.style.opacity = open ? 1 : 0));
+      if (!open) menu.classList.remove('is-closing');
+      return;
+    }
+
+    if (open) {
+      // Bottom → top. Each pill springs up out of the FAB as a 56px circle, then its width springs
+      // out right → left (right edge pinned to the FAB edge, label revealed as the left edge travels).
+      const fabTop = fab.getBoundingClientRect().top;
+      [...segments].reverse().forEach((seg, i) => {
+        seg.style.width = '';
+        const full = seg.scrollWidth;
+        const rise = fabTop - seg.getBoundingClientRect().top;
+        const delay = i * STAGGER_OPEN;
+        running.push(
+          seg.animate([{ transform: `translateY(${rise}px)` }, { transform: 'translateY(0)' }],
+            { duration: spring.duration, delay, easing: spring.easing, fill: 'backwards' }),
+          seg.animate([{ opacity: 0 }, { opacity: 1 }],
+            { duration: FAST, delay, easing: 'linear', fill: 'both' }),
+          seg.animate([{ width: `${COLLAPSED}px` }, { width: `${full}px` }],
+            { duration: shapeSpring.duration, delay: delay + EXPAND_LEAD, easing: shapeSpring.easing, fill: 'backwards' }),
+          // Hide the clipped label while the pill is still a circle; bring it in as the width opens.
+          seg.firstElementChild.animate([{ opacity: 0 }, { opacity: 1 }],
+            { duration: FAST, delay: delay + EXPAND_LEAD, easing: 'linear', fill: 'backwards' })
+        );
+      });
+    } else {
+      // Top → bottom. Pills keep their width, fade out and sink back toward the FAB.
+      const fabTop = fab.getBoundingClientRect().top;
+      const sink = num('--fab-segment-sink');
+      segments.forEach((seg, i) => {
+        const drop = (fabTop - seg.getBoundingClientRect().top) * sink;
+        const delay = i * STAGGER_CLOSE;
+        running.push(seg.animate([{ transform: 'translateY(0)' }, { transform: `translateY(${drop}px)` }],
+          { duration: FAST, delay, easing: 'ease-in', fill: 'both' }));
+        running.push(seg.animate([{ opacity: 1 }, { opacity: 0 }],
+          { duration: FAST, delay, easing: 'linear', fill: 'both' }));
+      });
+      const last = running[running.length - 1];
+      last.finished.then(() => menu.classList.remove('is-closing')).catch(() => {});
+    }
+  }
+
+  fab.addEventListener('click', () => setOpen(!open));
+  segments.forEach((s) => s.addEventListener('click', () => { setOpen(false); fab.focus(); }));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && open) { setOpen(false); fab.focus(); }
+  });
+  document.addEventListener('pointerdown', (e) => {
+    if (open && !menu.contains(e.target)) setOpen(false);
+  });
+})();
+</script>
+</body>
+</html>
