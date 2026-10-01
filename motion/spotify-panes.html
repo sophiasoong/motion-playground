@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Music Player Panes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=swap" />
+<style>
+  :root {
+    /* ---- tokens.json : size ---- */
+    --size-space-component-gap-xs: 4px;            /* size/spaceComponentGapXs */
+    --size-space-component-gap-sm: 8px;            /* size/spaceComponentGapSm — pane gap / drag handle */
+    --size-space-component-gap-md: 12px;           /* size/spaceComponentGapMd */
+    --size-space-component-gap-lg: 16px;           /* size/spaceComponentGapLg */
+    --size-space-component-padding-xs: 4px;        /* size/spaceComponentPaddingXs */
+    --size-space-component-padding-sm: 8px;        /* size/spaceComponentPaddingSm */
+    --size-space-component-padding-md: 12px;       /* size/spaceComponentPaddingMd */
+    --size-space-component-padding-lg: 16px;       /* size/spaceComponentPaddingLg */
+    --size-space-component-padding-xl: 24px;       /* size/spaceComponentPaddingXl */
+    --size-space-component-padding-2xl: 36px;      /* size/spaceComponentPadding2xl */
+    --size-space-layout-section-gap-md: 24px;      /* size/spaceLayoutSectionGapMd */
+    --size-radius-sm: 6px;                         /* size/radiusSm */
+    --size-radius-md: 8px;                         /* size/radiusMd */
+    --size-radius-lg: 12px;                        /* size/radiusLg */
+    --size-radius-xl: 16px;                        /* size/radiusXl */
+    --size-radius-full: 9999px;                    /* size/radiusFull */
+    --size-border-sm: 1px;                         /* size/borderSm */
+    --size-border-md: 2px;                         /* size/borderMd */
+    --size-typography-xxs-font-size: 10px;         /* size/typographyXxsFontSize */
+    --size-typography-xs-font-size: 12px;          /* size/typographyXsFontSize */
+    --size-typography-xs-line-height: 16px;        /* size/typographyXsLineHeight */
+    --size-typography-sm-font-size: 14px;          /* size/typographySmFontSize */
+    --size-typography-sm-line-height: 20px;        /* size/typographySmLineHeight */
+    --size-typography-md-font-size: 16px;          /* size/typographyMdFontSize */
+    --size-typography-md-line-height: 22px;        /* size/typographyMdLineHeight */
+    --size-typography-lg-font-size: 20px;          /* size/typographyLgFontSize */
+    --size-typography-lg-line-height: 28px;        /* size/typographyLgLineHeight */
+    --size-typography-2xl-font-size: 34px;         /* size/typography2xlFontSize */
+    --size-typography-2xl-line-height: 40px;       /* size/typography2xlLineHeight */
+    --size-typography-3xl-font-size: 48px;         /* size/typography3xlFontSize */
+    --size-typography-3xl-line-height: 58px;       /* size/typography3xlLineHeight */
+    --size-typography-4xl-font-size: 60px;         /* size/typography4xlFontSize — hero title when content is wide */
+    --size-typography-4xl-line-height: 72px;       /* size/typography4xlLineHeight */
+    --size-component-height-xs: 24px;              /* size/componentHeightXs */
+    --size-component-height-md: 32px;              /* size/componentHeightMd */
+    --size-component-height-lg: 40px;              /* size/componentHeightLg */
+    --size-component-height-xl: 48px;              /* size/componentHeightXl */
+    --size-component-height-2xl: 56px;             /* size/componentHeight2xl */
+    --size-component-height-3xl: 64px;             /* size/componentHeight3xl — tiles, rail tiles, strip width */
+    --size-component-icon-xs: 12px;                /* size/componentIconXs */
+    --size-component-icon-sm: 16px;                /* size/componentIconSm */
+    --size-component-icon-md: 24px;                /* size/componentIconMd */
+    --size-component-icon-lg: 36px;                /* size/componentIconLg */
+    --size-component-width-sm: 260px;              /* size/componentWidthSm — library list min width */
+    --size-component-width-md: 432px;              /* size/componentWidthMd — default library / now-playing width */
+    --size-component-width-xl: 656px;              /* size/componentWidthXl — search bar, full-view art max */
+    --size-component-width-full: 1328px;           /* size/componentWidthFull — window min-width */
+    --size-component-dropdown-width-lg: 320px;     /* size/componentDropdownWidthLg — now-playing min width */
+
+    /* ---- tokens.json : font ---- */
+    --font-family-body: "Roboto";                  /* font/english/typographyFontFamilyBody */
+    --font-weight-regular: 400;                    /* font/english/typographyFontWeightRegular */
+    --font-weight-medium: 500;                     /* font/english/typographyFontWeightMedium */
+    --font-weight-bold: 600;                       /* font/english/typographyFontWeightBold */
+
+    /* ---- tokens.json : motion / opacity ---- */
+    --motion-duration-fast: 100ms;                 /* motion/durationFast — content fade under full view */
+    --motion-duration-normal: 200ms;               /* motion/durationNormal — pane resize, panel slide (video ≈180–250ms) */
+    --motion-duration-slow: 300ms;                 /* motion/durationSlow — full-view art scale (video ≈300ms) */
+    --opacity-60: 0.6;                             /* opacity/60 */
+    --opacity-0: 0;                                /* opacity/0 — hidden toolbar actions */
+    --opacity-20: 0.2;                             /* opacity/20 */
+
+    /* ---- tokens.json : color (mms) — wireframe greyscale ---- */
+    --color-surface-card-surface: #ffffff;         /* color/mms/surfaceCardSurface */
+    --color-surface-tag-neutral-surface: #f5f5f5;  /* color/mms/surfaceTagNeutralSurface */
+    --color-surface-card-shadow: #d9d9d9;          /* color/mms/surfaceCardShadow */
+    --color-text-heading-primary: #1e1e1e;         /* color/mms/textHeadingPrimary */
+    --color-text-body-secondary: #5c5c5c;          /* color/mms/textBodySecondary */
+    --color-text-body-tertiary: #a6a6a6;           /* color/mms/textBodyTertiary */
+    --color-brand-neutral-light: #bfbfbf;          /* color/mms/brandNeutralLight */
+    --color-brand-primary: #5244ee;                /* color/mms/brandPrimary */
+    --color-interactive-list-background-hover: #f1ecff; /* color/mms/interactiveListBackgroundHover */
+    --color-interactive-filter-chip-surface-default: #f7f6ff; /* color/mms/interactiveFilterChipSurfaceDefault */
+    --color-interactive-filter-chip-border-default: #d4d0fb;  /* color/mms/interactiveFilterChipBorderDefault */
+    --color-interactive-button-label-primary-solid-default: #ffffff; /* color/mms/interactiveButtonLabelPrimarySolidDefault */
+
+    /* ---- FLAGGED: no matching token in tokens.json ---- */
+    --wf-ease-out: cubic-bezier(0.2, 0, 0, 1);     /* NO TOKEN — tokens.json has no easing curves; read from video: fast start, soft settle */
+    --wf-rail-width: calc(var(--size-component-height-3xl) + 2 * var(--size-space-component-padding-lg)); /* NO TOKEN — 96px rail, composed from tokens */
+    --wf-progress-fill: 72%;                       /* NO TOKEN — 2:31 of 3:30 */
+    --wf-volume-fill: 70%;                         /* NO TOKEN — volume position */
+    --wf-full-art-scale-from: 0.55;                /* NO TOKEN — full-view art starts at ~55% (video) */
+    --wf-hero-title-fluid: 9cqi;                   /* NO TOKEN — fluid hero title size between 3xl and 4xl */
+    --wf-hero-cover-fluid: 22cqi;                  /* NO TOKEN — fluid hero cover between 128 and 192px */
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    padding: var(--size-space-component-padding-lg);
+    background: var(--color-surface-tag-neutral-surface);
+    color: var(--color-text-heading-primary);
+    font-family: var(--font-family-body), system-ui, sans-serif;
+    font-size: var(--size-typography-sm-font-size);
+    line-height: var(--size-typography-sm-line-height);
+    font-weight: var(--font-weight-regular);
+    overflow: hidden;
+  }
+  body.dragging, body.dragging * { cursor: col-resize !important; user-select: none; }
+
+  .icon {
+    font-family: "Material Symbols Rounded";
+    font-size: var(--size-component-icon-md);
+    width: var(--size-component-icon-md);
+    height: var(--size-component-icon-md);
+    line-height: 1;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--color-text-body-secondary);
+    user-select: none; flex: none;
+  }
+  .icon.sm { font-size: var(--size-component-icon-sm); width: var(--size-component-icon-sm); height: var(--size-component-icon-sm); }
+  .icon.lg { font-size: var(--size-component-icon-lg); width: var(--size-component-icon-lg); height: var(--size-component-icon-lg); }
+  .icon.fill { font-variation-settings: "FILL" 1; }
+  .icon.accent { color: var(--color-brand-primary); }
+
+  .img {
+    position: relative; flex: none;
+    background:
+      linear-gradient(to top right, transparent calc(50% - var(--size-border-sm) / 2), var(--color-surface-card-shadow) calc(50% - var(--size-border-sm) / 2), var(--color-surface-card-shadow) calc(50% + var(--size-border-sm) / 2), transparent calc(50% + var(--size-border-sm) / 2)),
+      linear-gradient(to bottom right, transparent calc(50% - var(--size-border-sm) / 2), var(--color-surface-card-shadow) calc(50% - var(--size-border-sm) / 2), var(--color-surface-card-shadow) calc(50% + var(--size-border-sm) / 2), transparent calc(50% + var(--size-border-sm) / 2)),
+      var(--color-surface-tag-neutral-surface);
+    border: var(--size-border-sm) solid var(--color-surface-card-shadow);
+    border-radius: var(--size-radius-sm);
+  }
+  .img.icon-tile { display: flex; align-items: center; justify-content: center; background-image: none; }
+  .img.circle { border-radius: var(--size-radius-full); }
+
+  .btn {
+    width: var(--size-component-height-lg); height: var(--size-component-height-lg);
+    border-radius: var(--size-radius-full);
+    border: var(--size-border-sm) solid var(--color-surface-card-shadow);
+    background: var(--color-surface-card-surface);
+    display: inline-flex; align-items: center; justify-content: center; flex: none;
+    cursor: pointer;
+  }
+  .btn.ghost { border-color: transparent; background: transparent; }
+  .btn.xl { width: var(--size-component-height-xl); height: var(--size-component-height-xl); }
+  .btn.primary { background: var(--color-brand-primary); border-color: var(--color-brand-primary); }
+  .btn.primary .icon { color: var(--color-interactive-button-label-primary-solid-default); }
+  .pill {
+    height: var(--size-component-height-lg); padding: 0 var(--size-space-component-padding-lg);
+    border-radius: var(--size-radius-full);
+    border: var(--size-border-sm) solid var(--color-surface-card-shadow);
+    background: var(--color-surface-card-surface);
+    display: inline-flex; align-items: center; gap: var(--size-space-component-gap-sm);
+    font-size: var(--size-typography-sm-font-size); font-weight: var(--font-weight-medium); white-space: nowrap;
+  }
+
+  /* ================= WINDOW ================= */
+  .window {
+    min-width: var(--size-component-width-full);
+    height: calc(100vh - 2 * var(--size-space-component-padding-lg));
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: var(--size-space-component-gap-sm);
+    background: var(--color-surface-card-surface);
+    border: var(--size-border-sm) solid var(--color-surface-card-shadow);
+    border-radius: var(--size-radius-lg);
+    padding: var(--size-space-component-padding-sm);
+  }
+
+  .region { position: relative; }
+  .region::before {
+    content: attr(data-note);
+    position: absolute; top: var(--size-space-component-padding-xs); left: var(--size-space-component-padding-xs); z-index: 2;
+    padding: 0 var(--size-space-component-padding-sm);
+    height: var(--size-component-height-xs); line-height: var(--size-component-height-xs);
+    font-size: var(--size-typography-xxs-font-size); font-weight: var(--font-weight-medium);
+    letter-spacing: var(--size-border-sm); text-transform: uppercase; white-space: nowrap;
+    color: var(--color-brand-primary);
+    background: var(--color-interactive-filter-chip-surface-default);
+    border: var(--size-border-sm) solid var(--color-interactive-filter-chip-border-default);
+    border-radius: var(--size-radius-sm);
+    pointer-events: none;
+    transition: opacity var(--motion-duration-normal);
+  }
+  .topbar.region::before { top: auto; bottom: 0; }
+  body.notes-off .region::before { opacity: 0; }
+
+  /* ================= TOP BAR ================= */
+  .topbar { height: var(--size-component-height-3xl); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 var(--size-space-component-padding-lg); }
+  .topbar .left, .topbar .right { display: flex; align-items: center; gap: var(--size-space-component-gap-md); }
+  .topbar .right { justify-content: flex-end; }
+  .traffic { display: flex; gap: var(--size-space-component-gap-sm); margin-right: var(--size-space-component-padding-xl); }
+  .traffic span { width: var(--size-component-icon-xs); height: var(--size-component-icon-xs); border-radius: var(--size-radius-full); border: var(--size-border-sm) solid var(--color-text-body-tertiary); }
+  .topbar .center { display: flex; align-items: center; gap: var(--size-space-component-gap-md); }
+  .search {
+    width: var(--size-component-width-xl); height: var(--size-component-height-2xl);
+    border-radius: var(--size-radius-full);
+    border: var(--size-border-sm) solid var(--color-surface-card-shadow);
+    background: var(--color-surface-tag-neutral-surface);
+    display: flex; align-items: center; gap: var(--size-space-component-gap-md);
+    padding: 0 var(--size-space-component-padding-lg);
+    color: var(--color-text-body-tertiary); font-size: var(--size-typography-md-font-size);
+  }
+  .search .placeholder { flex: 1; }
+  .search .divider { width: var(--size-border-sm); height: var(--size-component-icon-md); background: var(--color-surface-card-shadow); }
+  .badge { position: relative; }
+  .badge::after { content: ""; position: absolute; top: 0; right: 0; width: var(--size-space-component-gap-sm); height: var(--size-space-component-gap-sm); border-radius: var(--size-radius-full); background: var(--color-brand-primary); }
+  .avatar { width: var(--size-component-height-xl); height: var(--size-component-height-xl); border-radius: var(--size-radius-full); }
+
+  /* ================= COLUMNS (flex, JS-driven widths) ================= */
+  .columns {
+    position: relative;
+    min-width: 0; /* grid item: stop pane widths from growing the window */
+    display: flex;
+    align-items: stretch;
+    min-height: 0;
+    --lib-w: var(--size-component-width-md);
+    --content-w: 0px;
+    --right-w: var(--size-component-width-md);
+    --handle-a-w: var(--size-space-component-gap-sm);
+    --handle-b-w: var(--size-space-component-gap-sm);
+  }
+  .pane, .handle {
+    transition: width var(--motion-duration-normal) var(--wf-ease-out), opacity var(--motion-duration-normal) var(--wf-ease-out);
+  }
+  .columns.no-anim .pane, .columns.no-anim .handle { transition: none; }
+  .pane {
+    flex: none; min-width: 0;
+    background: var(--color-surface-card-surface);
+    border: var(--size-border-sm) solid var(--color-surface-card-shadow);
+    border-radius: var(--size-radius-lg);
+    overflow: hidden;
+    display: flex; flex-direction: column; min-height: 0;
+  }
+  .pane.lib { width: var(--lib-w); container: lib / inline-size; }
+  .pane.content { width: var(--content-w); container: content / inline-size; }
+  .pane.content[data-hidden="true"] { border-color: transparent; }
+  .pane.right { width: var(--right-w); container: right / inline-size; }
+
+  .handle {
+    flex: none; width: var(--handle-a-w); position: relative; cursor: col-resize; z-index: 3;
+  }
+  .handle.b { width: var(--handle-b-w); }
+  .handle::before { content: ""; position: absolute; inset: 0 calc(-1 * var(--size-space-component-gap-sm)); } /* 24px hit area */
+  .handle::after {
+    content: ""; position: absolute; top: 0; bottom: 0; left: 50%;
+    width: var(--size-border-md); margin-left: calc(-1 * var(--size-border-md) / 2);
+    border-radius: var(--size-radius-full);
+    background: var(--color-brand-primary);
+    opacity: 0;
+    transition: opacity var(--motion-duration-fast) var(--wf-ease-out);
+  }
+  .handle:hover::after, .handle.active::after { opacity: 1; }
+  .handle[data-hidden="true"] { pointer-events: none; }
+
+  /* ---------- Library pane ---------- */
+  .lib-head { display: flex; align-items: center; justify-content: space-between; gap: var(--size-space-component-gap-sm); padding: var(--size-space-component-padding-xl) var(--size-space-component-padding-lg) var(--size-space-component-padding-md); }
+  .lib-head h2 { margin: 0; font-size: var(--size-typography-lg-font-size); line-height: var(--size-typography-lg-line-height); font-weight: var(--font-weight-bold); white-space: nowrap; display: flex; align-items: center; gap: var(--size-space-component-gap-md); }
+  .lib-head .actions { display: flex; gap: var(--size-space-component-gap-sm); }
+  .pill .label { display: none; }
+  .chips { display: flex; gap: var(--size-space-component-gap-sm); padding: 0 var(--size-space-component-padding-lg); overflow: hidden; align-items: center; }
+  .chip {
+    height: var(--size-component-height-lg); padding: 0 var(--size-space-component-padding-lg);
+    border-radius: var(--size-radius-full);
+    border: var(--size-border-sm) solid var(--color-surface-card-shadow);
+    background: var(--color-surface-tag-neutral-surface);
+    display: inline-flex; align-items: center; white-space: nowrap; flex: none;
+    font-size: var(--size-typography-sm-font-size); color: var(--color-text-heading-primary);
+  }
+  .chip.artists { display: none; }
+  .lib-tools { display: flex; align-items: center; justify-content: space-between; gap: var(--size-space-component-gap-lg); padding: var(--size-space-component-padding-lg); color: var(--color-text-body-secondary); }
+  .lib-tools .grow { flex: 1; }
+  .lib-tools .lib-search {
+    display: none; width: var(--size-component-width-md); height: var(--size-component-height-lg);
+    border-radius: var(--size-radius-sm);
+    border: var(--size-border-sm) solid var(--color-surface-card-shadow);
+    background: var(--color-surface-tag-neutral-surface);
+    align-items: center; gap: var(--size-space-component-gap-md); padding: 0 var(--size-space-component-padding-md);
+    color: var(--color-text-body-tertiary); font-size: var(--size-typography-sm-font-size);
+  }
+  .lib-tools .sort { display: flex; align-items: center; gap: var(--size-space-component-gap-sm); font-size: var(--size-typography-md-font-size); white-space: nowrap; }
+  .lib-tools .sort .grid-icon { display: none; }
+
+  @container lib (min-width: 380px) {
+    .pill .label { display: inline; }
+    .chip.artists { display: inline-flex; }
+    .chips .btn.more { display: none; }
+  }
+  @container lib (min-width: 900px) {
+    .lib-tools .lib-search { display: flex; }
+    .lib-tools .search-icon { display: none; }
+  }
+
+  .lib-list { display: flex; flex-direction: column; padding: 0 var(--size-space-component-padding-sm); overflow: hidden; flex: 1; }
+  .lib-item { display: flex; align-items: center; gap: var(--size-space-component-gap-md); padding: var(--size-space-component-padding-sm); border-radius: var(--size-radius-md); }
+  .lib-item .img { width: var(--size-component-height-3xl); height: var(--size-component-height-3xl); }
+  .lib-item .text { flex: 1; min-width: 0; }
+  .title { font-size: var(--size-typography-md-font-size); line-height: var(--size-typography-md-line-height); color: var(--color-text-heading-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sub { display: flex; align-items: center; gap: var(--size-space-component-gap-xs); font-size: var(--size-typography-sm-font-size); line-height: var(--size-typography-sm-line-height); color: var(--color-text-body-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lib-item.active, .card.active { background: var(--color-interactive-list-background-hover); }
+  .lib-item.active .title, .card.active .title { color: var(--color-brand-primary); }
+
+  .lib-grid {
+    display: none; flex: 1; overflow: hidden;
+    padding: var(--size-space-component-padding-sm) var(--size-space-component-padding-lg);
+    grid-template-columns: repeat(auto-fill, minmax(calc(var(--size-component-width-sm) - var(--size-component-height-3xl) - var(--size-component-height-md)), 1fr)); /* 164px min card */
+    gap: var(--size-space-component-gap-lg);
+    align-content: start;
+  }
+  .card { display: flex; flex-direction: column; gap: var(--size-space-component-gap-xs); padding: var(--size-space-component-padding-sm); border-radius: var(--size-radius-md); min-width: 0; position: relative; }
+  .card .art { width: 100%; aspect-ratio: 1 / 1; }
+  .card .art .icon.lg { font-size: var(--size-component-height-xl); width: var(--size-component-height-xl); height: var(--size-component-height-xl); }
+  .card .title { margin-top: var(--size-space-component-gap-sm); }
+  .card .pause { position: absolute; right: var(--size-space-component-padding-lg); bottom: calc(var(--size-component-height-2xl) + var(--size-space-component-padding-sm)); }
+
+  .lib-rail { display: none; flex-direction: column; align-items: center; gap: var(--size-space-component-gap-sm); padding: var(--size-space-component-padding-2xl) var(--size-space-component-padding-lg) var(--size-space-component-padding-lg); overflow: hidden; }
+  .lib-rail .tile { width: var(--size-component-height-3xl); height: var(--size-component-height-3xl); }
+  .lib-rail .btn { margin-bottom: var(--size-space-component-gap-sm); }
+
+  .lib[data-mode="rail"] .lib-head, .lib[data-mode="rail"] .chips, .lib[data-mode="rail"] .lib-tools, .lib[data-mode="rail"] .lib-list { display: none; }
+  .lib[data-mode="rail"] .lib-rail { display: flex; }
+  .lib[data-mode="grid"] .lib-list { display: none; }
+  .lib[data-mode="grid"] .lib-grid { display: grid; }
+  .lib[data-mode="grid"] .lib-tools .sort .list-icon { display: none; }
+  .lib[data-mode="grid"] .lib-tools .sort .grid-icon { display: inline-flex; }
+
+  /* entering content fades and rises — video: grid tiles resolve during the expand */
+  @keyframes rise { from { opacity: 0; transform: translateY(var(--size-space-component-gap-sm)); } to { opacity: 1; transform: none; } }
+  .lib.entering .lib-grid .card, .lib.entering .lib-list .lib-item, .lib.entering .lib-rail > * {
+    animation: rise var(--motion-duration-normal) var(--wf-ease-out) both;
+    animation-delay: calc(var(--i, 0) * 12ms); /* NO TOKEN — 12ms stagger */
+  }
+
+  /* ---------- Content pane ---------- */
+  .content-inner { display: flex; flex-direction: column; min-height: 0; height: 100%; min-width: calc(var(--size-component-width-md) - var(--size-component-height-md)); /* 400px: keeps layout while pane collapses to 0 */ }
+  .hero {
+    display: flex; align-items: flex-end; gap: var(--size-space-layout-section-gap-md);
+    padding: var(--size-space-component-padding-xl);
+    background: var(--color-surface-tag-neutral-surface);
+    border-bottom: var(--size-border-sm) solid var(--color-surface-card-shadow);
+  }
+  .hero .img.cover {
+    width: clamp(calc(2 * var(--size-component-height-3xl)), var(--wf-hero-cover-fluid), calc(3 * var(--size-component-height-3xl)));
+    aspect-ratio: 1 / 1; border-radius: var(--size-radius-md);
+  }
+  .hero .meta { display: flex; flex-direction: column; gap: var(--size-space-component-gap-sm); min-width: 0; }
+  .eyebrow { font-size: var(--size-typography-sm-font-size); color: var(--color-text-body-secondary); }
+  .hero h1 {
+    margin: 0; font-weight: var(--font-weight-bold); letter-spacing: calc(-1 * var(--size-border-sm));
+    font-size: clamp(var(--size-typography-3xl-font-size), var(--wf-hero-title-fluid), var(--size-typography-4xl-font-size));
+    line-height: 1.2; white-space: nowrap;
+  }
+  .byline { display: flex; flex-wrap: wrap; align-items: center; gap: var(--size-space-component-gap-sm); white-space: nowrap; font-size: var(--size-typography-md-font-size); color: var(--color-text-body-secondary); }
+  .byline .img { width: var(--size-component-height-xs); height: var(--size-component-height-xs); border-radius: var(--size-radius-full); }
+  .byline b { color: var(--color-text-heading-primary); font-weight: var(--font-weight-medium); }
+
+  .actionbar { display: flex; align-items: center; gap: var(--size-space-component-gap-lg); padding: var(--size-space-component-padding-xl); }
+  .actionbar .play { width: var(--size-component-height-3xl); height: var(--size-component-height-3xl); }
+  .actionbar .img.mini { width: var(--size-component-height-2xl); height: var(--size-component-height-3xl); border-radius: var(--size-radius-md); }
+  .actionbar .spacer { flex: 1; }
+  .actionbar .view { display: flex; align-items: center; gap: var(--size-space-component-gap-sm); color: var(--color-text-body-secondary); font-size: var(--size-typography-md-font-size); }
+
+  .tracks { padding: 0 var(--size-space-component-padding-xl); flex: 1; overflow: hidden; }
+  .track-row {
+    display: grid; grid-template-columns: var(--size-component-height-md) 1fr var(--size-component-height-2xl);
+    align-items: center; gap: var(--size-space-component-gap-lg);
+    height: var(--size-component-height-3xl); padding: 0 var(--size-space-component-padding-lg); border-radius: var(--size-radius-md);
+  }
+  .track-row .plays { display: none; text-align: right; justify-content: flex-end; color: var(--color-text-body-secondary); font-size: var(--size-typography-md-font-size); }
+  @container content (min-width: 700px) {
+    .track-row { grid-template-columns: var(--size-component-height-md) 1fr calc(2 * var(--size-component-height-3xl)) var(--size-component-height-2xl); }
+    .track-row .plays { display: flex; }
+  }
+  .track-row.head { height: var(--size-component-height-xl); color: var(--color-text-body-secondary); border-bottom: var(--size-border-sm) solid var(--color-surface-card-shadow); border-radius: 0; margin-bottom: var(--size-space-component-gap-lg); font-size: var(--size-typography-md-font-size); }
+  .track-row .num { color: var(--color-text-body-secondary); font-size: var(--size-typography-md-font-size); display: flex; justify-content: center; }
+  .track-row .dur { text-align: right; color: var(--color-text-body-secondary); font-size: var(--size-typography-md-font-size); display: flex; justify-content: flex-end; }
+  .track-row.playing .title { color: var(--color-brand-primary); }
+
+  /* ---------- Right pane: strip / panel ---------- */
+  .np { padding: var(--size-space-component-padding-lg) var(--size-space-component-padding-xl) var(--size-space-component-padding-xl); gap: var(--size-space-layout-section-gap-md); display: flex; flex-direction: column; min-width: calc(var(--size-component-dropdown-width-lg) - var(--size-space-component-gap-sm)); }
+  .np .context { font-size: var(--size-typography-md-font-size); font-weight: var(--font-weight-bold); }
+  /* hover toolbar — video/screenshot: collapse + title left, more + expand right, revealed on pane hover */
+  .np-toolbar { display: flex; align-items: center; gap: var(--size-space-component-gap-md); min-height: var(--size-component-height-lg); }
+  .np-toolbar .context { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .np-toolbar .btn.ghost { opacity: var(--opacity-0); transition: opacity var(--motion-duration-normal) var(--wf-ease-out); }
+  .np:hover .np-toolbar .btn.ghost, .np-toolbar .btn.ghost:focus-visible { opacity: 1; }
+  .np-toolbar .actions { display: flex; gap: var(--size-space-component-gap-xs); }
+  .np .img.art { width: 100%; aspect-ratio: 1 / 1; border-radius: var(--size-radius-md); }
+  .np .track { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--size-space-component-gap-lg); }
+  .np .track h3 { margin: 0; font-size: var(--size-typography-2xl-font-size); line-height: var(--size-typography-2xl-line-height); font-weight: var(--font-weight-bold); }
+  .np .track .artist { font-size: var(--size-typography-lg-font-size); line-height: var(--size-typography-lg-line-height); color: var(--color-text-body-secondary); }
+  .np h4 { margin: 0; font-size: var(--size-typography-lg-font-size); line-height: var(--size-typography-lg-line-height); font-weight: var(--font-weight-bold); }
+  .related { display: flex; flex-direction: column; gap: var(--size-space-component-gap-md); }
+  .related .row { display: flex; gap: var(--size-space-component-gap-lg); overflow: hidden; }
+  .related .img { width: 100%; aspect-ratio: 16 / 9; border-radius: var(--size-radius-md); }
+  .related .img.peek { width: var(--size-component-height-lg); flex: none; }
+  .strip { display: none; flex: 1; align-items: center; justify-content: center; padding-top: var(--size-space-component-padding-2xl); }
+  .right[data-mode="strip"] .np { display: none; }
+  .right[data-mode="strip"] .strip { display: flex; }
+  .right.entering .np > * { animation: rise var(--motion-duration-normal) var(--wf-ease-out) both; animation-delay: calc(var(--i, 0) * 20ms); }
+
+  /* ---------- Full view overlay ---------- */
+  .fullview {
+    position: absolute; inset: 0; z-index: 5;
+    background: var(--color-surface-card-surface);
+    border: var(--size-border-sm) solid var(--color-surface-card-shadow);
+    border-radius: var(--size-radius-lg);
+    display: flex; flex-direction: column;
+    padding: var(--size-space-component-padding-2xl) var(--size-space-component-padding-lg) var(--size-space-component-padding-xl);
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity var(--motion-duration-normal) var(--wf-ease-out), visibility 0s linear var(--motion-duration-normal);
+  }
+  .fullview.on { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity var(--motion-duration-normal) var(--wf-ease-out), visibility 0s; }
+  .fv-head { display: flex; align-items: center; justify-content: space-between; padding: 0 var(--size-space-component-padding-sm); }
+  .fv-head .context { font-size: var(--size-typography-md-font-size); font-weight: var(--font-weight-bold); }
+  .fv-actions { display: flex; align-items: center; gap: var(--size-space-component-gap-lg); }
+  .fv-actions .divider { width: var(--size-border-sm); height: var(--size-component-icon-md); background: var(--color-surface-card-shadow); }
+  .fv-stage { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; padding: var(--size-space-component-padding-xl); }
+  .fv-art {
+    height: 100%; max-height: min(100%, var(--size-component-width-xl)); aspect-ratio: 1 / 1; border-radius: var(--size-radius-xl);
+    transform: scale(var(--wf-full-art-scale-from));
+    transition: transform var(--motion-duration-slow) var(--wf-ease-out);
+  }
+  .fullview.on .fv-art { transform: none; }
+  /* panes fade under the full view — video: content dims before art lands */
+  .columns.full .pane, .columns.full .handle { opacity: var(--opacity-20); transition-duration: var(--motion-duration-fast); }
+
+  /* ================= PLAYER BAR ================= */
+  .player { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--size-space-component-gap-lg); padding: var(--size-space-component-padding-lg) var(--size-space-component-padding-xl); border-top: var(--size-border-sm) solid var(--color-surface-card-shadow); }
+  .now { display: flex; align-items: center; gap: var(--size-space-component-gap-lg); }
+  .now .img { width: var(--size-component-height-3xl); height: var(--size-component-height-3xl); }
+  .now .title { font-size: var(--size-typography-sm-font-size); line-height: var(--size-typography-sm-line-height); }
+  .controls { display: flex; flex-direction: column; align-items: center; gap: var(--size-space-component-gap-sm); }
+  .controls .row { display: flex; align-items: center; gap: var(--size-space-component-gap-lg); }
+  .controls .play { width: var(--size-component-height-2xl); height: var(--size-component-height-2xl); }
+  .progress { display: flex; align-items: center; gap: var(--size-space-component-gap-md); width: var(--size-component-width-xl); color: var(--color-text-body-secondary); font-size: var(--size-typography-sm-font-size); }
+  .bar { flex: 1; height: var(--size-space-component-gap-xs); border-radius: var(--size-radius-full); background: var(--color-brand-neutral-light); position: relative; }
+  .bar::after { content: ""; position: absolute; inset: 0; width: var(--wf-progress-fill); border-radius: var(--size-radius-full); background: var(--color-text-body-secondary); }
+  .extras { display: flex; align-items: center; justify-content: flex-end; gap: var(--size-space-component-gap-lg); }
+  .volume { display: flex; align-items: center; gap: var(--size-space-component-gap-sm); }
+  .volume .bar { width: var(--size-component-height-3xl); flex: none; }
+  .volume .bar::after { width: var(--wf-volume-fill); }
+  .connect { position: relative; }
+  .connect::after { content: ""; position: absolute; bottom: calc(-1 * var(--size-space-component-gap-xs)); left: 50%; width: var(--size-space-component-gap-xs); height: var(--size-space-component-gap-xs); margin-left: calc(-1 * var(--size-space-component-gap-xs) / 2); border-radius: var(--size-radius-full); background: var(--color-brand-primary); }
+
+  /* ================= PRESET / HUD BAR ================= */
+  .hud {
+    position: fixed; left: 50%; bottom: var(--size-space-component-padding-lg); transform: translateX(-50%); z-index: 10;
+    display: flex; align-items: center; gap: var(--size-space-component-gap-sm);
+    padding: var(--size-space-component-padding-xs);
+    border-radius: var(--size-radius-full);
+    border: var(--size-border-sm) solid var(--color-interactive-filter-chip-border-default);
+    background: var(--color-interactive-filter-chip-surface-default);
+  }
+  .hud button {
+    height: var(--size-component-height-md); padding: 0 var(--size-space-component-padding-md);
+    border-radius: var(--size-radius-full); border: var(--size-border-sm) solid transparent;
+    background: transparent; color: var(--color-brand-primary);
+    font: inherit; font-size: var(--size-typography-xs-font-size); font-weight: var(--font-weight-medium); cursor: pointer;
+    transition: background var(--motion-duration-fast) var(--wf-ease-out);
+  }
+  .hud button:hover { background: var(--color-surface-card-surface); }
+  .hud button.current { background: var(--color-brand-primary); color: var(--color-interactive-button-label-primary-solid-default); }
+  .hud .state { padding: 0 var(--size-space-component-padding-md); font-size: var(--size-typography-xs-font-size); color: var(--color-text-body-secondary); white-space: nowrap; min-width: calc(var(--size-component-width-sm) - var(--size-component-height-lg)); }
+  .hud .sep { width: var(--size-border-sm); height: var(--size-component-icon-sm); background: var(--color-interactive-filter-chip-border-default); }
+</style>
+</head>
+<body>
+<div class="window">
+
+  <!-- 01 Top bar -->
+  <header class="topbar region" data-note="01 · Top bar">
+    <div class="left">
+      <div class="traffic"><span></span><span></span><span></span></div>
+      <span class="icon">chevron_left</span>
+      <span class="icon" style="opacity: var(--opacity-60)">chevron_right</span>
+    </div>
+    <div class="center">
+      <span class="btn xl"><span class="icon">home</span></span>
+      <div class="search">
+        <span class="icon">search</span>
+        <span class="placeholder">What do you want to play?</span>
+        <span class="divider"></span>
+        <span class="icon">inventory_2</span>
+      </div>
+    </div>
+    <div class="right">
+      <span class="icon badge">notifications</span>
+      <span class="icon">group</span>
+      <span class="img avatar badge"></span>
+    </div>
+  </header>
+
+  <main class="columns" id="columns">
+
+    <!-- 02 Library -->
+    <aside class="pane lib region" id="lib" data-note="02 · Library" data-mode="list">
+      <div class="lib-head">
+        <h2><span class="icon" title="Collapse to rail" data-act="rail" style="cursor:pointer">view_sidebar</span>Your Library</h2>
+        <div class="actions">
+          <span class="pill"><span class="icon sm">add</span><span class="label">Create</span></span>
+          <span class="btn ghost" data-act="toggleGrid" title="Expand / collapse library"><span class="icon" id="gridIcon">open_in_full</span></span>
+        </div>
+      </div>
+      <div class="chips">
+        <span class="chip">Playlists</span>
+        <span class="chip">Podcasts</span>
+        <span class="chip">Albums</span>
+        <span class="chip artists">Artists</span>
+        <span class="btn more"><span class="icon">chevron_right</span></span>
+      </div>
+      <div class="lib-tools">
+        <span class="icon search-icon">search</span>
+        <span class="grow"></span>
+        <span class="lib-search"><span class="icon">search</span>Search in Your Library</span>
+        <span class="sort">Recents <span class="icon list-icon">format_list_bulleted</span><span class="icon grid-icon">grid_view</span></span>
+      </div>
+
+      <div class="lib-list">
+        <div class="lib-item" style="--i:0"><span class="img icon-tile"><span class="icon fill">favorite</span></span><div class="text"><div class="title">Liked Songs</div><div class="sub"><span class="icon sm">push_pin</span>Playlist • Sophia</div></div></div>
+        <div class="lib-item" style="--i:1"><span class="img icon-tile"><span class="icon fill">bookmark</span></span><div class="text"><div class="title">Your Episodes</div><div class="sub"><span class="icon sm">push_pin</span>Playlist • Saved &amp; downloaded episodes</div></div></div>
+        <div class="lib-item" style="--i:2"><span class="img"></span><div class="text"><div class="title">《The Real Story》By 報導者</div><div class="sub"><span class="icon sm">push_pin</span>Podcast • 報導者 The Reporter</div></div></div>
+        <div class="lib-item" style="--i:3"><span class="img"></span><div class="text"><div class="title">The Diary Of A CEO with Steven Bartlett</div><div class="sub"><span class="icon sm">push_pin</span>Podcast • FlightStory</div></div></div>
+        <div class="lib-item active" style="--i:4"><span class="img"></span><div class="text"><div class="title">25, spring</div><div class="sub">EP • Shallou</div></div><span class="icon accent">volume_up</span></div>
+        <div class="lib-item" style="--i:5"><span class="img"></span><div class="text"><div class="title">DJ</div><div class="sub">Playlist • Spotify</div></div></div>
+      </div>
+
+      <div class="lib-grid">
+        <div class="card" style="--i:0"><span class="img art icon-tile"><span class="icon lg">favorite</span></span><div class="title">Liked Songs</div><div class="sub"><span class="icon sm">push_pin</span>Playlist • Sophia</div></div>
+        <div class="card" style="--i:1"><span class="img art icon-tile"><span class="icon lg">bookmark</span></span><div class="title">Your Episodes</div><div class="sub"><span class="icon sm">push_pin</span>Playlist • Saved &amp; downloaded…</div></div>
+        <div class="card" style="--i:2"><span class="img art"></span><div class="title">《The Real Story》By 報導者</div><div class="sub"><span class="icon sm">push_pin</span>Podcast • 報導者 The Reporter</div></div>
+        <div class="card" style="--i:3"><span class="img art"></span><div class="title">The Diary Of A CEO with Steven Bartlett</div><div class="sub"><span class="icon sm">push_pin</span>Podcast • FlightStory</div></div>
+        <div class="card active" style="--i:4"><span class="img art"></span><span class="btn primary pause"><span class="icon fill">pause</span></span><div class="title">25, spring</div><div class="sub">EP • Shallou</div></div>
+        <div class="card" style="--i:5"><span class="img art"></span><div class="title">DJ</div><div class="sub">Click to start listening</div></div>
+        <div class="card" style="--i:6"><span class="img art icon-tile"><span class="icon lg">folder</span></span><div class="title">Folder</div><div class="sub">Folder</div></div>
+        <div class="card" style="--i:7"><span class="img art"></span><div class="title">Artist</div><div class="sub">Artist</div></div>
+        <div class="card" style="--i:8"><span class="img art"></span><div class="title">Album</div><div class="sub">Album • Artist</div></div>
+        <div class="card" style="--i:9"><span class="img art"></span><div class="title">Soundtrack</div><div class="sub">Album • Various Artists</div></div>
+        <div class="card" style="--i:10"><span class="img art"></span><div class="title">Album</div><div class="sub">Album • Artist</div></div>
+        <div class="card" style="--i:11"><span class="img art circle"></span><div class="title">Artist</div><div class="sub">Artist</div></div>
+      </div>
+
+      <div class="lib-rail">
+        <span class="btn ghost" style="--i:0" data-act="list" title="Expand library"><span class="icon">view_sidebar</span></span>
+        <span class="btn" style="--i:1"><span class="icon">add</span></span>
+        <span class="img tile icon-tile" style="--i:2"><span class="icon">favorite</span></span>
+        <span class="img tile icon-tile" style="--i:3"><span class="icon">bookmark</span></span>
+        <span class="img tile" style="--i:4"></span>
+        <span class="img tile" style="--i:5"></span>
+        <span class="img tile" style="--i:6"></span>
+        <span class="img tile" style="--i:7"></span>
+      </div>
+    </aside>
+
+    <div class="handle a" id="handleA" title="Drag to resize library"></div>
+
+    <!-- 03 Main content -->
+    <section class="pane content region" id="content" data-note="03 · Content — EP detail">
+      <div class="content-inner">
+        <div class="hero">
+          <span class="img cover"></span>
+          <div class="meta">
+            <span class="eyebrow">EP</span>
+            <h1>25, spring</h1>
+            <div class="byline"><span class="img"></span><b>Shallou</b><span>• 2025 • 5 songs, 12 min 46 sec</span></div>
+          </div>
+        </div>
+        <div class="actionbar">
+          <span class="btn primary play"><span class="icon lg fill">pause</span></span>
+          <span class="img mini"></span>
+          <span class="icon">shuffle</span>
+          <span class="icon accent fill">check_circle</span>
+          <span class="icon">download_for_offline</span>
+          <span class="icon">more_horiz</span>
+          <span class="spacer"></span>
+          <span class="view">List <span class="icon">format_list_bulleted</span></span>
+        </div>
+        <div class="tracks">
+          <div class="track-row head"><span class="num">#</span><span>Title</span><span class="plays">Plays</span><span class="dur"><span class="icon">schedule</span></span></div>
+          <div class="track-row"><span class="num">1</span><div><div class="title">A Clearing</div><div class="sub">Shallou</div></div><span class="plays">86,429</span><span class="dur">1:18</span></div>
+          <div class="track-row playing"><span class="num"><span class="icon accent fill">equalizer</span></span><div><div class="title">Habitat</div><div class="sub">Shallou</div></div><span class="plays">1,190,575</span><span class="dur">3:30</span></div>
+          <div class="track-row"><span class="num">3</span><div><div class="title">Embrace</div><div class="sub">Shallou</div></div><span class="plays">145,928</span><span class="dur">2:10</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="handle b" id="handleB" title="Drag to resize now playing"></div>
+
+    <!-- 04 Now playing -->
+    <aside class="pane right region" id="right" data-note="04 · Now playing" data-mode="panel">
+      <div class="np">
+        <div class="np-toolbar" style="--i:0">
+          <span class="btn ghost" data-act="strip" title="Close now playing"><span class="icon">right_panel_close</span></span>
+          <div class="context">25, spring</div>
+          <div class="actions">
+            <span class="btn ghost" title="More"><span class="icon">more_horiz</span></span>
+            <span class="btn ghost" data-act="full" title="Open full now playing view"><span class="icon">open_in_full</span></span>
+          </div>
+        </div>
+        <span class="img art" style="--i:1"></span>
+        <div class="track" style="--i:2"><div><h3>Habitat</h3><div class="artist">Shallou</div></div><span class="icon accent fill">check_circle</span></div>
+        <div class="related" style="--i:3"><h4>Related music videos</h4><div class="row"><span class="img"></span><span class="img peek"></span></div></div>
+      </div>
+      <div class="strip"><span class="btn ghost" data-act="panel" title="Open now playing"><span class="icon">chevron_left</span></span></div>
+    </aside>
+
+    <!-- 04 Now playing — full view overlay -->
+    <div class="fullview region" id="fullview" data-note="04 · Now playing — full view">
+      <div class="fv-head">
+        <span class="context">25, spring</span>
+        <div class="fv-actions">
+          <span class="icon">explore</span>
+          <span class="icon">smart_display</span>
+          <span class="icon">person_add</span>
+          <span class="divider"></span>
+          <span class="icon">more_horiz</span>
+          <span class="icon">fullscreen</span>
+          <span class="btn" data-act="exitFull" title="Minimize now playing view"><span class="icon">close_fullscreen</span></span>
+        </div>
+      </div>
+      <div class="fv-stage"><span class="img fv-art"></span></div>
+    </div>
+  </main>
+
+  <!-- 05 Player bar -->
+  <footer class="player region" data-note="05 · Player bar">
+    <div class="now">
+      <span class="img"></span>
+      <div><div class="title">Habitat</div><div class="sub">Shallou</div></div>
+      <span class="icon accent fill">check_circle</span>
+    </div>
+    <div class="controls">
+      <div class="row">
+        <span class="icon">shuffle</span>
+        <span class="icon fill">skip_previous</span>
+        <span class="btn primary play"><span class="icon fill">pause</span></span>
+        <span class="icon fill">skip_next</span>
+        <span class="icon accent connect">devices</span>
+      </div>
+      <div class="progress"><span>2:31</span><span class="bar"></span><span>3:30</span></div>
+    </div>
+    <div class="extras">
+      <span class="icon">mic</span>
+      <span class="icon">queue_music</span>
+      <span class="icon">headphones</span>
+      <span class="volume"><span class="icon">volume_up</span><span class="bar"></span></span>
+      <span class="icon">picture_in_picture_alt</span>
+      <span class="btn ghost" data-act="full" title="Open full now playing view"><span class="icon">fullscreen</span></span>
+    </div>
+  </footer>
+</div>
+
+<div class="hud" id="hud">
+  <button data-preset="wf2">WF 2</button>
+  <button data-preset="wf3">WF 3</button>
+  <button data-preset="wf4">WF 4</button>
+  <button data-preset="wf5">WF 5</button>
+  <button data-preset="wf6">WF 6</button>
+  <button data-preset="wf7">WF 7</button>
+  <span class="sep"></span>
+  <span class="state" id="stateText"></span>
+  <span class="sep"></span>
+  <button type="button" id="notesBtn">Hide notes</button>
+</div>
+
+<script>
+(() => {
+  const px = (v) => parseFloat(v);
+  const root = getComputedStyle(document.documentElement);
+  // Geometry — all read from tokens declared above
+  const GAP       = px(root.getPropertyValue('--size-space-component-gap-sm'));         // 8
+  const RAIL      = px(root.getPropertyValue('--size-component-height-3xl')) + 2 * px(root.getPropertyValue('--size-space-component-padding-lg')); // 96
+  const LIST_MIN  = px(root.getPropertyValue('--size-component-width-sm'));             // 260
+  const DEFAULT_W = px(root.getPropertyValue('--size-component-width-md'));             // 432
+  const STRIP     = px(root.getPropertyValue('--size-component-height-3xl'));           // 64
+  const PANEL_MIN = px(root.getPropertyValue('--size-component-dropdown-width-lg'));    // 320
+  const CONTENT_MIN = DEFAULT_W - px(root.getPropertyValue('--size-component-height-md')); // 400 — matches .content-inner min-width
+  const SNAP_ZONE = LIST_MIN - px(root.getPropertyValue('--size-component-height-lg')); // 220: below this, list snaps to rail / panel snaps to strip
+  const OVERSHOOT = px(root.getPropertyValue('--size-space-component-padding-xl'));     // 24px past the content-min limit flips to grid / full view
+  const ANIM_MS   = px(root.getPropertyValue('--motion-duration-normal'));              // 200
+
+  const cols = document.getElementById('columns');
+  const lib = document.getElementById('lib');
+  const content = document.getElementById('content');
+  const right = document.getElementById('right');
+  const handleA = document.getElementById('handleA');
+  const handleB = document.getElementById('handleB');
+  const fullview = document.getElementById('fullview');
+  const gridIcon = document.getElementById('gridIcon');
+  const stateText = document.getElementById('stateText');
+
+  // State: lib ∈ rail | list | grid ; right ∈ strip | panel | full
+  // 3-pane layout (list + content + panel) is locked to library : content : now playing = 1 : 2 : 1 (NO TOKEN — ratio, not a size)
+  const quarter = () => Math.max(PANEL_MIN, (cols.clientWidth - 2 * GAP) / 4);
+  const locked = () => S.lib === 'list' && S.right === 'panel';
+  const Q = quarter();
+  const S = { lib: 'list', libW: Q, lastListW: Q, right: 'panel', rightW: Q, lastPanelW: Q };
+  let snapUntil = 0; // ignore continuous drag updates briefly after a snap so the snap animation can play
+
+  const total = () => cols.clientWidth;
+  const setVar = (k, v) => cols.style.setProperty(k, v + 'px');
+
+  function enter(el) { // replay the rise animation on a pane whose contents changed
+    el.classList.remove('entering'); void el.offsetWidth; el.classList.add('entering');
+    clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('entering'), ANIM_MS * 2);
+  }
+
+  function setLibMode(mode) {
+    if (S.lib === mode) return;
+    if (S.lib === 'list') S.lastListW = S.libW;
+    S.lib = mode;
+    lib.dataset.mode = mode;
+    gridIcon.textContent = mode === 'grid' ? 'close_fullscreen' : 'open_in_full';
+    enter(lib);
+  }
+  function setRightMode(mode) {
+    if (S.right === mode) return;
+    if (S.right === 'panel') S.lastPanelW = S.rightW;
+    const wasFull = S.right === 'full';
+    S.right = mode;
+    if (mode === 'full') { fullview.classList.add('on'); cols.classList.add('full'); }
+    else { fullview.classList.remove('on'); cols.classList.remove('full'); }
+    if (mode !== 'full') { right.dataset.mode = mode; if (!wasFull) enter(right); }
+  }
+
+  function layout(animate = true) {
+    const T = total();
+    let rightW = S.right === 'strip' ? STRIP : S.rightW;
+    let libW, contentW, hA = GAP, hB = GAP;
+    if (S.lib === 'grid') { // grid fills everything left of now-playing; only the right divider stays live
+      libW = T - rightW - GAP; contentW = 0; hA = 0;
+    } else if (locked()) { // 3-pane: 1 : 2 : 1, independent of drag history and window size
+      libW = rightW = S.libW = S.rightW = S.lastPanelW = quarter(); contentW = Math.max(0, T - 2 * libW - 2 * GAP);
+    } else {
+      libW = S.lib === 'rail' ? RAIL : S.libW;
+      contentW = Math.max(0, T - libW - rightW - 2 * GAP);
+    }
+    cols.classList.toggle('no-anim', !animate);
+    setVar('--lib-w', libW); setVar('--content-w', contentW); setVar('--right-w', rightW);
+    setVar('--handle-a-w', hA); setVar('--handle-b-w', hB);
+    content.dataset.hidden = contentW === 0;
+    handleA.dataset.hidden = hA === 0;
+    handleB.dataset.hidden = hB === 0;
+    stateText.textContent = `library ${S.lib} ${Math.round(libW)}px · now playing ${S.right} ${S.right === 'full' ? '' : Math.round(rightW) + 'px'}`;
+    markPreset();
+  }
+
+  // ---------- Drag ----------
+  function startDrag(handle, onMove, onDown) {
+    handle.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      onDown && onDown();
+      handle.setPointerCapture(e.pointerId);
+      handle.classList.add('active'); document.body.classList.add('dragging');
+      const rect = cols.getBoundingClientRect();
+      const move = (ev) => onMove(ev.clientX - rect.left, rect.width);
+      const up = () => {
+        handle.removeEventListener('pointermove', move);
+        handle.classList.remove('active'); document.body.classList.remove('dragging');
+        layout(true);
+      };
+      handle.addEventListener('pointermove', move);
+      handle.addEventListener('pointerup', up, { once: true });
+      handle.addEventListener('pointercancel', up, { once: true });
+    });
+  }
+
+  // Handle A: library edge. Rail ← 220 → list (continuous) → content-min limit +24 → grid
+  startDrag(handleA, (x, T) => {
+    const rightW = S.right === 'strip' ? STRIP : S.rightW;
+    const libMax = T - rightW - 2 * GAP - CONTENT_MIN;
+    const want = x - GAP / 2;
+    if (locked()) { // 3-pane is fixed at 1 : 2 : 1 — the divider only snaps to the next wireframe
+      if (want < SNAP_ZONE) { setLibMode('rail'); snap(); }
+      else if (want > quarter() + SNAP_ZONE) { setLibMode('grid'); snap(); }
+      return;
+    }
+    if (want < SNAP_ZONE) { if (S.lib !== 'rail') { setLibMode('rail'); snap(); } return; }
+    if (want > libMax + OVERSHOOT) { setLibMode('grid'); snap(); return; }
+    if (S.lib === 'rail') { setLibMode('list'); S.libW = Math.max(LIST_MIN, want); snap(); return; }
+    if (performance.now() < snapUntil) return;
+    S.libW = Math.max(LIST_MIN, Math.min(want, libMax));
+    layout(false);
+  });
+
+  // Handle B: now-playing edge. Strip ← 220 → panel (continuous) → content-min limit +24 → full view
+  startDrag(handleB, (x, T) => {
+    const libW = S.lib === 'rail' ? RAIL : S.libW;
+    // grid mode: the library grid may shrink to its default width before the panel flips to full view
+    const panelMax = S.lib === 'grid' ? T - GAP - DEFAULT_W : T - libW - 2 * GAP - CONTENT_MIN;
+    const want = T - x - GAP / 2;
+    if (S.right === 'full') return;
+    if (locked()) { // 3-pane is fixed at 1 : 2 : 1 — the divider only snaps to the next wireframe
+      if (want < SNAP_ZONE) { setRightMode('strip'); snap(); }
+      else if (want > quarter() + SNAP_ZONE) { S.rightW = S.lastPanelW = quarter(); setRightMode('full'); snap(); }
+      return;
+    }
+    if (want < SNAP_ZONE) { if (S.right !== 'strip') { setRightMode('strip'); snap(); } return; }
+    if (want > panelMax + OVERSHOOT) { S.rightW = dragStartPanelW; setRightMode('full'); snap(); return; } // full view remembers the pre-drag panel width
+    if (S.right === 'strip') { setRightMode('panel'); S.rightW = Math.max(PANEL_MIN, want); snap(); return; }
+    if (performance.now() < snapUntil) return;
+    S.rightW = Math.max(PANEL_MIN, Math.min(want, panelMax));
+    layout(false);
+  }, () => { dragStartPanelW = S.right === 'panel' ? S.rightW : S.lastPanelW; });
+  let dragStartPanelW = DEFAULT_W;
+
+  function snap() { snapUntil = performance.now() + ANIM_MS; layout(true); }
+
+  // ---------- Buttons ----------
+  document.addEventListener('click', (e) => {
+    const act = e.target.closest('[data-act]')?.dataset.act;
+    if (!act) return;
+    if (act === 'rail') setLibMode('rail');
+    if (act === 'list') { setLibMode('list'); S.libW = S.lastListW; }
+    if (act === 'toggleGrid') { if (S.lib === 'grid') { setLibMode('list'); S.libW = S.lastListW; } else setLibMode('grid'); }
+    if (act === 'panel') { setRightMode('panel'); S.rightW = S.lastPanelW; }
+    if (act === 'strip') setRightMode('strip');
+    if (act === 'full') { if (S.right === 'panel') S.lastPanelW = S.rightW; setRightMode('full'); }
+    if (act === 'exitFull') { setRightMode('panel'); S.rightW = S.lastPanelW; }
+    layout(true);
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && S.right === 'full') { setRightMode('panel'); S.rightW = S.lastPanelW; layout(true); } });
+
+  // ---------- Presets = the six Figma wireframes ----------
+  const WIDE_LIST = DEFAULT_W + px(root.getPropertyValue('--size-component-height-3xl')) * 2; // 560 — WF3 wide list
+  const PRESETS = {
+    wf2: () => { const q = quarter(); return { lib: 'list', libW: q, right: 'panel', rightW: q }; }, // 1 : 2 : 1
+    wf3: () => ({ lib: 'list', libW: WIDE_LIST, right: 'strip', rightW: quarter() }),
+    wf4: () => ({ lib: 'rail', libW: quarter(), right: 'panel', rightW: quarter() }),
+    wf5: () => ({ lib: 'grid', libW: quarter(), right: 'panel', rightW: quarter() }),
+    wf6: () => ({ lib: 'list', libW: quarter(), right: 'full',  rightW: quarter() }),
+    wf7: () => ({ lib: 'grid', libW: quarter(), right: 'strip', rightW: quarter() }),
+  };
+  function applyPreset(p) {
+    if (typeof p === 'function') p = p();
+    if (p.right === 'full' && S.right !== 'full') { // full view: open the panel first so the underlying layout is WF2
+      setLibMode(p.lib); S.libW = p.libW; setRightMode('panel'); S.rightW = p.rightW; layout(true);
+      setTimeout(() => { setRightMode('full'); layout(true); }, ANIM_MS / 2);
+      return;
+    }
+    setRightMode(p.right); S.rightW = p.rightW; S.lastPanelW = p.rightW;
+    setLibMode(p.lib); S.libW = p.libW; S.lastListW = p.libW;
+    layout(true);
+  }
+  function markPreset() {
+    const libW = S.lib === 'list' ? S.libW : 0;
+    document.querySelectorAll('[data-preset]').forEach((b) => {
+      const p = PRESETS[b.dataset.preset]();
+      const hit = p.lib === S.lib && p.right === S.right && (S.lib !== 'list' || Math.abs(p.libW - libW) < OVERSHOOT);
+      b.classList.toggle('current', hit);
+    });
+  }
+  document.querySelectorAll('[data-preset]').forEach((b) => b.addEventListener('click', () => applyPreset(PRESETS[b.dataset.preset])));
+
+  document.getElementById('notesBtn').addEventListener('click', function () {
+    document.body.classList.toggle('notes-off');
+    this.textContent = document.body.classList.contains('notes-off') ? 'Show notes' : 'Hide notes';
+  });
+
+  window.addEventListener('resize', () => layout(false)); // locked 1 : 2 : 1 recomputes from the live width
+  layout(false);
+})();
+</script>
+</body>
+</html>
