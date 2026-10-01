@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Filter Carousel Motion</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" />
+<style>
+  :root {
+    /* ---- tokens.json ---- */
+    --size-space-component-padding-sm: 8px;     /* size/spaceComponentPaddingSm — carousel padding, row side padding */
+    --size-space-component-padding-lg: 16px;    /* size/spaceComponentPaddingLg — Cancel/Save row vertical padding */
+    --size-space-component-padding-xl: 24px;    /* size/spaceComponentPaddingXl — button side padding */
+    --size-space-component-gap-xs: 4px;         /* size/spaceComponentGapXs — carousel anchor (x-small) item width */
+    --size-space-component-gap-sm: 8px;         /* size/spaceComponentGapSm — gap between carousel items */
+    --size-space-component-gap-lg: 16px;        /* size/spaceComponentGapLg — carousel small item width (M3 multi-browse) */
+    --size-component-height-lg: 40px;           /* size/componentHeightLg — label row height */
+    --size-component-height-2xl: 56px;          /* size/componentHeight2xl — icon buttons, buttons, carousel medium item */
+    --size-component-icon-md: 24px;             /* size/componentIconMd — icons */
+    --size-radius-md: 8px;                      /* size/radiusMd — preview corner */
+    --size-radius-xl: 16px;                     /* size/radiusXl — thumbnail corner */
+    --size-radius-full: 9999px;                 /* size/radiusFull — selected thumbnail, buttons */
+    --size-typography-sm-font-size: 14px;       /* size/typographySmFontSize — M3 title/small */
+    --size-typography-sm-line-height: 20px;     /* size/typographySmLineHeight */
+    --size-typography-md-font-size: 16px;       /* size/typographyMdFontSize — M3 title/medium */
+    --size-typography-md-line-height: 22px;     /* size/typographyMdLineHeight (M3 title/medium is 24px) */
+    --font-family-body: "Roboto";               /* font/english/typographyFontFamilyBody */
+    --font-weight-medium: 500;                  /* font/english/typographyFontWeightMedium */
+    --motion-duration-fast: 100ms;              /* motion/durationFast — state layers */
+    --motion-duration-normal: 200ms;            /* motion/durationNormal — label color */
+    --motion-duration-slow: 300ms;              /* motion/durationSlow — preview filter crossfade */
+
+    /* ---- FLAGGED: no matching token in tokens.json (values from Figma M3 dark scheme / measured from video) ---- */
+    --carousel-item-large: 72px;                /* NO TOKEN — M3 carousel large item (Figma Item-1 72×72) */
+    --m3-surface: #131217;                      /* NO TOKEN — Figma frame background */
+    --m3-surface-container-high: #ECE6F0;       /* NO TOKEN — Figma schemes/surface-container-high (thumbnail fill) */
+    --m3-inverse-primary: #D0BCFF;              /* NO TOKEN — Figma schemes/inverse-primary (selected thumb + label) */
+    --m3-on-primary-container-light: #4F378A;   /* NO TOKEN — check icon fill from Figma */
+    --m3-on-primary-container: #EADDFF;         /* NO TOKEN — M3/sys/dark/on-primary-container (button labels) */
+    --m3-primary: #6750A4;                      /* NO TOKEN — Figma schemes/primary (Save button) */
+    --m3-on-surface-80: rgba(255, 255, 255, 0.8);      /* NO TOKEN — Figma label color */
+    --m3-state-layer-16: rgba(254, 247, 255, 0.16);    /* NO TOKEN — Figma state-layers/surface/opacity-16 */
+    --m3-state-layer-08: rgba(254, 247, 255, 0.08);    /* NO TOKEN — M3 hover state layer */
+    --m3-preview-placeholder: #D9D9D9;          /* NO TOKEN — Figma rectangle fill under the preview image */
+    --page-backdrop: #0B0A0E;                   /* NO TOKEN — stage behind the phone frame */
+    --m3-tracking-title-small: 0.1px;           /* NO TOKEN — M3 title/small tracking */
+    --m3-tracking-title-medium: 0.15px;         /* NO TOKEN — M3 title/medium tracking */
+    --select-spring-stiffness: 700;             /* NO TOKEN — M3 expressive "default spatial" spring for shape morph */
+    --select-spring-damping-ratio: 0.8;         /* NO TOKEN — ~2% overshoot on the circle morph */
+    --select-morph-dip: 0.92;                   /* NO TOKEN — M3 expressive shape morph: brief 8% shrink mid-morph */
+    --scroll-spring-stiffness: 220;             /* NO TOKEN — release/snap spring, measured ~0.35s settle in video */
+    --scroll-spring-damping-ratio: 0.88;        /* NO TOKEN — slight overshoot on snap, as in video 2.3s–2.6s */
+    /* --select-easing / --select-duration are written by the script from the spring above */
+  }
+
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    display: grid;
+    place-items: center;
+    background: var(--page-backdrop);
+    font-family: var(--font-family-body), system-ui, sans-serif;
+    font-weight: var(--font-weight-medium);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* 412×917 Figma frame; scaled to fit the viewport by the script */
+  .phone {
+    position: relative;
+    width: 412px;
+    height: 917px;
+    background: var(--m3-surface);
+    border-radius: var(--size-radius-xl);
+    overflow: hidden;
+    transform-origin: center;
+    user-select: none;
+  }
+
+  /* ---- Preview (Figma 101:4952) ---- */
+  .preview {
+    position: absolute;
+    left: var(--size-space-component-padding-sm);
+    top: 193px;
+    width: 396px;
+    height: 380px;
+    border-radius: var(--size-radius-md);
+    background: var(--m3-preview-placeholder);
+    overflow: hidden;
+  }
+  .preview img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: var(--preview-filter, none);
+    transition: filter var(--motion-duration-slow) ease-out;
+  }
+
+  /* ---- Carousel (Figma 101:4919) ---- */
+  .carousel {
+    position: absolute;
+    left: 0;
+    bottom: 176px;
+    width: 412px;
+    padding: var(--size-space-component-padding-sm) 0;
+    overflow: hidden;
+    touch-action: pan-y;
+    cursor: grab;
+  }
+  .carousel.is-dragging { cursor: grabbing; }
+  .carousel__track {
+    position: relative;
+    height: calc(var(--carousel-item-large) + var(--size-component-height-lg));
+  }
+  .item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--carousel-item-large);
+    will-change: transform, width;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    outline: none;
+  }
+  .item:focus-visible .thumb { box-shadow: 0 0 0 2px var(--m3-inverse-primary); }
+
+  .thumb {
+    position: relative;
+    height: var(--carousel-item-large);
+    border-radius: var(--size-radius-xl);
+    background: var(--m3-surface-container-high);
+    overflow: hidden;
+    transform-origin: center;
+    transition:
+      border-radius var(--select-duration, 400ms) var(--select-easing, ease),
+      background-color var(--select-duration, 400ms) var(--select-easing, ease);
+  }
+  /* Shape morph pulse: the thumb dips and springs back while its corners round off */
+  .item.is-morphing .thumb {
+    animation: thumb-morph var(--select-duration, 400ms) var(--select-easing, ease);
+  }
+  @keyframes thumb-morph {
+    0%   { transform: scale(1); }
+    35%  { transform: scale(var(--select-morph-dip)); }
+    100% { transform: scale(1); }
+  }
+  /* Image stays put at 72px while the item mask narrows — the video shows a centered strip, never a squish */
+  .thumb img {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: var(--carousel-item-large);
+    height: var(--carousel-item-large);
+    transform: translateX(-50%);
+    object-fit: contain;
+    mix-blend-mode: luminosity;
+    transition:
+      opacity var(--motion-duration-normal) ease-out,
+      transform var(--select-duration, 400ms) var(--select-easing, ease);
+  }
+  .item.is-selected .thumb img { transform: translateX(-50%) scale(0.6); }
+  .thumb svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--size-component-icon-md);
+    height: var(--size-component-icon-md);
+    margin: calc(var(--size-component-icon-md) / -2) 0 0 calc(var(--size-component-icon-md) / -2);
+    fill: var(--m3-on-primary-container-light);
+    opacity: 0;
+    transform: scale(0.4);
+    transition:
+      opacity var(--motion-duration-fast) ease-out,
+      transform var(--select-duration, 400ms) var(--select-easing, ease);
+  }
+  .item.is-selected .thumb {
+    /* Half the 72px item, not radius-full: 9999px would snap to a circle in the first frame.
+       On a compressed (narrower) item CSS scales this radius down, which yields the Figma oval. */
+    border-radius: calc(var(--carousel-item-large) / 2);
+    background: var(--m3-inverse-primary);
+  }
+  .item.is-selected .thumb img { opacity: 0; }
+  .item.is-selected .thumb svg { opacity: 1; transform: scale(1); }
+
+  .label {
+    height: var(--size-component-height-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: var(--m3-on-surface-80);
+    font-size: var(--size-typography-sm-font-size);
+    line-height: var(--size-typography-sm-line-height);
+    letter-spacing: var(--m3-tracking-title-small);
+    white-space: nowrap;
+    transition: color var(--motion-duration-normal) ease-out;
+  }
+  .label span {
+    display: inline-block;
+    transform-origin: center;
+    will-change: transform;
+  }
+  .item.is-selected .label { color: var(--m3-inverse-primary); }
+
+  /* ---- Standard button group (Figma 101:4948) ---- */
+  .tools {
+    position: absolute;
+    left: 0;
+    top: 757px;
+    width: 412px;
+    padding: 0 var(--size-space-component-padding-sm);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .icon-btn {
+    width: var(--size-component-height-2xl);
+    height: var(--size-component-height-2xl);
+    border: 0;
+    padding: 0;
+    border-radius: var(--size-radius-full);
+    background: transparent;
+    display: grid;
+    place-items: center;
+    opacity: 0.8;
+    cursor: pointer;
+    transition: background-color var(--motion-duration-fast) ease-out, opacity var(--motion-duration-fast) ease-out;
+  }
+  .icon-btn:hover { background: var(--m3-state-layer-08); opacity: 1; }
+  .icon-btn.is-selected { background: var(--m3-state-layer-16); opacity: 1; }
+  .icon-btn img { width: var(--size-component-icon-md); height: var(--size-component-icon-md); display: block; }
+
+  /* ---- Cancel / Save (Figma 101:4949) ---- */
+  .actions {
+    position: absolute;
+    left: 0;
+    top: 829px;
+    width: 412px;
+    padding: var(--size-space-component-padding-lg) var(--size-space-component-padding-sm);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .btn {
+    height: var(--size-component-height-2xl);
+    padding: 0 var(--size-space-component-padding-xl);
+    border: 0;
+    border-radius: var(--size-radius-full);
+    background: transparent;
+    color: var(--m3-on-primary-container);
+    font: inherit;
+    font-size: var(--size-typography-md-font-size);
+    line-height: var(--size-typography-md-line-height);
+    letter-spacing: var(--m3-tracking-title-medium);
+    cursor: pointer;
+    transition: background-color var(--motion-duration-fast) ease-out;
+  }
+  .btn:hover { background: var(--m3-state-layer-08); }
+  .btn--filled { background: var(--m3-primary); }
+  .btn--filled:hover { background: color-mix(in srgb, var(--m3-primary), var(--m3-on-primary-container) 8%); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .thumb, .thumb img, .thumb svg, .label, .preview img { transition-duration: 0ms !important; }
+    .item.is-morphing .thumb { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <main class="phone" id="phone" aria-label="Photo filter editor">
+    <div class="preview" id="preview">
+      <img src="filter-carousel/preview.png" alt="Photo preview" draggable="false" />
+    </div>
+
+    <div class="carousel" id="carousel" role="listbox" aria-label="Filters" aria-orientation="horizontal">
+      <div class="carousel__track" id="track"></div>
+    </div>
+
+    <div class="tools" role="group" aria-label="Edit tools">
+      <button class="icon-btn" type="button" aria-label="Auto enhance"><img src="filter-carousel/icon-01.svg" alt="" /></button>
+      <button class="icon-btn" type="button" aria-label="Voice"><img src="filter-carousel/icon-02.svg" alt="" /></button>
+      <button class="icon-btn" type="button" aria-label="Stickers"><img src="filter-carousel/icon-03.svg" alt="" /></button>
+      <button class="icon-btn is-selected" type="button" aria-label="Filters" aria-pressed="true"><img src="filter-carousel/icon-04.svg" alt="" /></button>
+      <button class="icon-btn" type="button" aria-label="More options"><img src="filter-carousel/icon-05.svg" alt="" /></button>
+    </div>
+
+    <div class="actions">
+      <button class="btn" type="button">Cancel</button>
+      <button class="btn btn--filled" type="button">Save</button>
+    </div>
+  </main>
+
+<script>
+(() => {
+  const css = getComputedStyle(document.documentElement);
+  const px = (name) => parseFloat(css.getPropertyValue(name));
+  const num = (name) => parseFloat(css.getPropertyValue(name));
+
+  // ---- Spring → CSS linear() easing (same approach as fab-menu.html) ----
+  function springCurve(stiffness, dampingRatio) {
+    const w0 = Math.sqrt(stiffness);
+    const zeta = dampingRatio;
+    const wd = w0 * Math.sqrt(1 - zeta * zeta);
+    const pos = (t) => 1 - Math.exp(-zeta * w0 * t) * (Math.cos(wd * t) + (zeta * w0 / wd) * Math.sin(wd * t));
+    let duration = 0.1;
+    for (let t = 0.1; t < 3; t += 0.01) { if (Math.abs(1 - pos(t)) < 0.001 && Math.abs(1 - pos(t + 0.05)) < 0.001) { duration = t; break; } }
+    const steps = 48, pts = [];
+    for (let i = 0; i <= steps; i++) pts.push(pos((i / steps) * duration).toFixed(4));
+    return { easing: `linear(${pts.join(', ')})`, duration: Math.round(duration * 1000) };
+  }
+  const sel = springCurve(num('--select-spring-stiffness'), num('--select-spring-damping-ratio'));
+  document.documentElement.style.setProperty('--select-easing', sel.easing);
+  document.documentElement.style.setProperty('--select-duration', sel.duration + 'ms');
+
+  // ---- Geometry (Figma frame 412 wide; M3 multi-browse keylines) ----
+  const W = 412;
+  const P = px('--size-space-component-padding-sm');   // 8
+  const G = px('--size-space-component-gap-sm');       // 8
+  const L = px('--carousel-item-large');               // 72
+  const M = px('--size-component-height-2xl');         // 56
+  const S = px('--size-space-component-gap-lg');       // 16
+  const XS = px('--size-space-component-gap-xs');      // 4 (anchor, off-screen)
+
+  const FILTERS = [
+    { label: 'None',    filter: 'none' },
+    { label: 'Simple',  filter: 'saturate(0.85) contrast(1.05)' },
+    { label: 'Verbana', filter: 'sepia(0.25) hue-rotate(-14deg) saturate(1.25)' },
+    { label: 'Palma',   filter: 'sepia(0.4) saturate(1.35) brightness(1.04)' },
+    { label: 'Dark',    filter: 'brightness(0.72) contrast(1.15)' },
+    { label: 'Mono',    filter: 'grayscale(1)' },
+    { label: 'Noir',    filter: 'grayscale(1) contrast(1.45) brightness(0.85)' },
+  ];
+  const N = FILTERS.length;
+  const contentW = W - 2 * P;
+  const step = L + G;
+  const maxScroll = N * L + (N - 1) * G - contentW;
+
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  // A keyline state maps an item's *unadjusted* center (as if every item were large)
+  // to an actual center + width. Anchors sit just outside the frame so items shrink to nothing at the edges.
+  function buildState(widths, uFirst) {
+    const sum = widths.reduce((a, b) => a + b, 0);
+    const gap = (contentW - sum) / (widths.length - 1);
+    let x = P; const ks = [];
+    widths.forEach((w, j) => { ks.push({ u: uFirst + j * step, c: x + w / 2, w }); x += w + gap; });
+    ks.unshift({ u: ks[0].u - step, c: -XS / 2, w: XS });
+    ks.push({ u: ks[ks.length - 1].u + step, c: W + XS / 2, w: XS });
+    return ks;
+  }
+  const startState = buildState([L, L, L, L, M, S], P + L / 2);                       // Figma "Default"
+  const endState   = buildState([S, M, L, L, L, L], (W - P - L / 2) - 5 * step);      // Figma "Scrolled"
+  const shiftRange = startState[6].u - endState[6].u;   // small/medium keylines migrate to the start over the last stretch
+
+  function stateAt(s) {
+    const t = clamp((s - (maxScroll - shiftRange)) / shiftRange, 0, 1);
+    if (t <= 0) return startState;
+    if (t >= 1) return endState;
+    return startState.map((k, i) => ({ u: lerp(k.u, endState[i].u, t), c: lerp(k.c, endState[i].c, t), w: lerp(k.w, endState[i].w, t) }));
+  }
+  function place(ks, u) {
+    const first = ks[0], last = ks[ks.length - 1];
+    if (u <= first.u) return { c: first.c - (first.u - u), w: XS };
+    if (u >= last.u)  return { c: last.c + (u - last.u), w: XS };
+    for (let i = 0; i < ks.length - 1; i++) {
+      const a = ks[i], b = ks[i + 1];
+      if (u >= a.u && u <= b.u) { const t = (u - a.u) / (b.u - a.u); return { c: lerp(a.c, b.c, t), w: lerp(a.w, b.w, t) }; }
+    }
+    return { c: last.c, w: XS };
+  }
+
+  // ---- DOM ----
+  const track = document.getElementById('track');
+  const carousel = document.getElementById('carousel');
+  const preview = document.getElementById('preview');
+  const items = FILTERS.map((f, i) => {
+    const el = document.createElement('button');
+    el.className = 'item'; el.type = 'button'; el.setAttribute('role', 'option');
+    el.dataset.index = i;
+    el.innerHTML = `
+      <div class="thumb">
+        <img src="filter-carousel/thumb-placeholder.png" alt="" draggable="false" />
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.54881 18.0001L3.84881 12.3001L5.27381 10.8751L9.54881 15.1501L18.7238 5.97512L20.1488 7.40012L9.54881 18.0001Z"/></svg>
+      </div>
+      <div class="label"><span>${f.label}</span></div>`;
+    track.appendChild(el);
+    return { el, thumb: el.querySelector('.thumb'), label: el.querySelector('.label span'), textW: 0 };
+  });
+  items.forEach((it) => { it.textW = it.label.getBoundingClientRect().width; });
+
+  let scroll = 0;
+  function render() {
+    const ks = stateAt(scroll);
+    items.forEach((it, i) => {
+      const u = P + L / 2 + i * step - scroll;
+      const { c, w } = place(ks, u);
+      const width = Math.max(0, w);
+      it.el.style.width = width + 'px';
+      it.el.style.transform = `translate3d(${(c - width / 2).toFixed(2)}px,0,0)`;
+      // Label squeezes horizontally with its item (Figma "Mono" sliver is a compressed glyph run)
+      const sx = it.textW ? clamp((width - 2) / it.textW, 0.05, 1) : 1;
+      it.label.style.transform = `scaleX(${sx.toFixed(3)})`;
+      const fade = clamp((width - XS) / (S - XS), 0, 1);
+      it.el.style.opacity = fade.toFixed(3);
+      it.el.setAttribute('aria-hidden', width < S / 2 ? 'true' : 'false');
+    });
+  }
+
+  // ---- Selection ----
+  let selected = 0;
+  function select(i) {
+    const prev = selected;
+    selected = i;
+    items.forEach((it, j) => {
+      it.el.classList.toggle('is-selected', j === i);
+      it.el.setAttribute('aria-selected', j === i ? 'true' : 'false');
+    });
+    // Replay the morph pulse on both the item rounding into a circle and the one squaring back off
+    if (prev !== i) [prev, i].forEach((j) => {
+      const el = items[j].el;
+      el.classList.remove('is-morphing');
+      void el.offsetWidth;
+      el.classList.add('is-morphing');
+      el.addEventListener('animationend', () => el.classList.remove('is-morphing'), { once: true });
+    });
+    preview.style.setProperty('--preview-filter', FILTERS[i].filter);
+  }
+  select(0);
+
+  // ---- Scroll physics ----
+  let target = 0, velocity = 0, raf = 0, lastT = 0;
+  const K = num('--scroll-spring-stiffness');
+  const C = 2 * Math.sqrt(K) * num('--scroll-spring-damping-ratio');
+  function animate(now) {
+    const dt = Math.min(0.032, (now - lastT) / 1000 || 0.016); lastT = now;
+    const a = -K * (scroll - target) - C * velocity;
+    velocity += a * dt; scroll += velocity * dt;
+    render();
+    if (Math.abs(scroll - target) < 0.05 && Math.abs(velocity) < 2) { scroll = target; velocity = 0; render(); raf = 0; return; }
+    raf = requestAnimationFrame(animate);
+  }
+  function settle(to, v0) {
+    target = to; velocity = v0 || 0;
+    if (!raf) { lastT = performance.now(); raf = requestAnimationFrame(animate); }
+  }
+  function snapTarget(projected) {
+    const t = clamp(projected, 0, maxScroll);
+    if (t > maxScroll - step / 2) return maxScroll;
+    return clamp(Math.round(t / step) * step, 0, maxScroll);
+  }
+  // Scroll offset that parks item i on the large keyline nearest the frame's center (the third
+  // large slot, center 204 of 412). Clamped, so items near either end land full-size at the edge.
+  function centerScroll(i) {
+    return clamp((i - 2) * step, 0, maxScroll);
+  }
+  function isCompressed(i) {
+    return parseFloat(items[i].el.style.width) < L - 0.5;
+  }
+  function rubber(raw) {
+    if (raw < 0) return raw * 0.3;
+    if (raw > maxScroll) return maxScroll + (raw - maxScroll) * 0.3;
+    return raw;
+  }
+
+  // Pointer drag (mouse + touch), tap to select
+  let drag = null;
+  carousel.addEventListener('pointerdown', (e) => {
+    if (e.button !== undefined && e.button !== 0) return;
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    drag = { x0: e.clientX, s0: scroll, moved: false, samples: [{ t: performance.now(), x: e.clientX }], target: e.target.closest('.item') };
+    carousel.setPointerCapture(e.pointerId);
+  });
+  carousel.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const scale = phoneScale();
+    const dx = (e.clientX - drag.x0) / scale;
+    if (Math.abs(dx) > 4) drag.moved = true;
+    scroll = rubber(drag.s0 - dx);
+    drag.samples.push({ t: performance.now(), x: e.clientX });
+    if (drag.samples.length > 6) drag.samples.shift();
+    render();
+  });
+  function endDrag(e) {
+    if (!drag) return;
+    const d = drag; drag = null;
+    carousel.classList.remove('is-dragging');
+    if (!d.moved) {
+      if (d.target) {
+        const i = +d.target.dataset.index;
+        if (isCompressed(i)) {
+          // Tap on a squished edge thumbnail: expand it to the default shape and bring it to the center.
+          // It is not selected yet; a second tap on the full-size item selects it.
+          settle(centerScroll(i), 0);
+          return;
+        }
+        select(i);
+      }
+      settle(snapTarget(scroll), 0);
+      return;
+    }
+    const a = d.samples[0], b = d.samples[d.samples.length - 1];
+    const dt = Math.max(1, b.t - a.t);
+    const v = clamp(-((b.x - a.x) / phoneScale()) / dt * 1000, -1800, 1800); // px/s in scroll direction
+    // Project at most one keyline step past the release point, as in the video (no long flings)
+    settle(snapTarget(scroll + clamp(v * 0.12, -step, step)), v);
+  }
+  carousel.addEventListener('pointerup', endDrag);
+  carousel.addEventListener('pointercancel', endDrag);
+  carousel.addEventListener('pointerdown', () => carousel.classList.add('is-dragging'));
+
+  // Trackpad / wheel
+  let wheelTimer = 0;
+  carousel.addEventListener('wheel', (e) => {
+    const dx = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : (e.shiftKey ? e.deltaY : 0);
+    if (!dx) return;
+    e.preventDefault();
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    scroll = rubber(scroll + dx);
+    render();
+    clearTimeout(wheelTimer);
+    wheelTimer = setTimeout(() => settle(snapTarget(scroll), 0), 120);
+  }, { passive: false });
+
+  // Keyboard
+  carousel.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    e.preventDefault();
+    const next = clamp(selected + (e.key === 'ArrowRight' ? 1 : -1), 0, N - 1);
+    select(next);
+    items[next].el.focus({ preventScroll: true });
+    settle(centerScroll(next), 0);
+  });
+
+  // ---- Fit the 412×917 frame to the viewport ----
+  const phone = document.getElementById('phone');
+  function phoneScale() { return parseFloat(phone.dataset.scale || '1'); }
+  function fit() {
+    const s = Math.min(1, (window.innerHeight - 48) / 917, (window.innerWidth - 32) / 412);
+    phone.dataset.scale = s;
+    phone.style.transform = `scale(${s})`;
+  }
+  window.addEventListener('resize', fit);
+  fit();
+  render();
+  if (document.fonts) document.fonts.ready.then(() => { items.forEach((it) => { it.label.style.transform = ''; it.textW = it.label.getBoundingClientRect().width; }); render(); });
+})();
+</script>
+</body>
+</html>
