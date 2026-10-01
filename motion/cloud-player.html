@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cloud 9 Wave Progress</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Flex:wght@500&family=IBM+Plex+Mono&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,1,0&display=swap" />
+<style>
+  :root {
+    /* ---- tokens.json ---- */
+    --size-space-component-padding-3xl: 40px;   /* size/spaceComponentPadding3xl — phone side margin */
+    --size-space-component-padding-xl: 24px;    /* size/spaceComponentPaddingXl — volume pill side padding */
+    --size-space-component-padding-lg: 16px;    /* size/spaceComponentPaddingLg — volume pill vertical padding */
+    --size-space-component-padding-md: 12px;    /* size/spaceComponentPaddingMd — chip side padding */
+    --size-space-component-padding-sm: 8px;     /* size/spaceComponentPaddingSm — app bar vertical padding */
+    --size-space-component-padding-xs: 4px;     /* size/spaceComponentPaddingXs — app bar side padding */
+    --size-space-component-gap-xs: 4px;         /* size/spaceComponentGapXs — chip icon→label */
+    --size-space-component-gap-sm: 8px;         /* size/spaceComponentGapSm — buttons, time→indicator */
+    --size-space-layout-section-gap-md: 24px;   /* size/spaceLayoutSectionGapMd — demo strip → phone */
+    --size-radius-lg: 12px;                     /* size/radiusLg — chip corner */
+    --size-radius-full: 9999px;                 /* size/radiusFull — volume pills, app bar state layer, nav handle */
+    --size-border-md: 2px;                      /* size/borderMd — focus ring */
+    --size-component-height-xl: 48px;           /* size/componentHeightXl — app bar icon slot */
+    --size-component-height-lg: 40px;           /* size/componentHeightLg — app bar state layer */
+    --size-component-height-md: 32px;           /* size/componentHeightMd — chip height */
+    --size-component-height-2xl: 56px;          /* size/componentHeight2xl — volume pills */
+    --size-component-height-3xl: 64px;          /* size/componentHeight3xl — app bar height */
+    --size-component-icon-md: 24px;             /* size/componentIconMd — volume + app bar icons */
+    --size-typography-sm-font-size: 14px;       /* size/typographySmFontSize — M3 label/large */
+    --size-typography-sm-line-height: 20px;     /* size/typographySmLineHeight — M3 label/large */
+    --font-family-body: "Roboto";               /* font/english/typographyFontFamilyBody */
+    --font-weight-regular: 400;                 /* font/english/typographyFontWeightRegular */
+    --font-weight-medium: 500;                  /* font/english/typographyFontWeightMedium */
+    --motion-duration-fast: 100ms;              /* motion/durationFast — wave amplitude rise on entry / resume */
+    --motion-duration-normal: 200ms;            /* motion/durationNormal — wave flattens on complete / pause (measured ~150ms) */
+    --motion-duration-slow: 300ms;              /* motion/durationSlow — icon swap cross-fade */
+
+    /* ---- FLAGGED: no matching token in tokens.json (values from Figma M3 kit / measured from video) ---- */
+    --m3-primary: #6750A4;                      /* NO TOKEN — Figma M3/sys/light/primary: active wave, handle, pause button */
+    --m3-on-primary: #FFFFFF;                   /* NO TOKEN — Figma M3/sys/light/on-primary */
+    --m3-secondary-container: #E8DEF8;          /* NO TOKEN — Figma M3/sys/light/secondary-container: tonal buttons */
+    --m3-on-secondary-container: #1D192B;       /* NO TOKEN — Figma M3/sys/light/on-secondary-container */
+    --m3-surface-variant: #E7E0EC;              /* NO TOKEN — Figma M3/sys/light/surface-variant: chips */
+    --m3-on-surface-variant: #49454F;           /* NO TOKEN — Figma M3/sys/light/on-surface-variant */
+    --m3-on-surface: #1D1B20;                   /* NO TOKEN — Figma M3/sys/light/on-surface: title */
+    --m3-outline-variant: #CAC4D0;              /* NO TOKEN — Figma M3/sys/light/outline-variant: track */
+    --m3-inverse-on-surface: #F5EFF7;           /* NO TOKEN — Figma frame background */
+    --m3-surface: #FFFFFF;                      /* NO TOKEN — white volume pills */
+    --surface-page: #E6E3F6;                    /* NO TOKEN — stage lavender sampled from reference video card */
+    --phone-width: 412px;                       /* NO TOKEN — Figma frame "Android Compact - 2" */
+    --phone-height: 917px;                      /* NO TOKEN — Figma frame "Android Compact - 2" */
+    --status-bar-height: 52px;                  /* NO TOKEN — Figma Building Blocks/status-bar */
+    --nav-bar-height: 24px;                     /* NO TOKEN — Figma Building Blocks/navigation */
+    --art-size: 332px;                          /* NO TOKEN — Figma album art 332×332 */
+    --art-radius: 24px;                         /* NO TOKEN — Figma album art corner */
+    --art-top: 157px;                           /* NO TOKEN — Figma album art y */
+    --progress-top: 545px;                      /* NO TOKEN — Figma progress row y */
+    --transport-top: 605px;                     /* NO TOKEN — Figma transport row y */
+    --volume-top: 733px;                        /* NO TOKEN — Figma volume row y */
+    --chips-top: 837px;                         /* NO TOKEN — Figma chips row y */
+    --transport-height: 96px;                   /* NO TOKEN — Figma icon buttons 96 tall */
+    --transport-side-width: 96px;               /* NO TOKEN — Figma tonal icon button width */
+    --transport-center-width: 124px;            /* NO TOKEN — Figma primary pause button width */
+    --transport-side-radius: 24px;              /* NO TOKEN — Figma tonal icon button corner */
+    --transport-center-radius: 28px;            /* NO TOKEN — Figma pause button corner */
+    --transport-icon: 40px;                     /* NO TOKEN — Figma 40dp transport glyphs */
+    --volume-pill-width: 130px;                 /* NO TOKEN — Figma volume down/up pills */
+    --chip-icon: 20px;                          /* NO TOKEN — Figma 20dp chip glyphs (componentIconSm is 16) */
+    --chip-padding-y: 6px;                      /* NO TOKEN — Figma chip vertical padding */
+    --title-font-size: 22px;                    /* NO TOKEN — M3 title/large */
+    --title-line-height: 28px;                  /* NO TOKEN — M3 title/large */
+    --label-tracking: 0.1px;                    /* NO TOKEN — M3 label/large tracking */
+    --nav-handle-width: 108px;                  /* NO TOKEN — Android gesture handle */
+    --nav-handle-height: 4px;                   /* NO TOKEN — Android gesture handle */
+
+    /* Wave indicator geometry — Figma ".Building Blocks/Progress indicator/Width 4/Segment - wave" */
+    --wave-thickness: 4px;                      /* NO TOKEN — Figma Thickness=4 (stroke) */
+    --wave-height: 12px;                        /* NO TOKEN — Figma Wave height=12 (peak-to-peak incl. stroke) */
+    --wave-length: 40px;                        /* NO TOKEN — Figma Wavelength=40 */
+    --wave-row-height: 20px;                    /* NO TOKEN — Figma indicator frame height */
+    --wave-lead: 2px;                            /* NO TOKEN — Figma pl-[2px] before active indicator */
+    --wave-handle-gap: 6px;                     /* NO TOKEN — Figma gap-[6px] either side of the handle */
+    --wave-handle-width: 4px;                   /* NO TOKEN — Figma "Line 1" 4px stroke */
+    --wave-handle-height: 20px;                 /* NO TOKEN — Figma "Line 1" 20px */
+
+    /* Motion — measured from reference video (60fps frame analysis) */
+    --wave-speed-cycles: 2.5;                   /* NO TOKEN — wave travels 2.5 wavelengths/s toward the start (measured −16 rad/s) */
+    --fill-spring-stiffness: 800;               /* NO TOKEN — fill-in / complete spring, peak ≈130–150ms after trigger */
+    --fill-spring-damping-ratio: 0.6;           /* NO TOKEN — ≈10% overshoot on fill-in and on complete */
+    --art-wave-amplitude: 6px;                  /* NO TOKEN — album art ripple amplitude (bar centerline amplitude is 4px) */
+    --art-wave-length-ratio: 4;                 /* NO TOKEN — art wavelength = 4× bar wavelength; crest velocity matched to the bar */
+    --art-kick-gain: 1.6;                       /* NO TOKEN — extra ripple px per (progress/s) while the fill spring is moving */
+    --art-kick-max: 8px;                        /* NO TOKEN — ripple cap during fill surges */
+    --demo-hold-before-complete: 1200ms;        /* NO TOKEN — reference holds ~1.2s at partial fill before completing */
+    --demo-hold-after-complete: 1300ms;         /* NO TOKEN — reference holds ~1.3s at 100% before restarting */
+    --track-duration-s: 649;                    /* NO TOKEN — Figma "10:49" */
+    --initial-progress: 0.33;                   /* NO TOKEN — Figma active indicator ≈ 80px of 252 */
+  }
+
+  html { height: 100%; }
+  body {
+    margin: 0;
+    min-height: 100%;
+    box-sizing: border-box;
+    padding: var(--size-space-layout-section-gap-md) 0;
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    row-gap: var(--size-space-layout-section-gap-md);
+    background: var(--surface-page);
+    font-family: var(--font-family-body), system-ui, sans-serif;
+    color: var(--m3-on-surface);
+  }
+
+  .material-symbols-rounded {
+    font-family: "Material Symbols Rounded";
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    font-variation-settings: "FILL" 1, "wght" 300, "GRAD" 0, "opsz" 24;
+    font-size: var(--size-component-icon-md);
+    user-select: none;
+  }
+
+  /* ---------- phone ---------- */
+  .phone {
+    position: relative;
+    width: var(--phone-width);
+    height: var(--phone-height);
+    background: var(--m3-inverse-on-surface);
+    overflow: hidden;
+  }
+
+  .status-bar {
+    position: absolute; inset: 0 0 auto 0;
+    height: var(--status-bar-height);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 var(--size-space-component-padding-xl);
+    box-sizing: border-box;
+    font: var(--font-weight-medium) var(--size-typography-sm-font-size) / var(--size-typography-sm-line-height) var(--font-family-body), system-ui, sans-serif;
+  }
+  .status-bar__camera {
+    position: absolute; left: 50%; top: 50%;
+    width: var(--size-component-icon-md); height: var(--size-component-icon-md);
+    transform: translate(-50%, -50%);
+    border-radius: var(--size-radius-full);
+    background: var(--m3-on-surface);
+  }
+  .status-bar__icons { display: flex; gap: var(--size-space-component-gap-xs); }
+  .status-bar__icons .material-symbols-rounded { font-size: var(--size-typography-sm-line-height); color: var(--m3-on-surface); }
+
+  .app-bar {
+    position: absolute; left: 0; right: 0; top: var(--status-bar-height);
+    height: var(--size-component-height-3xl);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--size-space-component-padding-sm) var(--size-space-component-padding-xs);
+    box-sizing: border-box;
+  }
+  .app-bar__title {
+    position: absolute; left: var(--size-component-height-2xl); right: var(--size-component-height-2xl);
+    margin: 0; text-align: center;
+    font: var(--font-weight-regular) var(--title-font-size) / var(--title-line-height) var(--font-family-body), system-ui, sans-serif;
+    color: var(--m3-on-surface);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .icon-slot {
+    display: grid; place-items: center;
+    width: var(--size-component-height-xl); height: var(--size-component-height-xl);
+    border: 0; padding: 0; background: none; color: var(--m3-on-surface-variant); cursor: pointer;
+  }
+  .icon-slot > span {
+    display: grid; place-items: center;
+    width: var(--size-component-height-lg); height: var(--size-component-height-lg);
+    border-radius: var(--size-radius-full);
+  }
+
+  /* ---------- album art ---------- */
+  .art {
+    position: absolute; left: 50%; top: var(--art-top);
+    width: var(--art-size); height: var(--art-size);
+    transform: translateX(-50%);
+    border-radius: var(--art-radius);
+    overflow: hidden;
+    background: var(--m3-secondary-container);
+  }
+  .art canvas { display: block; width: 100%; height: 100%; }
+  .art img { display: none; }
+
+  /* ---------- progress ---------- */
+  .progress-row {
+    position: absolute; left: var(--size-space-component-padding-3xl); right: var(--size-space-component-padding-3xl);
+    top: var(--progress-top);
+    height: var(--wave-row-height);
+    display: flex; align-items: center; gap: var(--size-space-component-gap-sm);
+  }
+  .progress-row time {
+    font: var(--font-weight-regular) var(--size-typography-sm-font-size) / var(--size-typography-sm-line-height) "IBM Plex Mono", ui-monospace, monospace;
+    letter-spacing: var(--label-tracking);
+    color: var(--m3-on-surface);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .wave-indicator {
+    flex: 1 0 0; min-width: 0;
+    height: var(--wave-row-height);
+    position: relative;
+  }
+  .wave-indicator svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .wave-indicator__active { fill: none; stroke: var(--m3-primary); stroke-width: var(--wave-thickness); stroke-linecap: round; }
+  .wave-indicator__handle { fill: var(--m3-primary); }
+  .wave-indicator__track { fill: none; stroke: var(--m3-outline-variant); stroke-width: var(--wave-thickness); stroke-linecap: round; }
+
+  /* ---------- transport ---------- */
+  .transport {
+    position: absolute; left: var(--size-space-component-padding-3xl); top: var(--transport-top);
+    display: flex; align-items: center; gap: var(--size-space-component-gap-sm);
+  }
+  .tonal-btn, .primary-btn {
+    display: grid; place-items: center;
+    height: var(--transport-height);
+    border: 0; padding: 0; cursor: pointer;
+    transition: background-color var(--motion-duration-fast) ease-out;
+  }
+  .tonal-btn {
+    width: var(--transport-side-width);
+    border-radius: var(--transport-side-radius);
+    background: var(--m3-secondary-container);
+    color: var(--m3-on-secondary-container);
+  }
+  .primary-btn {
+    width: var(--transport-center-width);
+    border-radius: var(--transport-center-radius);
+    background: var(--m3-primary);
+    color: var(--m3-on-primary);
+  }
+  .transport .material-symbols-rounded { font-size: var(--transport-icon); font-variation-settings: "FILL" 1, "wght" 300, "GRAD" 0, "opsz" 40; }
+  /* pause / play glyphs share a cell and cross-fade so the button is never empty */
+  .primary-btn .material-symbols-rounded { grid-area: 1 / 1; transition: opacity var(--motion-duration-fast) linear; }
+  .primary-btn .icon-play { opacity: 0; }
+  .phone.is-paused .primary-btn .icon-pause { opacity: 0; }
+  .phone.is-paused .primary-btn .icon-play { opacity: 1; }
+
+  /* ---------- volume ---------- */
+  .volume {
+    position: absolute; left: var(--size-space-component-padding-3xl); top: var(--volume-top);
+    display: flex; align-items: center; gap: var(--size-space-component-gap-sm);
+  }
+  .pill-btn {
+    display: grid; place-items: center;
+    height: var(--size-component-height-2xl);
+    padding: var(--size-space-component-padding-lg) var(--size-space-component-padding-xl);
+    box-sizing: border-box;
+    border: 0; border-radius: var(--size-radius-full);
+    background: var(--m3-surface);
+    color: var(--m3-primary);
+    cursor: pointer;
+  }
+  .pill-btn--icon { width: var(--size-component-height-2xl); padding: 0; }
+  .pill-btn--wide { width: var(--volume-pill-width); }
+
+  /* ---------- chips ---------- */
+  .chips {
+    position: absolute; left: var(--size-space-component-padding-3xl); right: var(--size-space-component-padding-3xl);
+    top: var(--chips-top);
+    display: flex; justify-content: space-between;
+  }
+  .chip {
+    display: inline-flex; align-items: center; gap: var(--size-space-component-gap-xs);
+    height: var(--size-component-height-md);
+    padding: var(--chip-padding-y) var(--size-space-component-padding-md);
+    box-sizing: border-box;
+    border: 0; border-radius: var(--size-radius-lg);
+    background: var(--m3-surface-variant);
+    color: var(--m3-on-surface-variant);
+    font: var(--font-weight-medium) var(--size-typography-sm-font-size) / var(--size-typography-sm-line-height) "Roboto Flex", var(--font-family-body), system-ui, sans-serif;
+    letter-spacing: var(--label-tracking);
+    cursor: pointer;
+  }
+  .chip .material-symbols-rounded { font-size: var(--chip-icon); font-variation-settings: "FILL" 1, "wght" 300, "GRAD" 0, "opsz" 20; }
+
+  .nav-bar {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: var(--nav-bar-height);
+    display: grid; place-items: center;
+  }
+  .nav-bar::before {
+    content: "";
+    width: var(--nav-handle-width); height: var(--nav-handle-height);
+    border-radius: var(--size-radius-full);
+    background: var(--m3-on-surface);
+  }
+
+  /* ---------- demo strip (outside the phone) ---------- */
+  .demo {
+    display: flex; align-items: center; gap: var(--size-space-component-gap-sm);
+    font: var(--font-weight-medium) var(--size-typography-sm-font-size) / var(--size-typography-sm-line-height) var(--font-family-body), system-ui, sans-serif;
+    color: var(--m3-on-surface-variant);
+  }
+  .demo button {
+    height: var(--size-component-height-md);
+    padding: 0 var(--size-space-component-padding-md);
+    border: 0; border-radius: var(--size-radius-lg);
+    background: var(--m3-surface); color: var(--m3-primary);
+    font: inherit; cursor: pointer;
+  }
+  .demo label { display: inline-flex; align-items: center; gap: var(--size-space-component-gap-xs); cursor: pointer; }
+
+  button:focus-visible { outline: var(--size-border-md) solid var(--m3-primary); outline-offset: var(--size-border-md); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tonal-btn, .primary-btn, .primary-btn .material-symbols-rounded { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="phone" id="phone">
+    <div class="status-bar" aria-hidden="true">
+      <span>9:30</span>
+      <span class="status-bar__camera"></span>
+      <span class="status-bar__icons">
+        <span class="material-symbols-rounded">wifi</span>
+        <span class="material-symbols-rounded">signal_cellular_alt</span>
+        <span class="material-symbols-rounded">battery_full</span>
+      </span>
+    </div>
+
+    <header class="app-bar">
+      <button class="icon-slot" aria-label="Collapse"><span><span class="material-symbols-rounded">keyboard_arrow_down</span></span></button>
+      <h1 class="app-bar__title">Cloud 9</h1>
+      <button class="icon-slot" aria-label="More options"><span><span class="material-symbols-rounded">more_vert</span></span></button>
+    </header>
+
+    <div class="art">
+      <canvas id="artCanvas" aria-hidden="true"></canvas>
+      <img id="artImage" src="cloud-player/cloud9.jpg" alt="Cloud 9 album art: sunbeams through purple clouds" />
+    </div>
+
+    <div class="progress-row">
+      <time id="elapsed">0:00</time>
+      <div class="wave-indicator" id="waveIndicator" role="progressbar" aria-valuemin="0" aria-valuemax="649" aria-valuenow="0" aria-label="Playback position">
+        <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <path class="wave-indicator__active" id="waveActive" d="" />
+          <rect class="wave-indicator__handle" id="waveHandle" x="0" y="0" width="4" height="20" rx="2" />
+          <line class="wave-indicator__track" id="waveTrack" x1="0" y1="10" x2="0" y2="10" />
+        </svg>
+      </div>
+      <time id="total">10:49</time>
+    </div>
+
+    <div class="transport">
+      <button class="tonal-btn" id="btnBack" aria-label="Replay 30 seconds"><span class="material-symbols-rounded">replay_30</span></button>
+      <button class="primary-btn" id="btnPlay" aria-label="Pause" aria-pressed="false">
+        <span class="material-symbols-rounded icon-pause">pause</span>
+        <span class="material-symbols-rounded icon-play">play_arrow</span>
+      </button>
+      <button class="tonal-btn" id="btnFwd" aria-label="Forward 30 seconds"><span class="material-symbols-rounded">forward_30</span></button>
+    </div>
+
+    <div class="volume">
+      <button class="pill-btn pill-btn--icon" aria-label="Mute"><span class="material-symbols-rounded">volume_off</span></button>
+      <button class="pill-btn pill-btn--wide" aria-label="Volume down"><span class="material-symbols-rounded">volume_down</span></button>
+      <button class="pill-btn pill-btn--wide" aria-label="Volume up"><span class="material-symbols-rounded">volume_up</span></button>
+    </div>
+
+    <div class="chips">
+      <button class="chip"><span class="material-symbols-rounded">speaker</span>Living room</button>
+      <button class="chip"><span class="material-symbols-rounded">playlist_play</span>Queue</button>
+    </div>
+
+    <div class="nav-bar" aria-hidden="true"></div>
+  </div>
+
+  <div class="demo">
+    <button id="demoEntry">Replay entry</button>
+    <button id="demoComplete">Complete</button>
+    <label><input type="checkbox" id="demoLoop" checked /> Loop like reference</label>
+  </div>
+
+<script>
+(() => {
+  const root = getComputedStyle(document.documentElement);
+  const num = (name) => parseFloat(root.getPropertyValue(name));
+
+  // ---- geometry (tokens) ----
+  const WAVELENGTH   = num('--wave-length');          // 40
+  const WAVE_HEIGHT  = num('--wave-height');          // 12 (peak-to-peak including stroke)
+  const THICKNESS    = num('--wave-thickness');       // 4
+  const AMPLITUDE    = (WAVE_HEIGHT - THICKNESS) / 2; // 4 — centerline amplitude
+  const ROW_H        = num('--wave-row-height');      // 20
+  const LEAD         = num('--wave-lead');            // 2
+  const HANDLE_GAP   = num('--wave-handle-gap');      // 6
+  const HANDLE_W     = num('--wave-handle-width');    // 4
+
+  // ---- motion (measured) ----
+  const WAVE_SPEED   = num('--wave-speed-cycles');            // 2.5 cycles/s, toward the start
+  const STIFFNESS    = num('--fill-spring-stiffness');        // 800
+  const DAMPING      = 2 * num('--fill-spring-damping-ratio') * Math.sqrt(STIFFNESS);
+  const AMP_IN_MS    = num('--motion-duration-fast');         // 100
+  const AMP_OUT_MS   = num('--motion-duration-normal');       // 200
+  const ART_AMP      = num('--art-wave-amplitude');           // 6
+  const ART_RATIO    = num('--art-wave-length-ratio');        // 4
+  const ART_KICK     = num('--art-kick-gain');
+  const ART_KICK_MAX = num('--art-kick-max');
+  const HOLD_BEFORE  = num('--demo-hold-before-complete');
+  const HOLD_AFTER   = num('--demo-hold-after-complete');
+  const TRACK_S      = num('--track-duration-s');             // 649
+  const INITIAL      = num('--initial-progress');             // 0.33
+  const REDUCED      = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const phone     = document.getElementById('phone');
+  const indicator = document.getElementById('waveIndicator');
+  const active    = document.getElementById('waveActive');
+  const handle    = document.getElementById('waveHandle');
+  const track     = document.getElementById('waveTrack');
+  const elapsedEl = document.getElementById('elapsed');
+  const canvas    = document.getElementById('artCanvas');
+  const ctx       = canvas.getContext('2d');
+  const art       = document.getElementById('artImage');
+
+  // ---- state ----
+  const S = {
+    progress: 0, target: INITIAL, velocity: 0,   // fill spring
+    playing: true,
+    amp: 0, ampTarget: 1,                        // wave amplitude envelope 0..1
+    phase: 0,                                    // radians, shared by bar and art
+    seeking: false,
+  };
+
+  const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+
+  // ---- spring: semi-implicit Euler, sub-stepped for stability ----
+  function stepSpring(dt) {
+    const steps = Math.max(1, Math.ceil(dt / (1 / 240)));
+    const h = dt / steps;
+    for (let i = 0; i < steps; i++) {
+      const a = -STIFFNESS * (S.progress - S.target) - DAMPING * S.velocity;
+      S.velocity += a * h;
+      S.progress += S.velocity * h;
+    }
+    if (Math.abs(S.progress - S.target) < 1e-4 && Math.abs(S.velocity) < 1e-3) {
+      S.progress = S.target; S.velocity = 0;
+    }
+  }
+
+  // ---- wave bar ----
+  function drawBar() {
+    const W = indicator.clientWidth;
+    const inner = W - LEAD - HANDLE_GAP - HANDLE_W - HANDLE_GAP;
+    const shown = Math.min(S.progress, 1 + HANDLE_GAP / inner * 1.5); // let the spring overshoot past the track end, like the reference
+    const end = LEAD + inner * Math.max(0, shown);
+    const env = ease(S.amp) * AMPLITUDE;
+    const cy = ROW_H / 2;
+
+    let d = '';
+    const step = 2;
+    for (let x = LEAD; x <= end; x += step) {
+      const y = cy + env * Math.sin((2 * Math.PI * x) / WAVELENGTH + S.phase);
+      d += (x === LEAD ? 'M' : 'L') + x.toFixed(2) + ' ' + y.toFixed(2);
+    }
+    if (end - LEAD < step) d = `M${LEAD} ${cy}L${(LEAD + 0.01).toFixed(2)} ${cy}`; // zero-length still shows a round dot
+    else {
+      const y = cy + env * Math.sin((2 * Math.PI * end) / WAVELENGTH + S.phase);
+      d += 'L' + end.toFixed(2) + ' ' + y.toFixed(2);
+    }
+    active.setAttribute('d', d);
+
+    const hx = end + HANDLE_GAP;
+    handle.setAttribute('x', hx.toFixed(2));
+    handle.setAttribute('width', HANDLE_W);
+    handle.setAttribute('height', ROW_H);
+    handle.setAttribute('rx', HANDLE_W / 2);
+
+    const tx1 = hx + HANDLE_W + HANDLE_GAP + THICKNESS / 2;
+    const tx2 = W - THICKNESS / 2;
+    const visible = tx2 - tx1 > 0;
+    track.style.visibility = visible ? 'visible' : 'hidden';
+    track.setAttribute('x1', tx1.toFixed(2)); track.setAttribute('x2', tx2.toFixed(2));
+    track.setAttribute('y1', cy); track.setAttribute('y2', cy);
+
+    const secs = Math.min(TRACK_S, Math.max(0, S.progress * TRACK_S));
+    elapsedEl.textContent = fmt(secs);
+    indicator.setAttribute('aria-valuenow', Math.round(secs));
+  }
+
+  // ---- album art: the same traveling wave, applied as a per-column vertical displacement ----
+  let dpr = 1, cw = 0, ch = 0;
+  function sizeCanvas() {
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    const r = canvas.getBoundingClientRect();
+    cw = Math.round(r.width * dpr); ch = Math.round(r.height * dpr);
+    if (canvas.width !== cw || canvas.height !== ch) { canvas.width = cw; canvas.height = ch; }
+  }
+  function drawArt() {
+    if (!art.complete || !art.naturalWidth) return;
+    const kick = Math.min(ART_KICK_MAX, Math.abs(S.velocity) * ART_KICK);
+    const ampCss = REDUCED ? 0 : ART_AMP * ease(S.amp) + kick;
+    const A = ampCss * dpr;
+    const lambda = WAVELENGTH * ART_RATIO * dpr;
+    const phase = S.phase / ART_RATIO; // same crest velocity as the bar
+    ctx.clearRect(0, 0, cw, ch);
+    if (A < 0.05) { ctx.drawImage(art, 0, 0, art.naturalWidth, art.naturalHeight, 0, 0, cw, ch); return; }
+    const sw = art.naturalWidth / cw;
+    const drawH = ch + 2 * A; // overdraw so displaced columns never reveal the background
+    for (let x = 0; x < cw; x++) {
+      const dy = A * Math.sin((2 * Math.PI * x) / lambda + phase);
+      ctx.drawImage(art, x * sw, 0, sw, art.naturalHeight, x, -A + dy, 1, drawH);
+    }
+  }
+
+  const ease = (t) => t * t * (3 - 2 * t); // smoothstep on the amplitude envelope
+
+  // ---- frame loop ----
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+
+    stepSpring(dt);
+
+    // amplitude envelope: rises over durationFast, falls over durationNormal
+    const rate = S.ampTarget > S.amp ? dt * 1000 / AMP_IN_MS : dt * 1000 / AMP_OUT_MS;
+    S.amp += Math.max(-rate, Math.min(rate, S.ampTarget - S.amp));
+
+    if (!REDUCED) S.phase += 2 * Math.PI * WAVE_SPEED * dt; // sin(kx + phase) with rising phase: crests travel toward the start, as measured
+
+    // real-time playback (visible over minutes; the demo loop shows the fast choreography)
+    if (S.playing && !S.seeking && S.target < 1 && !demo.running) {
+      S.target = Math.min(1, S.target + dt / TRACK_S);
+    }
+    S.ampTarget = (S.playing && S.target < 1) ? 1 : 0;
+
+    drawBar();
+    drawArt();
+    demo.tick(now);
+    requestAnimationFrame(frame);
+  }
+
+  // ---- controls ----
+  function setPlaying(p) {
+    S.playing = p;
+    phone.classList.toggle('is-paused', !p);
+    const btn = document.getElementById('btnPlay');
+    btn.setAttribute('aria-label', p ? 'Pause' : 'Play');
+    btn.setAttribute('aria-pressed', String(!p));
+  }
+  function seekBy(seconds) {
+    S.target = Math.max(0, Math.min(1, S.target + seconds / TRACK_S));
+  }
+  function playEntry() {
+    S.progress = 0; S.velocity = 0; S.target = INITIAL; S.amp = 0;
+    setPlaying(true);
+  }
+  function complete() { S.target = 1; }
+
+  document.getElementById('btnPlay').addEventListener('click', () => { demo.stop(); setPlaying(!S.playing); });
+  document.getElementById('btnBack').addEventListener('click', () => { demo.stop(); if (S.target >= 1) setPlaying(true); seekBy(-30); });
+  document.getElementById('btnFwd').addEventListener('click',  () => { demo.stop(); seekBy(30); });
+
+  // ---- demo loop: mirrors the 3s reference (fill in → hold → complete → hold) ----
+  const demo = {
+    running: false, stage: 0, at: 0,
+    start(now) { this.running = true; this.stage = 0; this.at = now; playEntry(); },
+    stop() { this.running = false; loopBox.checked = false; },
+    tick(now) {
+      if (!this.running) return;
+      if (this.stage === 0 && now - this.at >= HOLD_BEFORE) { complete(); this.stage = 1; this.at = now; }
+      else if (this.stage === 1 && now - this.at >= HOLD_AFTER) { this.start(now); }
+    },
+  };
+  const loopBox = document.getElementById('demoLoop');
+  loopBox.addEventListener('change', () => loopBox.checked ? demo.start(performance.now()) : (demo.running = false));
+  document.getElementById('demoEntry').addEventListener('click', () => { demo.running = false; loopBox.checked = false; playEntry(); });
+  document.getElementById('demoComplete').addEventListener('click', () => { demo.running = false; loopBox.checked = false; complete(); });
+
+  // ---- boot ----
+  new ResizeObserver(() => { sizeCanvas(); drawBar(); }).observe(indicator);
+  new ResizeObserver(sizeCanvas).observe(canvas);
+  sizeCanvas();
+  const boot = () => { if (loopBox.checked) demo.start(performance.now()); else playEntry(); requestAnimationFrame(frame); };
+  if (art.complete) boot(); else art.addEventListener('load', boot, { once: true });
+})();
+</script>
+</body>
+</html>
