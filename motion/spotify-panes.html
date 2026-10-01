@@ -238,9 +238,12 @@
     display: flex; flex-direction: column; min-height: 0;
   }
   .pane.lib { width: var(--lib-w); container: lib / inline-size; }
-  .pane.content { width: var(--content-w); container: content / inline-size; }
+  .pane.content { width: calc(var(--content-w) - var(--peek-w)); container: content / inline-size; }
   .pane.content[data-hidden="true"] { border-color: transparent; }
-  .pane.right { width: var(--right-w); container: right / inline-size; }
+  .pane.right { width: calc(var(--right-w) + var(--peek-w)); container: right / inline-size; }
+  .columns { --peek-w: 0px; }
+  .columns.peek { --peek-w: var(--size-space-component-gap-lg); }                 /* strip hover: widens ≈14px in the video → gap-lg 16px */
+  .columns.peek .pane.lib[data-mode="grid"] { width: calc(var(--lib-w) - var(--peek-w)); } /* no content pane in grid mode: the grid gives way instead */
 
   .handle {
     flex: none; width: var(--handle-a-w); position: relative; cursor: col-resize; z-index: 3;
@@ -399,23 +402,50 @@
   .related .row { display: flex; gap: var(--size-space-component-gap-lg); overflow: hidden; }
   .related .img { width: 100%; aspect-ratio: 16 / 9; border-radius: var(--size-radius-md); }
   .related .img.peek { width: var(--size-component-height-lg); flex: none; }
-  .strip { display: none; flex: 1; align-items: center; justify-content: center; padding-top: var(--size-space-component-padding-2xl); }
-  .right[data-mode="strip"] .np { display: none; }
+  .strip { display: none; flex: 1; align-items: center; justify-content: center; padding-top: var(--size-space-component-padding-2xl); position: relative; z-index: 1; }
   .right[data-mode="strip"] .strip { display: flex; }
+  /* Strip hover (hover hint video): chevron brightens at once, the strip widens and the now-playing panel ghosts in behind it
+     at ~20% over ≈200ms, then a "Show Now Playing view" tooltip fades in ≈300ms after the hover begins. */
+  .pane.right { position: relative; }
+  .right[data-mode="strip"] .np {
+    position: absolute; inset: 0; width: var(--size-component-width-md); /* laid out at panel width, clipped by the strip */
+    opacity: var(--opacity-0); pointer-events: none;
+    transition: opacity var(--motion-duration-normal) var(--wf-ease-out);
+  }
+  .columns.peek .right[data-mode="strip"] .np { opacity: var(--opacity-20); }
+  .strip .icon { opacity: var(--opacity-60); transition: opacity var(--motion-duration-fast) var(--wf-ease-out); }
+  .columns.peek .strip .icon { opacity: 1; }
+  .tip {
+    position: absolute; z-index: 5; white-space: nowrap; pointer-events: none;
+    margin-bottom: var(--size-space-component-gap-xs);
+    background: var(--color-text-heading-primary); color: var(--color-interactive-button-label-primary-solid-default);
+    font-size: var(--size-typography-xs-font-size); line-height: var(--size-typography-xs-line-height);
+    padding: var(--size-space-component-padding-xs) var(--size-space-component-padding-sm);
+    border-radius: var(--size-radius-sm);
+    opacity: var(--opacity-0); transition: opacity var(--motion-duration-fast) var(--wf-ease-out);
+  }
+  .columns.peek .tip { opacity: 1; transition-delay: var(--motion-duration-slow); }
   .right.entering .np > * { animation: rise var(--motion-duration-normal) var(--wf-ease-out) both; animation-delay: calc(var(--i, 0) * 20ms); }
 
   /* ---------- Full view overlay ---------- */
+  /* WF5 opens from the now-playing pane: the overlay starts at that pane's left edge (--fv-left, set by JS)
+     and its left edge sweeps right → left across the window over durationSlow; closing reverses the sweep. */
   .fullview {
-    position: absolute; inset: 0; z-index: 5;
+    position: absolute; inset: 0 0 0 var(--fv-left, 0px); z-index: 5;
     background: var(--color-surface-card-surface);
     border: var(--size-border-sm) solid var(--color-surface-card-shadow);
     border-radius: var(--size-radius-lg);
     display: flex; flex-direction: column;
     padding: var(--size-space-component-padding-2xl) var(--size-space-component-padding-lg) var(--size-space-component-padding-xl);
     opacity: 0; visibility: hidden; pointer-events: none;
-    transition: opacity var(--motion-duration-normal) var(--wf-ease-out), visibility 0s linear var(--motion-duration-normal);
+    transition: left var(--motion-duration-slow) var(--wf-ease-out),
+                opacity var(--motion-duration-fast) var(--wf-ease-out) var(--motion-duration-normal), /* fade out only in the last 100ms of the sweep back */
+                visibility 0s linear var(--motion-duration-slow);
   }
-  .fullview.on { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity var(--motion-duration-normal) var(--wf-ease-out), visibility 0s; }
+  .fullview.on {
+    left: 0; opacity: 1; visibility: visible; pointer-events: auto;
+    transition: left var(--motion-duration-slow) var(--wf-ease-out), opacity var(--motion-duration-fast) var(--wf-ease-out), visibility 0s;
+  }
   .fv-head { display: flex; align-items: center; justify-content: space-between; padding: 0 var(--size-space-component-padding-sm); }
   .fv-head .context { font-size: var(--size-typography-md-font-size); font-weight: var(--font-weight-bold); }
   .fv-actions { display: flex; align-items: center; gap: var(--size-space-component-gap-lg); }
@@ -592,6 +622,7 @@
     <div class="handle b" id="handleB" title="Drag to resize now playing"></div>
 
     <!-- 04 Now playing -->
+    <div class="tip" id="stripTip" aria-hidden="true">Show Now Playing view</div>
     <aside class="pane right region" id="right" data-note="04 · Now playing" data-mode="panel">
       <div class="np">
         <div class="np-toolbar" style="--i:0">
@@ -606,7 +637,7 @@
         <div class="track" style="--i:2"><div><h3>Habitat</h3><div class="artist">Shallou</div></div><span class="icon accent fill">check_circle</span></div>
         <div class="related" style="--i:3"><h4>Related music videos</h4><div class="row"><span class="img"></span><span class="img peek"></span></div></div>
       </div>
-      <div class="strip"><span class="btn ghost" data-act="panel" title="Open now playing"><span class="icon">chevron_left</span></span></div>
+      <div class="strip"><span class="btn ghost" data-act="panel"><span class="icon">chevron_left</span></span></div>
     </aside>
 
     <!-- 04 Now playing — full view overlay -->
@@ -656,12 +687,12 @@
 </div>
 
 <div class="hud" id="hud">
+  <button data-preset="wf1">WF 1</button>
   <button data-preset="wf2">WF 2</button>
   <button data-preset="wf3">WF 3</button>
   <button data-preset="wf4">WF 4</button>
   <button data-preset="wf5">WF 5</button>
   <button data-preset="wf6">WF 6</button>
-  <button data-preset="wf7">WF 7</button>
   <span class="sep"></span>
   <span class="state" id="stateText"></span>
   <span class="sep"></span>
@@ -723,8 +754,18 @@
     if (S.right === 'panel') S.lastPanelW = S.rightW;
     const wasFull = S.right === 'full';
     S.right = mode;
-    if (mode === 'full') { fullview.classList.add('on'); cols.classList.add('full'); }
-    else { fullview.classList.remove('on'); cols.classList.remove('full'); }
+    // The sweep starts / ends at the now-playing pane's left edge. Moving that edge while hidden must not itself
+    // animate (left is a transitioned property), so it is committed with transitions off before .on is added.
+    if (mode === 'full') {
+      fullview.style.transition = 'none';
+      fullview.style.setProperty('--fv-left', right.offsetLeft + 'px');
+      void fullview.offsetWidth;
+      fullview.style.transition = '';
+      fullview.classList.add('on'); cols.classList.add('full');
+    } else {
+      fullview.style.setProperty('--fv-left', right.offsetLeft + 'px'); // .on pins left to 0, so this only sets the sweep-back target
+      fullview.classList.remove('on'); cols.classList.remove('full');
+    }
     if (mode !== 'full') { right.dataset.mode = mode; if (!wasFull) enter(right); }
   }
 
@@ -741,6 +782,7 @@
       contentW = Math.max(0, T - libW - rightW - 2 * GAP);
     }
     cols.classList.toggle('no-anim', !animate);
+    if (S.right !== 'strip') cols.classList.remove('peek');
     setVar('--lib-w', libW); setVar('--content-w', contentW); setVar('--right-w', rightW);
     setVar('--handle-a-w', hA); setVar('--handle-b-w', hB);
     content.dataset.hidden = contentW === 0;
@@ -777,7 +819,9 @@
     const want = x - GAP / 2;
     if (locked()) { // 3-pane is fixed at 1 : 2 : 1 — the divider only snaps to the next wireframe
       if (want < SNAP_ZONE) { setLibMode('rail'); snap(); }
-      else if (want > quarter() + SNAP_ZONE) { setLibMode('grid'); snap(); }
+      else if (want > quarter() + SNAP_ZONE / 2) { // → WF2: now playing collapses to the strip, library widens, content grows
+        setRightMode('strip'); S.libW = S.lastListW = Math.max(WIDE_LIST, want); snap();
+      }
       return;
     }
     if (want < SNAP_ZONE) { if (S.lib !== 'rail') { setLibMode('rail'); snap(); } return; }
@@ -811,6 +855,21 @@
 
   function snap() { snapUntil = performance.now() + ANIM_MS; layout(true); }
 
+  // ---------- Strip hover peek ----------
+  const stripTip = document.getElementById('stripTip');
+  const PEEK_W = px(root.getPropertyValue('--size-space-component-gap-lg')); // 16 — must match .columns.peek
+  function setPeek(on) {
+    on = on && S.right === 'strip' && !document.body.classList.contains('dragging');
+    if (on) { // anchor the tooltip above the chevron; the strip grows leftward, so the button ends PEEK_W / 2 further left
+      const b = right.querySelector('.strip .btn').getBoundingClientRect(), c = cols.getBoundingClientRect();
+      stripTip.style.right = (c.right - b.right + PEEK_W / 2) + 'px';
+      stripTip.style.bottom = (c.bottom - b.top) + 'px';
+    }
+    cols.classList.toggle('peek', on);
+  }
+  right.addEventListener('pointerenter', () => setPeek(true));
+  right.addEventListener('pointerleave', () => setPeek(false));
+
   // ---------- Buttons ----------
   document.addEventListener('click', (e) => {
     const act = e.target.closest('[data-act]')?.dataset.act;
@@ -827,18 +886,18 @@
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && S.right === 'full') { setRightMode('panel'); S.rightW = S.lastPanelW; layout(true); } });
 
   // ---------- Presets = the six Figma wireframes ----------
-  const WIDE_LIST = DEFAULT_W + px(root.getPropertyValue('--size-component-height-3xl')) * 2; // 560 — WF3 wide list
+  const WIDE_LIST = DEFAULT_W + px(root.getPropertyValue('--size-component-height-3xl')) * 2; // 560 — WF2 wide list
   const PRESETS = {
-    wf2: () => { const q = quarter(); return { lib: 'list', libW: q, right: 'panel', rightW: q }; }, // 1 : 2 : 1
-    wf3: () => ({ lib: 'list', libW: WIDE_LIST, right: 'strip', rightW: quarter() }),
-    wf4: () => ({ lib: 'rail', libW: quarter(), right: 'panel', rightW: quarter() }),
-    wf5: () => ({ lib: 'grid', libW: quarter(), right: 'panel', rightW: quarter() }),
-    wf6: () => ({ lib: 'list', libW: quarter(), right: 'full',  rightW: quarter() }),
-    wf7: () => ({ lib: 'grid', libW: quarter(), right: 'strip', rightW: quarter() }),
+    wf1: () => { const q = quarter(); return { lib: 'list', libW: q, right: 'panel', rightW: q }; }, // 1 : 2 : 1
+    wf2: () => ({ lib: 'list', libW: WIDE_LIST, right: 'strip', rightW: quarter() }),
+    wf3: () => ({ lib: 'rail', libW: quarter(), right: 'panel', rightW: quarter() }),
+    wf4: () => ({ lib: 'grid', libW: quarter(), right: 'panel', rightW: quarter() }),
+    wf5: () => ({ lib: 'list', libW: quarter(), right: 'full',  rightW: quarter() }),
+    wf6: () => ({ lib: 'grid', libW: quarter(), right: 'strip', rightW: quarter() }),
   };
   function applyPreset(p) {
     if (typeof p === 'function') p = p();
-    if (p.right === 'full' && S.right !== 'full') { // full view: open the panel first so the underlying layout is WF2
+    if (p.right === 'full' && S.right !== 'full') { // full view: open the panel first so the underlying layout is WF1
       setLibMode(p.lib); S.libW = p.libW; setRightMode('panel'); S.rightW = p.rightW; layout(true);
       setTimeout(() => { setRightMode('full'); layout(true); }, ANIM_MS / 2);
       return;
