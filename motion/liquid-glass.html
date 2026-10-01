@@ -1,0 +1,1109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Liquid Glass Filter</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300,0,0&display=swap" />
+<style>
+  :root {
+    /* ---- tokens.json ---- */
+    --color-brand-primary: #5244ee;                                   /* color/brand/primary — slider fill, thumb ring, accents */
+    --color-surface-card-surface: #ffffff;                            /* color/surface/card/surface — control panel */
+    --color-surface-card-shadow: #d9d9d9;                             /* color/surface/card/shadow */
+    --color-text-heading-primary: #1e1e1e;                            /* color/text/heading/primary */
+    --color-text-heading-secondary: #5c5c5c;                          /* color/text/heading/secondary — section titles */
+    --color-text-label-primary: #5c5c5c;                              /* color/text/label/primary — slider labels */
+    --color-text-body-secondary: #5c5c5c;                             /* color/text/body/secondary */
+    --color-text-body-tertiary: #a6a6a6;                              /* color/text/body/tertiary — hints, values */
+    --color-interactive-input-border-default: #d9d9d9;                /* color/interactive/input/border/default — slider track, outlines */
+    --color-interactive-input-label-default: #1e1e1e;                 /* color/interactive/input/label/default — number input text */
+    --color-interactive-input-border-focused: #5244ee;                /* color/interactive/input/border/focused */
+    --color-interactive-input-shadow-focused: #5244ee33;              /* color/interactive/input/shadow/focused — focus ring */
+    --color-interactive-list-divider-on-surface: #f4f4f4;             /* color/interactive/list/divider/onSurface — section dividers */
+    --color-interactive-button-surface-primary-solid-default: #5244ee;/* color/interactive/button/surface/primary/solid/default */
+    --color-interactive-button-surface-primary-solid-hover: #7d73f2;  /* color/interactive/button/surface/primary/solid/hover */
+    --color-interactive-button-surface-primary-solid-focused: #1f11bb;/* color/interactive/button/surface/primary/solid/focused */
+    --color-interactive-button-label-primary-solid-default: #ffffff;  /* color/interactive/button/label/primary/solid/default */
+    --color-interactive-button-surface-primary-outline-default: #ffffff; /* color/interactive/button/surface/primary/outline/default */
+    --color-interactive-button-border-primary-outline-default: #5244ee;  /* color/interactive/button/border/primary/outline/default */
+    --color-interactive-button-border-primary-outline-hover: #7d73f2;    /* color/interactive/button/border/primary/outline/hover */
+    --color-interactive-button-label-primary-outline-default: #5244ee;   /* color/interactive/button/label/primary/outline/default */
+    --color-interactive-button-surface-primary-ghost-hover: #f7f6ff;     /* color/interactive/button/surface/primary/ghost/hover */
+    --color-interactive-button-label-primary-ghost-default: #5244ee;     /* color/interactive/button/label/primary/ghost/default */
+    --color-interactive-filter-chip-surface-default: #f7f6ff;         /* color/interactive/filterChip/surface/default — preset chips */
+    --color-interactive-filter-chip-border-default: #d4d0fb;          /* color/interactive/filterChip/border/default */
+    --color-interactive-filter-chip-border-hover: #7d73f2;            /* color/interactive/filterChip/border/hover */
+    --color-interactive-filter-chip-label-default: #5244ee;           /* color/interactive/filterChip/label/default */
+    --color-interactive-filter-chip-surface-selected: #d4d0fb;        /* color/interactive/filterChip/surface/selected */
+    --color-feedback-banner-surface-default: #f7f6ff;                 /* color/feedback/banner/surface/default — drop-zone active */
+    --color-feedback-banner-border-default: #d4d0fb;                  /* color/feedback/banner/border/default */
+    --color-brand-danger: #ff4d4f;                                    /* color/brand/danger — WebGL unsupported message */
+
+    --size-space-component-gap-xs: 4px;         /* size/spaceComponentGapXs */
+    --size-space-component-gap-sm: 8px;         /* size/spaceComponentGapSm */
+    --size-space-component-gap-md: 12px;        /* size/spaceComponentGapMd */
+    --size-space-component-gap-lg: 16px;        /* size/spaceComponentGapLg */
+    --size-space-component-padding-xs: 4px;     /* size/spaceComponentPaddingXs */
+    --size-space-component-padding-sm: 8px;     /* size/spaceComponentPaddingSm */
+    --size-space-component-padding-md: 12px;    /* size/spaceComponentPaddingMd */
+    --size-space-component-padding-lg: 16px;    /* size/spaceComponentPaddingLg — panel padding */
+    --size-space-layout-section-gap-md: 24px;   /* size/spaceLayoutSectionGapMd — stage ↔ panel gap, page padding */
+    --size-radius-sm: 6px;                      /* size/radiusSm — chips */
+    --size-radius-md: 8px;                      /* size/radiusMd — buttons */
+    --size-radius-lg: 12px;                     /* size/radiusLg — drop zone */
+    --size-radius-xl: 16px;                     /* size/radiusXl — panel */
+    --size-radius-full: 9999px;                 /* size/radiusFull — slider thumb */
+    --size-border-sm: 1px;                      /* size/borderSm */
+    --size-border-md: 2px;                      /* size/borderMd — slider thumb ring */
+    --size-typography-xxs-font-size: 10px;      /* size/typographyXxsFontSize — section eyebrows */
+    --size-typography-xxs-line-height: 14px;    /* size/typographyXxsLineHeight */
+    --size-typography-xs-font-size: 12px;       /* size/typographyXsFontSize — labels, values */
+    --size-typography-xs-line-height: 16px;     /* size/typographyXsLineHeight */
+    --size-typography-sm-font-size: 14px;       /* size/typographySmFontSize — buttons */
+    --size-typography-sm-line-height: 20px;     /* size/typographySmLineHeight */
+    --size-typography-lg-font-size: 20px;       /* size/typographyLgFontSize — panel title */
+    --size-typography-lg-line-height: 28px;     /* size/typographyLgLineHeight */
+    --size-component-height-xs: 24px;           /* size/componentHeightXs — number inputs */
+    --size-component-height-md: 32px;           /* size/componentHeightMd — chips */
+    --size-component-height-lg: 40px;           /* size/componentHeightLg — buttons */
+    --size-component-icon-sm: 16px;             /* size/componentIconSm — thumb size, button icons */
+    --size-component-icon-md: 24px;             /* size/componentIconMd — drop-zone icon */
+    --size-component-dropdown-width-sm: 280px;  /* size/componentDropdownWidthSm — control panel width */
+    --font-family-body: "Roboto";               /* font/english/typographyFontFamilyBody */
+    --font-weight-regular: 400;                 /* font/english/typographyFontWeightRegular */
+    --font-weight-medium: 500;                  /* font/english/typographyFontWeightMedium */
+    --font-weight-bold: 600;                    /* font/english/typographyFontWeightBold */
+    --motion-duration-fast: 100ms;              /* motion/durationFast — hover/focus */
+    --motion-duration-normal: 200ms;            /* motion/durationNormal — drop-zone highlight */
+    --shadow-sm: 1px;                           /* shadow/sm — panel shadow y offset */
+    --shadow-lg: 8px;                           /* shadow/lg — panel shadow blur */
+    --opacity-60: 0.6;                          /* opacity/60 — disabled/secondary icon */
+
+    /* ---- FLAGGED: no matching token in tokens.json (values from Figma frame 9:418) ---- */
+    --figma-window-w: 560px;                            /* NO TOKEN — Figma "Window" width */
+    --figma-window-h: 574px;                            /* NO TOKEN — Figma "Window" height */
+    --figma-glass-size: 370px;                          /* NO TOKEN — Figma "window" glass grid size */
+    --figma-bg-shadow: 47.7px 79.5px 159px rgba(0, 0, 0, 0.15); /* NO TOKEN — Figma "bg" drop shadow */
+    --page-backdrop: #f5f5f5;                           /* NO TOKEN — page background behind the cards */
+    --slider-track-h: 4px;                              /* NO TOKEN — slider track height */
+    --field-input-w: 56px;                              /* NO TOKEN — number input width */
+    --field-hex-w: 72px;                                /* NO TOKEN — hex colour input width */
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--page-backdrop);
+    font-family: var(--font-family-body), system-ui, sans-serif;
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text-heading-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+  .material-symbols-rounded {
+    font-family: "Material Symbols Rounded";
+    font-weight: normal; font-style: normal;
+    font-size: var(--size-component-icon-sm); line-height: 1;
+    letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap;
+    direction: ltr; -webkit-font-feature-settings: "liga"; -webkit-font-smoothing: antialiased;
+    font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 20;
+  }
+
+  .app {
+    display: flex;
+    align-items: stretch;   /* demo column matches the control panel height */
+    justify-content: center;
+    gap: var(--size-space-layout-section-gap-md);
+    padding: var(--size-space-layout-section-gap-md);
+  }
+
+  /* ---- Demo column: Figma "Window" card + toolbar below it ---- */
+  .demo {
+    flex: 0 1 var(--figma-window-w);
+    width: min(var(--figma-window-w), 100%);
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-space-layout-section-gap-md);
+  }
+
+  /* ---- Stage: Figma "Window" (9:418) ---- */
+  .stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 560 / 574;
+    background: var(--color-surface-card-surface);
+    border-radius: var(--size-radius-xl);
+    box-shadow: 0 var(--shadow-sm) var(--shadow-lg) var(--color-surface-card-shadow);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;   /* title + glass centred as one group */
+    gap: var(--size-space-layout-section-gap-md);
+    transition: box-shadow var(--motion-duration-normal) ease;
+  }
+  .stage__header {
+    width: 100%;
+    padding: 0 var(--size-space-component-padding-lg);
+    text-align: center;
+  }
+  .stage__title {
+    margin: 0;
+    font-size: var(--size-typography-lg-font-size);
+    line-height: var(--size-typography-lg-line-height);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-heading-primary);
+  }
+  .stage__subtitle {
+    margin: var(--size-space-component-gap-xs) 0 0;
+    font-size: var(--size-typography-xs-font-size);
+    line-height: var(--size-typography-xs-line-height);
+    color: var(--color-text-body-tertiary);
+  }
+  .stage.is-dragover { box-shadow: 0 0 0 var(--size-border-md) var(--color-interactive-input-border-focused) inset; }
+
+  /* Figma "window" (9:419): 370 / 560 of the card width */
+  .glass {
+    position: relative;
+    width: calc(100% * 370 / 560);
+    aspect-ratio: 1;
+    box-shadow: var(--figma-bg-shadow);
+    cursor: grab;
+    touch-action: none;
+  }
+  .glass:active { cursor: grabbing; }
+  .glass canvas { display: block; width: 100%; height: 100%; }
+
+  .stage__error {
+    display: none;
+    position: absolute; inset: 0;
+    place-items: center;
+    padding: var(--size-space-layout-section-gap-md);
+    text-align: center;
+    color: var(--color-brand-danger);
+    font-size: var(--size-typography-sm-font-size);
+    line-height: var(--size-typography-sm-line-height);
+  }
+  .stage.no-webgl .stage__error { display: grid; }
+  .stage.no-webgl .glass { display: none; }
+
+  /* ---- Toolbar under the window: background, presets, actions ---- */
+  .toolbar {
+    flex: 1 1 auto;         /* grows so the column bottom aligns with the panel */
+    background: var(--color-surface-card-surface);
+    border-radius: var(--size-radius-xl);
+    box-shadow: 0 var(--shadow-sm) var(--shadow-lg) var(--color-surface-card-shadow);
+    padding: var(--size-space-component-padding-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-space-component-gap-lg);
+  }
+  .toolbar__row {
+    display: flex; align-items: center; flex-wrap: wrap;
+    gap: var(--size-space-component-gap-md);
+  }
+  .toolbar__row > .dropzone,
+  .toolbar__row > .chips,
+  .toolbar__row > .field { flex: 1 1 240px; min-width: 0; }
+  .toolbar__row--upload { flex: 1 1 auto; flex-wrap: nowrap; align-items: stretch; }   /* upload area takes the spare height */
+  .toolbar__group {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: var(--size-space-component-gap-sm);
+    margin-left: auto;
+  }
+  .toolbar__footer {
+    justify-content: space-between;
+    padding-top: var(--size-space-component-gap-lg);
+    border-top: var(--size-border-sm) solid var(--color-interactive-list-divider-on-surface);
+  }
+
+  /* ---- Control panel ---- */
+  .panel {
+    flex: 0 0 var(--size-component-dropdown-width-sm);
+    width: var(--size-component-dropdown-width-sm);
+    max-height: calc(100vh - 2 * var(--size-space-layout-section-gap-md));
+    overflow-y: auto;
+    background: var(--color-surface-card-surface);
+    border-radius: var(--size-radius-xl);
+    box-shadow: 0 var(--shadow-sm) var(--shadow-lg) var(--color-surface-card-shadow);
+    padding: var(--size-space-component-padding-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-space-component-gap-lg);
+  }
+
+  .section {
+    display: flex; flex-direction: column;
+    gap: var(--size-space-component-gap-md);
+    padding-top: var(--size-space-component-gap-lg);
+    border-top: var(--size-border-sm) solid var(--color-interactive-list-divider-on-surface);
+  }
+  .section__title {
+    display: flex; align-items: center; gap: var(--size-space-component-gap-sm);
+    margin: 0;
+    font-size: var(--size-typography-xxs-font-size);
+    line-height: var(--size-typography-xxs-line-height);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-heading-secondary);
+  }
+  .section__title .material-symbols-rounded { color: var(--color-brand-primary); }
+  #sections { display: flex; flex-direction: column; gap: var(--size-space-component-gap-lg); }
+  #sections > .section:first-child { border-top: 0; padding-top: 0; }
+  .section--collapsible { gap: 0; }
+  .section__toggle {
+    display: flex; align-items: center; gap: var(--size-space-component-gap-sm);
+    width: 100%;
+    margin: 0; padding: 0;
+    background: none; border: 0;
+    font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit;
+    text-align: left;
+    cursor: pointer;
+    border-radius: var(--size-radius-sm);
+  }
+  .section__toggle:hover { color: var(--color-text-heading-primary); }
+  .section__toggle:focus-visible { outline: none; box-shadow: 0 0 0 var(--size-border-md) var(--color-interactive-input-shadow-focused); }
+  .section__title .section__chevron {
+    margin-left: auto;
+    color: var(--color-text-body-tertiary);
+    transition: transform var(--motion-duration-normal) ease;
+  }
+  .section__toggle[aria-expanded="false"] .section__chevron { transform: rotate(-90deg); }
+  .section__body {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows var(--motion-duration-normal) ease;
+  }
+  .section__body.is-collapsed { grid-template-rows: 0fr; }
+  .section__inner {
+    min-height: 0; overflow: hidden;
+    display: flex; flex-direction: column;
+    gap: var(--size-space-component-gap-md);
+    padding-top: var(--size-space-component-gap-md);
+    transition: padding-top var(--motion-duration-normal) ease, visibility 0s;
+  }
+  .section__body.is-collapsed .section__inner { padding-top: 0; visibility: hidden; transition: padding-top var(--motion-duration-normal) ease, visibility 0s var(--motion-duration-normal); }
+
+  /* Drop zone / upload */
+  .dropzone {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: var(--size-space-component-gap-xs);
+    padding: var(--size-space-component-padding-lg) var(--size-space-component-padding-md);
+    border: var(--size-border-sm) dashed var(--color-interactive-input-border-default);
+    border-radius: var(--size-radius-lg);
+    background: var(--color-surface-card-surface);
+    color: var(--color-text-body-secondary);
+    font: inherit;
+    font-size: var(--size-typography-xs-font-size);
+    line-height: var(--size-typography-xs-line-height);
+    cursor: pointer;
+    transition: border-color var(--motion-duration-fast) ease, background var(--motion-duration-normal) ease;
+    width: 100%;
+  }
+  .dropzone .material-symbols-rounded { font-size: var(--size-component-icon-md); color: var(--color-brand-primary); }
+  .dropzone strong { font-weight: var(--font-weight-medium); color: var(--color-text-heading-primary); }
+  .dropzone:hover, .dropzone.is-dragover {
+    border-color: var(--color-feedback-banner-border-default);
+    background: var(--color-feedback-banner-surface-default);
+  }
+  .dropzone:focus-visible {
+    outline: none;
+    border-color: var(--color-interactive-input-border-focused);
+    box-shadow: 0 0 0 var(--size-border-md) var(--color-interactive-input-shadow-focused);
+  }
+  .dropzone__name {
+    color: var(--color-text-body-tertiary);
+    max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .dropzone--inline {
+    flex-direction: row; justify-content: flex-start; text-align: left;
+    gap: var(--size-space-component-gap-md);
+    padding: var(--size-space-component-padding-sm) var(--size-space-component-padding-md);
+    min-height: var(--size-component-height-lg);
+  }
+  .dropzone__text { display: flex; flex-direction: column; gap: var(--size-space-component-gap-xs); min-width: 0; }
+  input[type="file"] { display: none; }
+
+  /* Preset chips */
+  .chips { display: flex; flex-wrap: wrap; gap: var(--size-space-component-gap-sm); }
+  .chip {
+    height: var(--size-component-height-md);
+    padding: 0 var(--size-space-component-padding-md);
+    border-radius: var(--size-radius-sm);
+    border: var(--size-border-sm) solid var(--color-interactive-filter-chip-border-default);
+    background: var(--color-interactive-filter-chip-surface-default);
+    color: var(--color-interactive-filter-chip-label-default);
+    font: inherit;
+    font-size: var(--size-typography-xs-font-size);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: border-color var(--motion-duration-fast) ease, background var(--motion-duration-fast) ease;
+  }
+  .chip:hover { border-color: var(--color-interactive-filter-chip-border-hover); }
+  .chip[aria-pressed="true"] { background: var(--color-interactive-filter-chip-surface-selected); }
+  .chip:focus-visible { outline: none; box-shadow: 0 0 0 var(--size-border-md) var(--color-interactive-input-shadow-focused); }
+
+  /* Shape selector (Figma 15:527 shape set, rendered from the same distance fields as the shader) */
+  .shapes { display: flex; flex-wrap: wrap; gap: var(--size-space-component-gap-sm); }
+  .shape {
+    width: var(--size-component-height-md); height: var(--size-component-height-md);
+    padding: var(--size-space-component-padding-xs);
+    border-radius: var(--size-radius-sm);
+    border: var(--size-border-sm) solid var(--color-interactive-filter-chip-border-default);
+    background: var(--color-interactive-filter-chip-surface-default);
+    color: var(--color-interactive-filter-chip-label-default);
+    cursor: pointer;
+    display: grid; place-items: center;
+    transition: border-color var(--motion-duration-fast) ease, background var(--motion-duration-fast) ease;
+  }
+  .shape svg { width: 100%; height: 100%; display: block; fill: currentColor; }
+  .shape:hover { border-color: var(--color-interactive-filter-chip-border-hover); }
+  .shape[aria-checked="true"] { background: var(--color-interactive-filter-chip-surface-selected); border-color: var(--color-interactive-filter-chip-border-hover); }
+  .shape:focus-visible { outline: none; box-shadow: 0 0 0 var(--size-border-md) var(--color-interactive-input-shadow-focused); }
+
+  /* Sliders */
+  .field { display: flex; flex-direction: column; gap: var(--size-space-component-gap-xs); }
+  .field__label {
+    color: var(--color-text-label-primary);
+    font-size: var(--size-typography-xs-font-size);
+    line-height: var(--size-typography-xs-line-height);
+  }
+  .field__row { display: flex; align-items: center; gap: var(--size-space-component-gap-sm); }
+  .field__row input[type="range"] { flex: 1 1 auto; min-width: 0; }
+  .field__value {
+    display: inline-flex; align-items: center; gap: var(--size-space-component-gap-xs); flex: 0 0 auto;
+    color: var(--color-text-body-tertiary); font-variant-numeric: tabular-nums;
+    font-size: var(--size-typography-xs-font-size);
+    line-height: var(--size-typography-xs-line-height);
+  }
+  .field__num {
+    -moz-appearance: textfield; appearance: textfield;
+    width: var(--field-input-w); height: var(--size-component-height-xs);
+    padding: 0 var(--size-space-component-padding-sm);
+    border: var(--size-border-sm) solid var(--color-interactive-input-border-default);
+    border-radius: var(--size-radius-sm);
+    background: var(--color-surface-card-surface);
+    color: var(--color-interactive-input-label-default);
+    font: inherit; font-variant-numeric: tabular-nums; text-align: right;
+    transition: border-color var(--motion-duration-fast) ease, box-shadow var(--motion-duration-fast) ease;
+  }
+  .field__num::-webkit-outer-spin-button, .field__num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .field__num:hover { border-color: var(--color-interactive-filter-chip-border-hover); }
+  .field__num:focus { outline: none; border-color: var(--color-interactive-input-border-focused); box-shadow: 0 0 0 var(--size-border-md) var(--color-interactive-input-shadow-focused); }
+  .field__unit { min-width: 2ch; } /* reserved even when empty so the number boxes align */
+  .field__hex { width: var(--field-hex-w); text-align: left; font-family: inherit; text-transform: lowercase; }
+  /* Colour swatch: native picker styled as a bar, same height as the number inputs */
+  .field__swatch {
+    -webkit-appearance: none; appearance: none;
+    flex: 1 1 auto; min-width: 0; height: var(--size-component-height-xs); padding: 0;
+    border: var(--size-border-sm) solid var(--color-interactive-input-border-default);
+    border-radius: var(--size-radius-sm);
+    background: var(--color-surface-card-surface); cursor: pointer;
+    transition: border-color var(--motion-duration-fast) ease, box-shadow var(--motion-duration-fast) ease;
+  }
+  .field__swatch::-webkit-color-swatch-wrapper { padding: 0; }
+  .field__swatch::-webkit-color-swatch { border: 0; border-radius: inherit; }
+  .field__swatch::-moz-color-swatch { border: 0; border-radius: inherit; }
+  .field__swatch:hover { border-color: var(--color-interactive-filter-chip-border-hover); }
+  .field__swatch:focus-visible { outline: none; border-color: var(--color-interactive-input-border-focused); box-shadow: 0 0 0 var(--size-border-md) var(--color-interactive-input-shadow-focused); }
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: var(--size-component-icon-sm);
+    margin: 0; background: transparent; cursor: pointer;
+    --p: 50%;
+  }
+  input[type="range"]:focus { outline: none; }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: var(--slider-track-h);
+    border-radius: var(--size-radius-full);
+    background: linear-gradient(to right, var(--color-brand-primary) var(--p), var(--color-interactive-input-border-default) var(--p));
+  }
+  input[type="range"]::-moz-range-track {
+    height: var(--slider-track-h);
+    border-radius: var(--size-radius-full);
+    background: var(--color-interactive-input-border-default);
+  }
+  input[type="range"]::-moz-range-progress {
+    height: var(--slider-track-h);
+    border-radius: var(--size-radius-full);
+    background: var(--color-brand-primary);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: var(--size-component-icon-sm); height: var(--size-component-icon-sm);
+    margin-top: calc((var(--slider-track-h) - var(--size-component-icon-sm)) / 2);
+    border-radius: var(--size-radius-full);
+    background: var(--color-surface-card-surface);
+    border: var(--size-border-md) solid var(--color-brand-primary);
+    transition: box-shadow var(--motion-duration-fast) ease;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: var(--size-component-icon-sm); height: var(--size-component-icon-sm);
+    border-radius: var(--size-radius-full);
+    background: var(--color-surface-card-surface);
+    border: var(--size-border-md) solid var(--color-brand-primary);
+    transition: box-shadow var(--motion-duration-fast) ease;
+  }
+  input[type="range"]:hover::-webkit-slider-thumb,
+  input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 var(--size-space-component-gap-xs) var(--color-interactive-input-shadow-focused); }
+  input[type="range"]:hover::-moz-range-thumb,
+  input[type="range"]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 var(--size-space-component-gap-xs) var(--color-interactive-input-shadow-focused); }
+
+  /* Buttons */
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--size-space-component-gap-sm); }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: var(--size-space-component-gap-xs);
+    height: var(--size-component-height-lg);
+    padding: 0 var(--size-space-component-padding-sm);
+    border-radius: var(--size-radius-md);
+    border: var(--size-border-sm) solid transparent;
+    font: inherit;
+    font-size: var(--size-typography-sm-font-size);
+    line-height: var(--size-typography-sm-line-height);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition: background var(--motion-duration-fast) ease, border-color var(--motion-duration-fast) ease, color var(--motion-duration-fast) ease;
+  }
+  .btn:focus-visible { outline: none; box-shadow: 0 0 0 var(--size-border-md) var(--color-interactive-input-shadow-focused); }
+  .btn--solid {
+    background: var(--color-interactive-button-surface-primary-solid-default);
+    color: var(--color-interactive-button-label-primary-solid-default);
+  }
+  .btn--solid:hover { background: var(--color-interactive-button-surface-primary-solid-hover); }
+  .btn--solid:active { background: var(--color-interactive-button-surface-primary-solid-focused); }
+  .btn--outline {
+    background: var(--color-interactive-button-surface-primary-outline-default);
+    border-color: var(--color-interactive-button-border-primary-outline-default);
+    color: var(--color-interactive-button-label-primary-outline-default);
+  }
+  .btn--outline:hover { border-color: var(--color-interactive-button-border-primary-outline-hover); color: var(--color-interactive-button-border-primary-outline-hover); }
+  .btn--ghost { background: transparent; color: var(--color-interactive-button-label-primary-ghost-default); }
+  .btn--ghost:hover { background: var(--color-interactive-button-surface-primary-ghost-hover); }
+  .btn--wide { grid-column: 1 / -1; }
+
+  @media (max-width: 900px) {
+    .app { flex-direction: column; align-items: stretch; }
+    .demo { flex-basis: auto; width: 100%; }
+    .panel { width: 100%; flex-basis: auto; max-height: none; }
+    .toolbar__group { margin-left: 0; width: 100%; }
+    .toolbar__group .btn { flex: 1 1 auto; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="demo">
+    <!-- Figma 9:418 "Window" -->
+    <section class="stage" id="stage" aria-label="Liquid glass preview">
+      <header class="stage__header">
+        <h1 class="stage__title">Liquid Glass</h1>
+        <p class="stage__subtitle">Refraction tiles over your own background · drag to reposition.</p>
+      </header>
+      <div class="glass" id="glass">
+        <canvas id="gl" aria-label="Glass tiles over the background image"></canvas>
+      </div>
+      <p class="stage__error">WebGL 2 is required to render the liquid glass effect. Please open this page in a current browser.</p>
+    </section>
+
+    <!-- Background, presets and actions live under the window -->
+    <section class="toolbar" aria-label="Background, presets and actions">
+      <div class="toolbar__row toolbar__row--upload">
+        <button type="button" class="dropzone dropzone--inline" id="dropzone">
+          <span class="material-symbols-rounded" aria-hidden="true">upload</span>
+          <span class="dropzone__text">
+            <span><strong>Upload image</strong> or drop it here</span>
+            <span class="dropzone__name" id="fileName">Curved Stripes (Figma shader)</span>
+          </span>
+        </button>
+        <input type="file" id="fileInput" accept="image/*" />
+      </div>
+      <div class="toolbar__row" id="bgFields"></div>
+      <div class="toolbar__row">
+        <div class="chips" id="chips" role="group" aria-label="Presets"></div>
+      </div>
+      <div class="toolbar__row">
+        <div class="shapes" id="shapes" role="radiogroup" aria-label="Tile shape"></div>
+      </div>
+      <div class="toolbar__row toolbar__footer">
+        <button type="button" class="btn btn--ghost" id="reset"><span class="material-symbols-rounded" aria-hidden="true">restart_alt</span>Reset</button>
+        <div class="toolbar__group">
+          <button type="button" class="btn btn--outline" id="compare"><span class="material-symbols-rounded" aria-hidden="true">compare</span>Hold to compare</button>
+          <button type="button" class="btn btn--solid" id="export"><span class="material-symbols-rounded" aria-hidden="true">download</span>Export PNG</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <aside class="panel" aria-label="Liquid glass controls">
+    <div id="sections"></div>
+  </aside>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // Geometry sliders are expressed in "design px" of the 370px Figma glass grid,
+  // so the look stays identical when the stage scales with the viewport.
+  const DESIGN_SIZE = 370;
+
+  // Tile shapes (Figma 15:527 "Shape set"). `id` is the branch used in the fragment shader;
+  // `r(theta)` (radial shapes) or `path` (unit box −1…1) draws the selector icon.
+  const TAU = Math.PI * 2;
+  const tri = (x) => Math.abs(((x % 1) + 1) % 1 * 2 - 1);
+  const ngon = (n, rot = 0) => (t) => Math.cos(Math.PI / n) / Math.cos(((t + rot + Math.PI / n) % (TAU / n) + TAU / n) % (TAU / n) - Math.PI / n);
+  const SHAPES = [
+    { id: 0,  name: 'Circle',          r: () => 1 },
+    { id: 1,  name: 'Square',          path: 'M-1,-0.7 Q-1,-1 -0.7,-1 H0.7 Q1,-1 1,-0.7 V0.7 Q1,1 0.7,1 H-0.7 Q-1,1 -1,0.7 Z' },
+    { id: 2,  name: 'Slanted',         path: 'M-0.8,-0.75 Q-0.75,-1 -0.5,-1 L0.95,-0.9 Q1.05,-0.9 1,-0.7 L0.8,0.75 Q0.75,1 0.5,1 L-0.95,0.9 Q-1.05,0.9 -1,0.7 Z' },
+    { id: 3,  name: 'Arch',            path: 'M-1,0 A1,1 0 0 1 1,0 V0.75 Q1,1 0.75,1 H-0.75 Q-1,1 -1,0.75 Z' },
+    { id: 4,  name: 'Semicircle',      path: 'M-1,0.5 A1,1 0 0 1 1,0.5 Q1,0.62 0.88,0.62 H-0.88 Q-1,0.62 -1,0.5 Z' },
+    { id: 5,  name: 'Oval',            r: (t) => { const a = t - Math.PI / 6; return 1 / Math.sqrt((Math.sin(a) / 0.68) ** 2 + Math.cos(a) ** 2); } },
+    { id: 6,  name: 'Triangle',        r: ngon(3) },
+    { id: 7,  name: 'Diamond',         r: ngon(4) },
+    { id: 8,  name: 'Pentagon',        r: ngon(5) },
+    { id: 9,  name: 'Hexagon',         r: ngon(6, Math.PI / 6) },
+    { id: 10, name: '4-sided cookie',  r: (t) => 0.86 + 0.14 * Math.cos(4 * t) },
+    { id: 11, name: '6-sided cookie',  r: (t) => 0.88 + 0.12 * Math.cos(6 * t) },
+    { id: 12, name: '9-sided cookie',  r: (t) => 0.9 + 0.1 * Math.cos(9 * t) },
+    { id: 13, name: '12-sided cookie', r: (t) => 0.92 + 0.08 * Math.cos(12 * t) },
+    { id: 14, name: 'Sunny',           r: (t) => 0.72 + 0.28 * tri(8 * t / TAU) ** 1.5 },
+    { id: 15, name: 'Very sunny',      r: (t) => 0.68 + 0.32 * tri(12 * t / TAU) ** 1.5 },
+    { id: 16, name: '4-leaf clover',   r: (t) => 0.7 + 0.3 * Math.cos(4 * t) },
+    { id: 17, name: '8-leaf clover',   r: (t) => 0.78 + 0.22 * Math.cos(8 * t) },
+    { id: 18, name: 'Burst',           r: (t) => 0.55 + 0.45 * tri(12 * t / TAU) ** 3 },
+    { id: 19, name: 'Flower',          r: (t) => 0.74 + 0.26 * Math.cos(7 * t) },
+    { id: 20, name: 'Heart',           path: 'M0,0.95 C-0.35,0.65 -1,0.2 -1,-0.35 C-1,-0.75 -0.7,-0.95 -0.45,-0.95 C-0.2,-0.95 -0.05,-0.8 0,-0.65 C0.05,-0.8 0.2,-0.95 0.45,-0.95 C0.7,-0.95 1,-0.75 1,-0.35 C1,0.2 0.35,0.65 0,0.95 Z' },
+  ];
+
+  const DEFAULTS = {
+    shape: 1,
+    cols: 5, gap: 5, radius: 1, pad: 0,
+    refract: 20, edge: 37, curve: 1.8, zoom: 1.0, chroma: 0.45, frost: 0.15,
+    fill: '#ffffff', tint: 0.04, sat: 1.0, spec: 0.45, light: 135, shadow: 0.25,
+    bgScale: 1.0,
+  };
+
+  const PRESETS = {
+    'Figma tiles': { ...DEFAULTS },
+    'Clear lens':  { ...DEFAULTS, shape: 0, cols: 1, gap: 0, radius: 80, pad: 40, refract: 44, edge: 80, curve: 2.2, zoom: 1.08, chroma: 0.4, frost: 0, tint: 0.02, spec: 0.6, shadow: 0.3 },
+    'Frosted':     { ...DEFAULTS, cols: 3, gap: 12, radius: 16, pad: 16, refract: 10, edge: 26, curve: 2, zoom: 1, chroma: 0.2, frost: 0.55, tint: 0.28, sat: 1.15, spec: 0.35, shadow: 0.2 },
+    'Prism':       { ...DEFAULTS, radius: 2, refract: 34, edge: 44, curve: 1.2, chroma: 1, frost: 0, tint: 0, spec: 0.5 },
+  };
+
+  const GROUPS = [
+    { title: 'Grid', icon: 'grid_view', items: [
+      { key: 'cols',   label: 'Tiles per row', min: 1, max: 10, step: 1 },
+      { key: 'gap',    label: 'Gap',           min: 0, max: 24, step: 0.5, unit: 'px' },
+      { key: 'radius', label: 'Corner radius', min: 0, max: 100, step: 1, unit: 'px' },
+      { key: 'pad',    label: 'Grid inset',    min: 0, max: 80, step: 1, unit: 'px' },
+    ]},
+    { title: 'Glass', icon: 'blur_on', items: [
+      { key: 'refract', label: 'Refraction',  min: 0, max: 80, step: 1, unit: 'px' },
+      { key: 'edge',    label: 'Edge width',  min: 1, max: 120, step: 1, unit: 'px' },
+      { key: 'curve',   label: 'Edge curve',  min: 0.4, max: 6, step: 0.1 },
+      { key: 'zoom',    label: 'Magnify',     min: 0.8, max: 1.6, step: 0.01, unit: '×' },
+      { key: 'chroma',  label: 'Chromatic aberration', min: 0, max: 1, step: 0.01 },
+      { key: 'frost',   label: 'Frost',       min: 0, max: 1, step: 0.01 },
+    ]},
+    { title: 'Surface', icon: 'light_mode', items: [
+      { key: 'fill',   label: 'Fill color',  type: 'color' },
+      { key: 'tint',   label: 'Tint',        min: 0, max: 1, step: 0.01 },
+      { key: 'sat',    label: 'Saturation',  min: 0, max: 2, step: 0.01, unit: '×' },
+      { key: 'spec',   label: 'Highlight',   min: 0, max: 1, step: 0.01 },
+      { key: 'light',  label: 'Light angle', min: 0, max: 360, step: 1, unit: '°' },
+      { key: 'shadow', label: 'Shadow',      min: 0, max: 1, step: 0.01 },
+    ]},
+  ];
+  const BG_ITEMS = [
+    { key: 'bgScale', label: 'Background scale', min: 0.5, max: 3, step: 0.01, unit: '×' },
+  ];
+
+  const state = { ...DEFAULTS, bgOffset: [0, 0], glassOn: 1, texAspect: 1 };
+
+  // ---------- DOM ----------
+  const $ = (id) => document.getElementById(id);
+  const stage = $('stage'), glassEl = $('glass'), canvas = $('gl');
+  const inputs = new Map();
+
+  function fmtNum(item, v) {
+    const dec = item.step >= 1 ? 0 : item.step >= 0.1 ? 1 : 2;
+    return Number(v).toFixed(dec);
+  }
+  function paint(input, item) {
+    const p = ((input.value - item.min) / (item.max - item.min)) * 100;
+    input.style.setProperty('--p', p + '%');
+    if (document.activeElement !== input._num) input._num.value = fmtNum(item, input.value);
+  }
+  function buildField(item) {
+    const field = document.createElement('div'); field.className = 'field';
+    const id = 'ctl-' + item.key;
+    field.innerHTML = `<label class="field__label" for="${id}">${item.label}</label><div class="field__row"><span class="field__value"><input type="number" class="field__num" id="${id}-num" min="${item.min}" max="${item.max}" step="${item.step}" aria-label="${item.label} value" /><span class="field__unit">${item.unit || ''}</span></span></div>`;
+    const input = document.createElement('input');
+    input.type = 'range'; input.id = id; input.min = item.min; input.max = item.max; input.step = item.step; input.value = state[item.key];
+    const num = field.querySelector('.field__num');
+    input._num = num;
+    const apply = (v) => { state[item.key] = v; input.value = v; paint(input, item); markPreset(); requestRender(); };
+    input.addEventListener('input', () => apply(Number(input.value)));
+    // Number input: live-apply valid values while typing, clamp + reformat on commit.
+    num.addEventListener('input', () => {
+      const v = Number(num.value);
+      if (num.value === '' || Number.isNaN(v)) return;
+      apply(Math.min(item.max, Math.max(item.min, v)));
+    });
+    const commit = () => { num.value = fmtNum(item, state[item.key]); paint(input, item); };
+    num.addEventListener('change', commit);
+    num.addEventListener('blur', commit);
+    num.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); num.blur(); } });
+    field.querySelector('.field__row').prepend(input);
+    inputs.set(item.key, { input, item });
+    paint(input, item);
+    return field;
+  }
+  // Colour field: swatch (native picker) + hex text input, both kept in sync with state.
+  const HEX_RE = /^#?([0-9a-f]{6}|[0-9a-f]{3})$/i;
+  function normHex(v) {
+    const m = HEX_RE.exec(v.trim()); if (!m) return null;
+    let h = m[1].toLowerCase(); if (h.length === 3) h = h.replace(/./g, (c) => c + c);
+    return '#' + h;
+  }
+  function hexToRgb(hex) { const n = parseInt(hex.slice(1), 16); return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255]; }
+  function buildColorField(item) {
+    const field = document.createElement('div'); field.className = 'field';
+    const id = 'ctl-' + item.key;
+    field.innerHTML = `<label class="field__label" for="${id}">${item.label}</label><div class="field__row"><input type="color" class="field__swatch" id="${id}" /><span class="field__value"><input type="text" class="field__num field__hex" id="${id}-hex" maxlength="7" spellcheck="false" autocomplete="off" aria-label="${item.label} hex" /><span class="field__unit"></span></span></div>`;
+    const swatch = field.querySelector('.field__swatch'), hex = field.querySelector('.field__hex');
+    const paintColor = () => { swatch.value = state[item.key]; if (document.activeElement !== hex) hex.value = state[item.key]; };
+    const apply = (v) => { state[item.key] = v; paintColor(); markPreset(); requestRender(); };
+    swatch.addEventListener('input', () => apply(swatch.value));
+    hex.addEventListener('input', () => { const v = normHex(hex.value); if (v) apply(v); });
+    const commit = () => { hex.value = state[item.key]; };
+    hex.addEventListener('change', commit);
+    hex.addEventListener('blur', commit);
+    hex.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); hex.blur(); } });
+    colorFields.set(item.key, paintColor);
+    paintColor();
+    return field;
+  }
+  const colorFields = new Map();
+  const sections = $('sections');
+  for (const g of GROUPS) {
+    const id = 'sec-' + g.title.toLowerCase();
+    const sec = document.createElement('div'); sec.className = 'section section--collapsible';
+    sec.innerHTML = `<h2 class="section__title"><button type="button" class="section__toggle" aria-expanded="true" aria-controls="${id}"><span class="material-symbols-rounded" aria-hidden="true">${g.icon}</span>${g.title}<span class="material-symbols-rounded section__chevron" aria-hidden="true">expand_more</span></button></h2><div class="section__body" id="${id}"><div class="section__inner"></div></div>`;
+    const inner = sec.querySelector('.section__inner');
+    for (const item of g.items) inner.appendChild(item.type === 'color' ? buildColorField(item) : buildField(item));
+    const toggle = sec.querySelector('.section__toggle'), body = sec.querySelector('.section__body');
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!open));
+      body.classList.toggle('is-collapsed', open);
+    });
+    sections.appendChild(sec);
+  }
+  const bgFields = $('bgFields');
+  for (const item of BG_ITEMS) bgFields.appendChild(buildField(item));
+
+  function syncInputs() {
+    for (const [key, { input, item }] of inputs) { input.value = state[key]; paint(input, item); }
+    for (const paintColor of colorFields.values()) paintColor();
+    for (const b of shapesEl.children) b.setAttribute('aria-checked', String(Number(b.dataset.shape) === state.shape));
+  }
+
+  // Shape selector
+  const shapesEl = $('shapes');
+  function shapeIcon(sh) {
+    let d = sh.path;
+    if (!d) {
+      const pts = [];
+      for (let i = 0; i < 120; i++) { const t = (i / 120) * TAU; const r = sh.r(t); pts.push(`${(Math.sin(t) * r).toFixed(3)},${(-Math.cos(t) * r).toFixed(3)}`); }
+      d = 'M' + pts.join('L') + 'Z';
+    }
+    return `<svg viewBox="-1.1 -1.1 2.2 2.2" aria-hidden="true"><path d="${d}"/></svg>`;
+  }
+  for (const sh of SHAPES) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'shape'; b.dataset.shape = sh.id;
+    b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', String(sh.id === state.shape));
+    b.setAttribute('aria-label', sh.name); b.title = sh.name;
+    b.innerHTML = shapeIcon(sh);
+    b.addEventListener('click', () => { state.shape = sh.id; syncInputs(); markPreset(); requestRender(); });
+    shapesEl.appendChild(b);
+  }
+
+  // Presets
+  const chips = $('chips');
+  for (const name of Object.keys(PRESETS)) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.textContent = name; b.dataset.preset = name;
+    b.setAttribute('aria-pressed', name === 'Figma tiles');
+    b.addEventListener('click', () => { Object.assign(state, PRESETS[name]); syncInputs(); markPreset(name); requestRender(); });
+    chips.appendChild(b);
+  }
+  function markPreset(name) {
+    if (!name) {
+      name = Object.keys(PRESETS).find((n) => Object.keys(PRESETS[n]).every((k) => PRESETS[n][k] === state[k]));
+    }
+    for (const c of chips.children) c.setAttribute('aria-pressed', String(c.dataset.preset === name));
+  }
+
+  // ---------- WebGL ----------
+  const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, premultipliedAlpha: false });
+  if (!gl) { stage.classList.add('no-webgl'); return; }
+
+  const VS = `#version 300 es
+  layout(location=0) in vec2 a_pos;
+  void main(){ gl_Position = vec4(a_pos, 0.0, 1.0); }`;
+
+  // Port of the Figma "Curved Stripes" WGSL shader fill (9:420) with the frame's parameters.
+  const STRIPES_FS = `#version 300 es
+  precision highp float;
+  out vec4 o;
+  uniform vec2 u_dims;
+  void main(){
+    float zoom = 0.6, density = 10.0, thickness = 0.5, curvature = 0.225, waveFreq = 1.0, spacing = 0.095;
+    vec3 colorA = vec3(0.18, 0.29, 0.75), colorB = vec3(0.95, 0.92, 0.85);
+    vec2 uvRaw = gl_FragCoord.xy / u_dims;
+    vec2 uv = (uvRaw - 0.5) / zoom + 0.5;
+    vec2 p = uv * u_dims;
+    float wave = curvature * u_dims.y * sin(waveFreq * 6.28318530718 * p.x / u_dims.x);
+    float distY = (p.y + wave) / u_dims.y;
+    float period = 1.0 / density;
+    float bandWidth = period * clamp(thickness - spacing, 0.01, 0.99);
+    float t = fract(distY / period);
+    float edgePx = 1.0 / (u_dims.y * period);
+    float d = min(t, 1.0 - t) - (0.5 - bandWidth / period * 0.5);
+    float mask = smoothstep(-edgePx, edgePx, d);
+    o = vec4(mix(colorB, colorA, mask), 1.0);
+  }`;
+
+  const GLASS_FS = `#version 300 es
+  precision highp float;
+  out vec4 o;
+  uniform vec2  u_res;        // canvas px
+  uniform float u_unit;       // canvas px per design px
+  uniform sampler2D u_tex;
+  uniform float u_texAspect;
+  uniform float u_bgScale;
+  uniform vec2  u_bgOffset;
+  uniform float u_cols, u_gap, u_radius, u_pad, u_shape;
+  uniform float u_refract, u_edge, u_curve, u_zoom, u_chroma, u_frost;
+  uniform float u_tint, u_sat, u_spec, u_light, u_shadow, u_glassOn;
+  uniform vec3 u_fill;
+
+  vec2 bgUV(vec2 p){
+    float ca = u_res.x / u_res.y;
+    vec2 uv;
+    if (u_texAspect > ca) { uv.y = p.y / u_res.y; uv.x = (p.x - u_res.x * 0.5) / (u_res.y * u_texAspect) + 0.5; }
+    else                  { uv.x = p.x / u_res.x; uv.y = (p.y - u_res.y * 0.5) / (u_res.x / u_texAspect) + 0.5; }
+    return (uv - 0.5) / u_bgScale + 0.5 + u_bgOffset;
+  }
+  vec3 bg(vec2 p, float lod){ return texture(u_tex, bgUV(p), lod).rgb; }
+  vec3 bgBlur(vec2 p, float lod, float r){
+    if (r < 0.5) return bg(p, lod);
+    vec3 c = bg(p, lod);
+    for (int i = 0; i < 8; i++) {
+      float a = 6.28318530718 * float(i) / 8.0;
+      c += bg(p + r * vec2(cos(a), sin(a)), lod);
+    }
+    return c / 9.0;
+  }
+  const float PI = 3.14159265359;
+  float sdBox2(vec2 q, vec2 b, float r){
+    vec2 d = abs(q) - b + r;
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0) - r;
+  }
+  float sdBox(vec2 q, float half_, float r){ return sdBox2(q, vec2(half_), r); }
+  // Regular n-gon with circumradius R, one vertex pointing up (y is down), rotated by rot
+  float sdNgon(vec2 q, float R, float n, float rot){
+    float sector = 2.0 * PI / n;
+    float a = atan(q.x, -q.y) + rot;
+    float b = mod(a + sector * 0.5, sector) - sector * 0.5;
+    vec2 p = length(q) * vec2(sin(b), cos(b));          // fold so the nearest edge is horizontal at y = apothem
+    float ap = R * cos(PI / n), he = R * sin(PI / n);    // apothem, half edge length
+    vec2 e = vec2(clamp(p.x, -he, he), ap);              // nearest point on that edge (vertices included)
+    return length(p - e) * sign(p.y - ap);               // exact SDF → offsetting by -r gives round corners
+  }
+  float tri(float x){ return abs(fract(x) * 2.0 - 1.0); }
+  float dot2(vec2 v){ return dot(v, v); }
+  float sdHeart(vec2 p){                       // iq: tip at (0,0), top at y = 1
+    p.x = abs(p.x);
+    if (p.y + p.x > 1.0) return sqrt(dot2(p - vec2(0.25, 0.75))) - sqrt(2.0) / 4.0;
+    return sqrt(min(dot2(p - vec2(0.0, 1.0)), dot2(p - 0.5 * max(p.x + p.y, 0.0)))) * sign(p.x - p.y);
+  }
+  // Tile shape (Figma 15:527 shape set). h = half tile size, r = corner rounding for polygonal shapes.
+  float sdShape(vec2 q, float h, float r){
+    int s = int(u_shape + 0.5);
+    float th = atan(q.x, -q.y);
+    float rr = min(r, h * 0.5);
+    if (s == 0) return length(q) - h;
+    if (s == 1) return sdBox(q, h, r);
+    if (s == 2) return sdBox2(vec2(q.x + q.y * 0.18, q.y), vec2(h * 0.88, h), max(rr, 2.0));
+    if (s == 3) {                                   // arch: one continuous field, no seam at the join
+      if (q.y < 0.0) return length(q) - h;          //   semicircular top
+      vec2 e = vec2(abs(q.x) - h + rr, q.y - h + rr); //   body open at the top, rounded bottom corners
+      return length(max(e, 0.0)) + min(max(e.x, e.y), 0.0) - rr;
+    }
+    if (s == 4) {                                   // semicircle with rounded base corners
+      vec2 e = vec2(length(q - vec2(0.0, h * 0.5)) - h + rr, q.y - h * 0.5 + rr);
+      return length(max(e, 0.0)) + min(max(e.x, e.y), 0.0) - rr;
+    }
+    if (s == 5) { float c = cos(PI / 6.0), sn = sin(PI / 6.0); vec2 e = vec2(q.x * c - q.y * sn, q.x * sn + q.y * c);
+                  vec2 ab = vec2(h * 0.68, h); return (length(e / ab) - 1.0) * min(ab.x, ab.y); }
+    if (s == 6) return sdNgon(q, h - rr, 3.0, 0.0) - rr;
+    if (s == 7) return sdNgon(q, h - rr, 4.0, 0.0) - rr;
+    if (s == 8) return sdNgon(q, h - rr, 5.0, 0.0) - rr;
+    if (s == 9) return sdNgon(q, h - rr, 6.0, PI / 6.0) - rr;
+    float rho = 1.0;
+    float k = clamp(rr / (0.5 * h), 0.0, 1.0);           // 0 = sharp tips, 1 = fully rounded tips
+    if (s == 10) rho = 0.86 + 0.14 * cos(4.0 * th);
+    else if (s == 11) rho = 0.88 + 0.12 * cos(6.0 * th);
+    else if (s == 12) rho = 0.90 + 0.10 * cos(9.0 * th);
+    else if (s == 13) rho = 0.92 + 0.08 * cos(12.0 * th);
+    else if (s == 14) rho = 0.72 + 0.28 * pow(mix(tri(8.0 * th / (2.0 * PI)),  0.5 + 0.5 * cos(8.0 * th),  k), 1.5);
+    else if (s == 15) rho = 0.68 + 0.32 * pow(mix(tri(12.0 * th / (2.0 * PI)), 0.5 + 0.5 * cos(12.0 * th), k), 1.5);
+    else if (s == 16) rho = 0.70 + 0.30 * cos(4.0 * th);
+    else if (s == 17) rho = 0.78 + 0.22 * cos(8.0 * th);
+    else if (s == 18) rho = 0.55 + 0.45 * pow(mix(tri(12.0 * th / (2.0 * PI)), 0.5 + 0.5 * cos(12.0 * th), k), 3.0);
+    else if (s == 19) rho = 0.74 + 0.26 * cos(7.0 * th);
+    else if (s == 20) { float S = h * 1.6 - rr * 1.66; return sdHeart(vec2(q.x / S, -q.y / S + 0.55)) * S - rr; }   // exact SDF offset by rr rounds the tip; S shrinks so the width stays ≤ 0.96h
+    return length(q) - h * rho;
+  }
+  vec3 saturate3(vec3 c, float s){
+    float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
+    return mix(vec3(l), c, s);
+  }
+
+  void main(){
+    vec2 p = vec2(gl_FragCoord.x, u_res.y - gl_FragCoord.y);   // y down, like CSS
+
+    float pad  = u_pad * u_unit;
+    float gap  = u_gap * u_unit;
+    float n    = max(u_cols, 1.0);
+    float pitch = (u_res.x - 2.0 * pad - (n - 1.0) * gap) / n;
+    float half_ = pitch * 0.5;
+    float r = min(u_radius * u_unit, half_);
+
+    vec2 cell = clamp(floor((p - pad) / (pitch + gap)), vec2(0.0), vec2(n - 1.0));
+    vec2 center = pad + cell * (pitch + gap) + half_;
+    vec2 q = p - center;
+    float d = sdShape(q, half_, r);
+
+    // Base background + tile drop shadow (Figma: 0 0.76px 5.7px rgba(0,0,0,.15))
+    vec3 base = bg(p, 0.0);
+    float dS = sdShape(q - vec2(0.0, 0.76 * u_unit), half_, r);
+    float sh = u_shadow * (1.0 - smoothstep(0.0, 6.0 * u_unit, dS));
+    base *= 1.0 - sh * 0.7;
+
+    if (u_glassOn < 0.5 || pitch <= 0.0) { o = vec4(bg(p, 0.0), 1.0); return; }
+
+    // Lens field: a radial profile centered on the tile. A square SDF normal flips at the
+    // diagonals and shows seams, so the lens is treated as a circular dome that the corners clip.
+    vec2 nrm = normalize(q + 1e-6);
+
+    // Refraction: bend samples toward the tile center, strongest at the edge
+    float edgeW = max(u_edge * u_unit, 1.0);
+    float t = clamp(1.0 + d / edgeW, 0.0, 1.0);                 // 1 at the shape's rim, 0 one edge-width inside
+    float bend = pow(t, u_curve) * u_refract * u_unit;
+    bend = min(bend, length(q) * 0.9);                       // never pull past the tile center (no fold-over)
+    vec2 pz = center + q / u_zoom;
+    float sep = u_chroma * 0.35;
+    float lod = u_frost * 4.5;
+    float blurR = u_frost * pitch * 0.06;
+    vec3 col;
+    col.r = bgBlur(pz - nrm * bend * (1.0 + sep), lod, blurR).r;
+    col.g = bgBlur(pz - nrm * bend,               lod, blurR).g;
+    col.b = bgBlur(pz - nrm * bend * (1.0 - sep), lod, blurR).b;
+
+    col = saturate3(col, u_sat);
+    col = mix(col, u_fill, u_tint);   // tint toward the chosen fill colour
+
+    // Specular rim + soft sheen
+    float a = radians(u_light);
+    vec2 L = vec2(cos(a), -sin(a));
+    float facing = dot(nrm, L);
+    float rim = pow(t, 3.0) * (0.9 * max(facing, 0.0) + 0.35 * max(-facing, 0.0));
+    float sheen = 0.06 * (1.0 - (q.y + half_) / pitch);
+    float hairline = 0.25 * (1.0 - smoothstep(0.0, 1.5 * u_unit, -d));
+    col += u_spec * (rim + sheen + hairline);
+
+    float cover = 1.0 - smoothstep(-0.75, 0.75, d);
+    o = vec4(mix(base, col, cover), 1.0);
+  }`;
+
+  function compile(type, src) {
+    const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+    return s;
+  }
+  function program(fs) {
+    const p = gl.createProgram();
+    gl.attachShader(p, compile(gl.VERTEX_SHADER, VS));
+    gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs));
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+    const u = {};
+    const count = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < count; i++) { const info = gl.getActiveUniform(p, i); u[info.name] = gl.getUniformLocation(p, info.name); }
+    return { p, u };
+  }
+
+  const quad = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
+  const vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
+  gl.enableVertexAttribArray(0);
+  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+  const stripesProg = program(STRIPES_FS);
+  const glassProg = program(GLASS_FS);
+
+  const tex = gl.createTexture();
+  function bindTexParams() {
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.generateMipmap(gl.TEXTURE_2D);
+  }
+
+  // Default background: render the Curved Stripes shader into the texture
+  function useStripes() {
+    const S = 1024;
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, S, S, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    const fbo = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+    gl.viewport(0, 0, S, S);
+    gl.useProgram(stripesProg.p);
+    gl.uniform2f(stripesProg.u.u_dims, S, S);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.deleteFramebuffer(fbo);
+    bindTexParams();
+    state.texAspect = 1;
+    state.bgOffset = [0, 0];
+    $('fileName').textContent = 'Curved Stripes (Figma shader)';
+    requestRender();
+  }
+
+  // Uploaded background: downscale large images, then upload as the texture
+  function useImage(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const MAX = 2048;
+      let w = img.naturalWidth, h = img.naturalHeight;
+      let src = img;
+      if (Math.max(w, h) > MAX) {
+        const k = MAX / Math.max(w, h);
+        const c = document.createElement('canvas');
+        c.width = Math.round(w * k); c.height = Math.round(h * k);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        src = c; w = c.width; h = c.height;
+      }
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, src);
+      bindTexParams();
+      state.texAspect = w / h;
+      state.bgOffset = [0, 0];
+      $('fileName').textContent = file.name;
+      requestRender();
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); $('fileName').textContent = 'Could not read that image'; };
+    img.src = url;
+  }
+
+  // ---------- Render ----------
+  let raf = 0;
+  function requestRender() { if (!raf) raf = requestAnimationFrame(render); }
+  function render() {
+    raf = 0;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const size = Math.max(1, Math.round(glassEl.clientWidth * dpr));
+    if (canvas.width !== size || canvas.height !== size) { canvas.width = size; canvas.height = size; }
+    gl.viewport(0, 0, size, size);
+    gl.useProgram(glassProg.p);
+    const u = glassProg.u;
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.uniform1i(u.u_tex, 0);
+    gl.uniform2f(u.u_res, size, size);
+    gl.uniform1f(u.u_unit, size / DESIGN_SIZE);
+    gl.uniform1f(u.u_texAspect, state.texAspect);
+    gl.uniform1f(u.u_bgScale, state.bgScale);
+    gl.uniform2f(u.u_bgOffset, state.bgOffset[0], state.bgOffset[1]);
+    gl.uniform3fv(u.u_fill, hexToRgb(state.fill));
+    for (const k of ['shape', 'cols', 'gap', 'radius', 'pad', 'refract', 'edge', 'curve', 'zoom', 'chroma', 'frost', 'tint', 'sat', 'spec', 'light', 'shadow', 'glassOn']) {
+      gl.uniform1f(u['u_' + k], state[k]);
+    }
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+  }
+  new ResizeObserver(requestRender).observe(glassEl);
+
+  // ---------- Interactions ----------
+  const fileInput = $('fileInput'), dropzone = $('dropzone');
+  dropzone.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', () => { useImage(fileInput.files[0]); fileInput.value = ''; });
+  for (const el of [stage, dropzone]) {
+    el.addEventListener('dragover', (e) => { e.preventDefault(); el.classList.add('is-dragover'); });
+    el.addEventListener('dragleave', () => el.classList.remove('is-dragover'));
+    el.addEventListener('drop', (e) => { e.preventDefault(); el.classList.remove('is-dragover'); useImage(e.dataTransfer.files[0]); });
+  }
+  window.addEventListener('paste', (e) => {
+    const item = [...(e.clipboardData?.items || [])].find((i) => i.type.startsWith('image/'));
+    if (item) useImage(item.getAsFile());
+  });
+
+  // Drag the background to reposition it
+  let drag = null;
+  glassEl.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, off: [...state.bgOffset] }; glassEl.setPointerCapture(e.pointerId); });
+  glassEl.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const s = glassEl.clientWidth * state.bgScale;
+    const ax = state.texAspect > 1 ? state.texAspect : 1, ay = state.texAspect < 1 ? 1 / state.texAspect : 1;
+    state.bgOffset = [drag.off[0] - (e.clientX - drag.x) / (s * ax), drag.off[1] - (e.clientY - drag.y) / (s * ay)];
+    requestRender();
+  });
+  const endDrag = () => { drag = null; };
+  glassEl.addEventListener('pointerup', endDrag);
+  glassEl.addEventListener('pointercancel', endDrag);
+
+  // Hold to compare (mouse, touch, keyboard)
+  const compare = $('compare');
+  const setGlass = (on) => { state.glassOn = on ? 1 : 0; compare.setAttribute('aria-pressed', String(!on)); requestRender(); };
+  compare.addEventListener('pointerdown', () => setGlass(false));
+  compare.addEventListener('pointerup', () => setGlass(true));
+  compare.addEventListener('pointerleave', () => setGlass(true));
+  compare.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setGlass(false); } });
+  compare.addEventListener('keyup', (e) => { if (e.key === ' ' || e.key === 'Enter') setGlass(true); });
+
+  $('reset').addEventListener('click', () => { Object.assign(state, DEFAULTS); state.bgOffset = [0, 0]; syncInputs(); markPreset('Figma tiles'); useStripes(); });
+
+  $('export').addEventListener('click', () => {
+    render();
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'liquid-glass.png';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }, 'image/png');
+  });
+
+  useStripes();
+})();
+</script>
+</body>
+</html>
