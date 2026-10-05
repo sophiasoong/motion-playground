@@ -3,3 +3,7 @@
 
 .vercel
 .env*.local
+
+# Separate git repos nested under demos/
+demos/glass-filter/
+demos/cookie-morph-loader/
