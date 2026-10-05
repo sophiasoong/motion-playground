@@ -165,3 +165,27 @@
     @apply font-sans;
     }
 }
+/* Demo backdrop — Figma "rainbow" palette (Visual Design, node 9:403).
+   FLAGGED: tokens.json has no matching color tokens; values come straight from the Figma gradient stops.
+   Laid out like the rainbow: warm arc down the left, cool arc down the right. */
+.rainbow-backdrop {
+  --rainbow-yellow: #ffc756;
+  --rainbow-orange: #ffa056;
+  --rainbow-lime: #c7d728;
+  --rainbow-teal: #428c84;
+  --rainbow-blue: #33b1ea;
+  --rainbow-purple: #9973e2;
+  --rainbow-pink: #e96890;
+  --rainbow-red: #ec5a67;
+
+  background:
+    radial-gradient(circle at 12% 12%, var(--rainbow-yellow) 0%, transparent 42%),
+    radial-gradient(circle at 42% 6%, var(--rainbow-orange) 0%, transparent 38%),
+    radial-gradient(circle at 8% 55%, var(--rainbow-lime) 0%, transparent 40%),
+    radial-gradient(circle at 22% 92%, var(--rainbow-teal) 0%, transparent 45%),
+    radial-gradient(circle at 78% 8%, var(--rainbow-blue) 0%, transparent 42%),
+    radial-gradient(circle at 95% 45%, var(--rainbow-purple) 0%, transparent 42%),
+    radial-gradient(circle at 62% 92%, var(--rainbow-pink) 0%, transparent 42%),
+    radial-gradient(circle at 95% 95%, var(--rainbow-red) 0%, transparent 40%),
+    linear-gradient(135deg, var(--rainbow-orange), var(--rainbow-teal) 40%, var(--rainbow-purple) 65%, var(--rainbow-pink));
+}

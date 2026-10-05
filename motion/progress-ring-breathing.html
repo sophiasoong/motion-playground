@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Breathing Progress Ring</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0&display=swap" />
 <style>
   :root {
     /* ---- tokens.json ---- */
@@ -15,6 +15,51 @@
     --color-text-heading-primary: #1e1e1e;      /* color/mms/textHeadingPrimary — pause glyph */
     --color-button-ghost-hover: #f7f6ff;        /* color/mms/interactiveButtonSurfacePrimaryGhostHover */
 
+    /* settings panel (same tokens as liquid-glass.html) */
+    --color-brand-primary: #5244ee;                         /* color/brand/primary — slider fill, thumb ring */
+    --color-surface-card-surface: #ffffff;                  /* color/surface/card/surface — panel */
+    --color-surface-card-shadow: #d9d9d9;                   /* color/surface/card/shadow */
+    --color-text-heading-secondary: #5c5c5c;                /* color/text/heading/secondary — section titles */
+    --color-text-label-primary: #5c5c5c;                    /* color/text/label/primary — field labels */
+    --color-text-body-tertiary: #a6a6a6;                    /* color/text/body/tertiary — units */
+    --color-interactive-input-border-default: #d9d9d9;      /* color/interactive/input/border/default — slider track, outlines */
+    --color-interactive-input-label-default: #1e1e1e;       /* color/interactive/input/label/default — input text */
+    --color-interactive-input-border-focused: #5244ee;      /* color/interactive/input/border/focused */
+    --color-interactive-input-shadow-focused: #5244ee33;    /* color/interactive/input/shadow/focused — focus ring */
+    --color-interactive-input-border-hover: #7d73f2;        /* color/interactive/filterChip/border/hover */
+    --color-interactive-list-divider-on-surface: #f4f4f4;   /* color/interactive/list/divider/onSurface — section dividers */
+    --size-space-component-gap-xs: 4px;         /* size/spaceComponentGapXs */
+    --size-space-component-gap-sm: 8px;         /* size/spaceComponentGapSm */
+    --size-space-component-gap-md: 12px;        /* size/spaceComponentGapMd */
+    --size-space-component-padding-sm: 8px;     /* size/spaceComponentPaddingSm */
+    --size-space-component-padding-lg: 16px;    /* size/spaceComponentPaddingLg — panel padding */
+    --size-space-layout-section-gap-md: 24px;   /* size/spaceLayoutSectionGapMd — stage ↔ panel gap, page padding */
+    --size-radius-sm: 6px;                      /* size/radiusSm — inputs */
+    --size-radius-md: 8px;                      /* size/radiusMd — buttons */
+    --size-radius-xl: 16px;                     /* size/radiusXl — panel */
+    --size-border-sm: 1px;                      /* size/borderSm */
+    --size-border-md: 2px;                      /* size/borderMd — slider thumb ring */
+    --size-typography-xxs-font-size: 10px;      /* size/typographyXxsFontSize — section eyebrows */
+    --size-typography-xxs-line-height: 14px;    /* size/typographyXxsLineHeight */
+    --size-typography-xs-font-size: 12px;       /* size/typographyXsFontSize — labels, values */
+    --size-typography-xs-line-height: 16px;     /* size/typographyXsLineHeight */
+    --size-typography-lg-font-size: 20px;       /* size/typographyLgFontSize — card title */
+    --size-typography-lg-line-height: 28px;     /* size/typographyLgLineHeight */
+    --size-component-height-xs: 24px;           /* size/componentHeightXs — number inputs */
+    --size-component-height-lg: 40px;           /* size/componentHeightLg — buttons */
+    --size-typography-sm-font-size: 14px;       /* size/typographySmFontSize — buttons */
+    --size-typography-sm-line-height: 20px;     /* size/typographySmLineHeight */
+    --color-interactive-button-label-primary-ghost-default: #5244ee;  /* color/interactive/button/label/primary/ghost/default */
+    --size-component-icon-sm: 16px;             /* size/componentIconSm — slider thumb */
+    --size-component-dropdown-width-sm: 280px;  /* size/componentDropdownWidthSm — panel width */
+    --font-family-body: "Roboto";               /* font/english/typographyFontFamilyBody */
+    --font-weight-regular: 400;                 /* font/english/typographyFontWeightRegular */
+    --font-weight-medium: 500;                  /* font/english/typographyFontWeightMedium — card title */
+    --font-weight-bold: 600;                    /* font/english/typographyFontWeightBold */
+    --motion-duration-fast: 100ms;              /* motion/durationFast — hover/focus */
+    --shadow-sm: 1px;                           /* shadow/sm — panel shadow y offset */
+    --shadow-lg: 8px;                           /* shadow/lg — panel shadow blur */
+
     /* ---- FLAGGED: no matching token in tokens.json (values specified in the brief) ---- */
     --ring-color-track: #BAC3FF;                /* NO TOKEN — brief: Track */
     --ring-color-fill: #394379;                 /* NO TOKEN — brief: Fill */
@@ -24,19 +69,65 @@
     --ring-wave-amplitude: 14px;                /* NO TOKEN — matched to 12-lobe reference (~6.5% of radius) */
     --ring-cycle-duration: 8000ms;              /* NO TOKEN — motion tokens top out at 300ms; one breath cycle */
     --surface-page: #E5E1F6;                    /* NO TOKEN — lavender surface sampled from video */
+    --demo-min-w: 560px;                        /* NO TOKEN — demo card width, matches liquid-glass Figma "Window" */
     --ring-control-icon: 120px;                 /* NO TOKEN — pause glyph ≈ 24% of ring diameter in video */
     --ring-control-size: 160px;                 /* NO TOKEN — pause button hit area */
+    --ring-scale: 1;                            /* NO TOKEN — --ring-size ÷ 500px design size, set by the Size control */
+    --ring-control-px: 160px;                   /* NO TOKEN — live pause-button diameter, set by the Button size control */
+    --back-to-menu-clearance: 52px;             /* NO TOKEN — clears the fixed "Back to Menu" link (36px tall, 16px inset) */
+    --slider-track-h: 4px;                      /* NO TOKEN — slider track height (as liquid-glass) */
+    --field-input-w: 56px;                      /* NO TOKEN — number input width (as liquid-glass) */
+    --field-hex-w: 72px;                        /* NO TOKEN — hex colour input width (as liquid-glass) */
   }
 
-  html, body { height: 100%; }
+  * { box-sizing: border-box; }
+  html { height: 100%; }
   body {
     margin: 0;
-    display: grid;
-    place-items: center;
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    padding: var(--back-to-menu-clearance) var(--size-space-layout-section-gap-md) var(--size-space-layout-section-gap-md);
     background: var(--surface-page);
+    font-family: var(--font-family-body), system-ui, sans-serif;
+    font-weight: var(--font-weight-regular);
+    -webkit-font-smoothing: antialiased;
   }
 
-  .stage { display: grid; place-items: center; }
+  /* ---- Demo column: card on top, settings panel below at the same width ---- */
+  .demo {
+    width: min(100%, max(var(--demo-min-w), calc(var(--ring-size) + 2 * var(--size-space-layout-section-gap-md))));
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-space-layout-section-gap-md);
+  }
+
+  /* ---- Stage card (same treatment as liquid-glass .stage) ---- */
+  .stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--size-space-layout-section-gap-md);
+    padding: var(--size-space-layout-section-gap-md);
+    background: var(--color-surface-card-surface);
+    border-radius: var(--size-radius-xl);
+    box-shadow: 0 var(--shadow-sm) var(--shadow-lg) var(--color-surface-card-shadow);
+    overflow: hidden;
+  }
+  .stage__header { width: 100%; text-align: center; }
+  .stage__title {
+    margin: 0;
+    font-size: var(--size-typography-lg-font-size);
+    line-height: var(--size-typography-lg-line-height);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-heading-primary);
+  }
+  .stage__subtitle {
+    margin: var(--size-space-component-gap-xs) 0 0;
+    font-size: var(--size-typography-xs-font-size);
+    line-height: var(--size-typography-xs-line-height);
+    color: var(--color-text-body-tertiary);
+  }
 
   .ring {
     position: relative;
@@ -67,8 +158,8 @@
     position: absolute;
     inset: 50% auto auto 50%;
     translate: -50% -50%;
-    width: var(--ring-control-size);
-    height: var(--ring-control-size);
+    width: var(--ring-control-px);
+    height: var(--ring-control-px);
     display: grid;
     place-items: center;
     border: 0;
@@ -80,14 +171,153 @@
   }
   .ring__toggle:hover { background: var(--color-button-ghost-hover); }
   .ring__toggle .material-symbols-rounded {
-    font-size: var(--ring-control-icon);
+    font-size: calc(var(--ring-control-px) * 120 / 160); /* --ring-control-icon : --ring-control-size */
     font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
   }
+
+  /* ---- Settings panel (pattern from liquid-glass.html) ---- */
+  .panel {
+    width: 100%;
+    background: var(--color-surface-card-surface);
+    border-radius: var(--size-radius-xl);
+    box-shadow: 0 var(--shadow-sm) var(--shadow-lg) var(--color-surface-card-shadow);
+    padding: var(--size-space-component-padding-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-space-component-gap-lg);
+  }
+  .section {
+    display: flex; flex-direction: column;
+    gap: var(--size-space-component-gap-md);
+    padding-top: var(--size-space-component-gap-lg);
+    border-top: var(--size-border-sm) solid var(--color-interactive-list-divider-on-surface);
+  }
+  .section:first-child { border-top: 0; padding-top: 0; }
+  .section__title {
+    display: flex; align-items: center; gap: var(--size-space-component-gap-sm);
+    margin: 0;
+    font-size: var(--size-typography-xxs-font-size);
+    line-height: var(--size-typography-xxs-line-height);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-heading-secondary);
+  }
+  .section__title .material-symbols-rounded { font-size: var(--size-component-icon-sm); color: var(--color-brand-primary); }
+
+  /* Track + Fill pickers side by side */
+  .field-pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--size-space-component-gap-lg); }
+  .field { display: flex; flex-direction: column; gap: var(--size-space-component-gap-xs); }
+  .field__label {
+    color: var(--color-text-label-primary);
+    font-size: var(--size-typography-xs-font-size);
+    line-height: var(--size-typography-xs-line-height);
+  }
+  .field__row { display: flex; align-items: center; gap: var(--size-space-component-gap-sm); }
+  .field__row input[type="range"] { flex: 1 1 auto; min-width: 0; }
+  .field__value {
+    display: inline-flex; align-items: center; gap: var(--size-space-component-gap-xs); flex: 0 0 auto;
+    color: var(--color-text-body-tertiary); font-variant-numeric: tabular-nums;
+    font-size: var(--size-typography-xs-font-size);
+    line-height: var(--size-typography-xs-line-height);
+  }
+  .field__num {
+    -moz-appearance: textfield; appearance: textfield;
+    width: var(--field-input-w); height: var(--size-component-height-xs);
+    padding: 0 var(--size-space-component-padding-sm);
+    border: var(--size-border-sm) solid var(--color-interactive-input-border-default);
+    border-radius: var(--size-radius-sm);
+    background: var(--color-surface-card-surface);
+    color: var(--color-interactive-input-label-default);
+    font: inherit; font-variant-numeric: tabular-nums; text-align: right;
+    transition: border-color var(--motion-duration-fast) ease, box-shadow var(--motion-duration-fast) ease;
+  }
+  .field__num::-webkit-outer-spin-button, .field__num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .field__num:hover { border-color: var(--color-interactive-input-border-hover); }
+  .field__num:focus { outline: none; border-color: var(--color-interactive-input-border-focused); box-shadow: 0 0 0 var(--size-border-md) var(--color-interactive-input-shadow-focused); }
+  .field__unit { min-width: 2ch; }
+  .field__hex { width: var(--field-hex-w); text-align: left; text-transform: lowercase; }
+  .field__swatch {
+    -webkit-appearance: none; appearance: none;
+    flex: 1 1 auto; min-width: 0; height: var(--size-component-height-xs); padding: 0;
+    border: var(--size-border-sm) solid var(--color-interactive-input-border-default);
+    border-radius: var(--size-radius-sm);
+    background: var(--color-surface-card-surface); cursor: pointer;
+    transition: border-color var(--motion-duration-fast) ease, box-shadow var(--motion-duration-fast) ease;
+  }
+  .field__swatch::-webkit-color-swatch-wrapper { padding: 0; }
+  .field__swatch::-webkit-color-swatch { border: 0; border-radius: inherit; }
+  .field__swatch::-moz-color-swatch { border: 0; border-radius: inherit; }
+  .field__swatch:hover { border-color: var(--color-interactive-input-border-hover); }
+  .field__swatch:focus-visible { outline: none; border-color: var(--color-interactive-input-border-focused); box-shadow: 0 0 0 var(--size-border-md) var(--color-interactive-input-shadow-focused); }
+
+  .panel__footer {
+    display: flex; align-items: center;
+    padding-top: var(--size-space-component-gap-lg);
+    border-top: var(--size-border-sm) solid var(--color-interactive-list-divider-on-surface);
+  }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: var(--size-space-component-gap-xs);
+    height: var(--size-component-height-lg);
+    padding: 0 var(--size-space-component-padding-sm);
+    border-radius: var(--size-radius-md);
+    border: var(--size-border-sm) solid transparent;
+    font: inherit;
+    font-size: var(--size-typography-sm-font-size);
+    line-height: var(--size-typography-sm-line-height);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: background var(--motion-duration-fast) ease;
+  }
+  .btn .material-symbols-rounded { font-size: var(--size-component-icon-sm); }
+  .btn:focus-visible { outline: none; box-shadow: 0 0 0 var(--size-border-md) var(--color-interactive-input-shadow-focused); }
+  .btn--ghost { background: transparent; color: var(--color-interactive-button-label-primary-ghost-default); }
+  .btn--ghost:hover { background: var(--color-button-ghost-hover); }
+
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: var(--size-component-icon-sm);
+    margin: 0; background: transparent; cursor: pointer;
+    --p: 50%;
+  }
+  input[type="range"]:focus { outline: none; }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: var(--slider-track-h);
+    border-radius: var(--size-radius-full);
+    background: linear-gradient(to right, var(--color-brand-primary) var(--p), var(--color-interactive-input-border-default) var(--p));
+  }
+  input[type="range"]::-moz-range-track { height: var(--slider-track-h); border-radius: var(--size-radius-full); background: var(--color-interactive-input-border-default); }
+  input[type="range"]::-moz-range-progress { height: var(--slider-track-h); border-radius: var(--size-radius-full); background: var(--color-brand-primary); }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: var(--size-component-icon-sm); height: var(--size-component-icon-sm);
+    margin-top: calc((var(--slider-track-h) - var(--size-component-icon-sm)) / 2);
+    border-radius: var(--size-radius-full);
+    background: var(--color-surface-card-surface);
+    border: var(--size-border-md) solid var(--color-brand-primary);
+    transition: box-shadow var(--motion-duration-fast) ease;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: var(--size-component-icon-sm); height: var(--size-component-icon-sm);
+    border-radius: var(--size-radius-full);
+    background: var(--color-surface-card-surface);
+    border: var(--size-border-md) solid var(--color-brand-primary);
+  }
+  input[type="range"]:hover::-webkit-slider-thumb,
+  input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 var(--size-space-component-gap-xs) var(--color-interactive-input-shadow-focused); }
+  input[type="range"]:hover::-moz-range-thumb,
+  input[type="range"]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 var(--size-space-component-gap-xs) var(--color-interactive-input-shadow-focused); }
 
 </style>
 </head>
 <body>
-  <div class="stage">
+  <div class="demo">
+  <section class="stage" aria-label="Breathing progress ring preview">
+    <header class="stage__header">
+      <h1 class="stage__title">Breathing Progress Ring</h1>
+      <p class="stage__subtitle">Wavy fill breathes around the ring · tap to pause.</p>
+    </header>
     <div class="ring" id="ring">
       <svg viewBox="0 0 500 500" aria-hidden="true">
         <path class="ring__track" id="track" d="" />
@@ -97,6 +327,65 @@
         <span class="material-symbols-rounded" id="toggleIcon">pause</span>
       </button>
     </div>
+  </section>
+
+  <aside class="panel" aria-label="Progress ring settings">
+    <section class="section">
+      <h2 class="section__title"><span class="material-symbols-rounded" aria-hidden="true">tune</span>Ring</h2>
+      <div class="field-pair">
+      <div class="field">
+        <label class="field__label" for="size">Ring size</label>
+        <div class="field__row">
+          <input type="range" autocomplete="off" id="size" min="200" max="720" step="10" />
+          <span class="field__value"><input type="number" autocomplete="off" class="field__num" id="size-num" min="200" max="720" step="10" aria-label="Ring size value" /><span class="field__unit">px</span></span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="button">Button size</label>
+        <div class="field__row">
+          <input type="range" autocomplete="off" id="button" min="40" max="320" step="1" />
+          <span class="field__value"><input type="number" autocomplete="off" class="field__num" id="button-num" min="40" max="320" step="1" aria-label="Button size value" /><span class="field__unit">px</span></span>
+        </div>
+      </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="stroke">Stroke weight</label>
+        <div class="field__row">
+          <input type="range" autocomplete="off" id="stroke" min="4" max="80" step="1" />
+          <span class="field__value"><input type="number" autocomplete="off" class="field__num" id="stroke-num" min="4" max="80" step="1" aria-label="Stroke weight value" /><span class="field__unit">px</span></span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="speed">Speed (one fill cycle)</label>
+        <div class="field__row">
+          <input type="range" autocomplete="off" id="speed" min="1" max="20" step="0.5" />
+          <span class="field__value"><input type="number" autocomplete="off" class="field__num" id="speed-num" min="1" max="20" step="0.5" aria-label="Speed value in seconds" /><span class="field__unit">s</span></span>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <h2 class="section__title"><span class="material-symbols-rounded" aria-hidden="true">palette</span>Color</h2>
+      <div class="field-pair">
+      <div class="field">
+        <label class="field__label" for="color-track">Track</label>
+        <div class="field__row">
+          <input type="color" autocomplete="off" class="field__swatch" id="color-track" />
+          <span class="field__value"><input type="text" class="field__num field__hex" id="color-track-hex" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Track color hex" /><span class="field__unit"></span></span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="color-fill">Fill</label>
+        <div class="field__row">
+          <input type="color" autocomplete="off" class="field__swatch" id="color-fill" />
+          <span class="field__value"><input type="text" class="field__num field__hex" id="color-fill-hex" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Fill color hex" /><span class="field__unit"></span></span>
+        </div>
+      </div>
+      </div>
+    </section>
+    <div class="panel__footer">
+      <button type="button" class="btn btn--ghost" id="reset"><span class="material-symbols-rounded" aria-hidden="true">restart_alt</span>Reset</button>
+    </div>
+  </aside>
   </div>
 
 <script>
@@ -106,20 +395,23 @@
 
   // ---- geometry (all derived from the CSS variables above) ----
   const SIZE       = px('--ring-size');            // 500
-  const STROKE     = px('--ring-stroke-fill');     // 40
+  let   STROKE     = px('--ring-stroke-fill');     // 40 — viewBox units; updated by the Stroke weight control
   const AMP        = px('--ring-wave-amplitude');  // 14
-  const CYCLE_MS   = px('--ring-cycle-duration');  // 8000
+  let   CYCLE_MS   = px('--ring-cycle-duration');  // 8000 — updated live by the Speed control
   const HOLD_MS    = px('--motion-duration-slow');  // 300 — pause at 100% before the loop restarts
   const GAP_PX     = px('--size-space-component-gap-lg'); // 16 — edge-to-edge gap between fill and track caps
-  const STROKE_TRK = px('--ring-stroke-track');    // 36
+  let   STROKE_TRK = px('--ring-stroke-track');    // 36
+  const TRK_RATIO  = STROKE_TRK / STROKE;          // track stays 90% of the fill stroke
   const CX = SIZE / 2, CY = SIZE / 2;
+  // Geometry is drawn in the fixed 500-unit viewBox; the Size control only changes --ring-size,
+  // so strokes, wave amplitude and the gap all scale with the ring.
   // Base radius sits so that crest + half stroke stays inside the 500px box.
-  const R = SIZE / 2 - STROKE / 2 - AMP;
+  let R = SIZE / 2 - STROKE / 2 - AMP;
 
   // ---- wave parameters (measured from the reference video) ----
   const WAVES_PER_TURN = 12;          // 12-lobe reference shape, 30° per wavelength → closes seamlessly
   // Angular gap so the round caps of fill and track sit GAP_PX apart edge to edge.
-  const GAP_RAD        = (GAP_PX + STROKE / 2 + STROKE_TRK / 2) / (SIZE / 2 - STROKE / 2 - AMP);
+  let   GAP_RAD        = (GAP_PX + STROKE / 2 + STROKE_TRK / 2) / R;
   const WAVE_DRIFT     = 0;           // rad/s of phase drift along the path (0 = stationary wave)
   const START          = -Math.PI / 2; // 12 o'clock
 
@@ -191,7 +483,77 @@
     icon.textContent = playing ? 'pause' : 'play_arrow';
     toggle.setAttribute('aria-label', playing ? 'Pause' : 'Play');
   });
+
+  // ---- settings panel ----
+  const root = document.documentElement.style;
+  const clamp = (v, el) => Math.min(+el.max, Math.max(+el.min, v));
+  const fillRange = (el) => el.style.setProperty('--p', ((el.value - el.min) / (el.max - el.min) * 100) + '%');
+
+  // Range + number pair; `apply` receives the clamped value.
+  function bindNumber(id, initial, apply) {
+    const range = document.getElementById(id), num = document.getElementById(id + '-num');
+    const set = (v, from) => {
+      if (!Number.isFinite(v)) return;
+      v = clamp(v, range);
+      if (from !== range) range.value = v;
+      if (from !== num) num.value = v;
+      fillRange(range);
+      apply(v);
+    };
+    range.addEventListener('input', () => set(+range.value, range));
+    num.addEventListener('input', () => { if (num.value !== '') set(+num.value, num); });
+    num.addEventListener('change', () => set(+num.value || initial));
+    set(initial);
+    return () => set(initial);
+  }
+
+  // Colour swatch + hex pair writing a CSS variable.
+  function bindColor(id, cssVar) {
+    const swatch = document.getElementById(id), hex = document.getElementById(id + '-hex');
+    const initial = css.getPropertyValue(cssVar).trim().toLowerCase();
+    const set = (v, from) => {
+      if (from !== swatch) swatch.value = v;
+      if (from !== hex) hex.value = v;
+      root.setProperty(cssVar, v);
+    };
+    swatch.addEventListener('input', () => set(swatch.value, swatch));
+    hex.addEventListener('input', () => {
+      let v = hex.value.trim();
+      if (!v.startsWith('#')) v = '#' + v;
+      if (/^#[0-9a-f]{6}$/i.test(v)) set(v.toLowerCase(), hex);
+    });
+    hex.addEventListener('blur', () => { hex.value = swatch.value; });
+    set(initial);
+    return () => set(initial);
+  }
+
+  const resets = [];
+  // Stroke weight and button size are on-screen px; ring geometry is drawn in the 500-unit
+  // viewBox, so the stroke is divided by the current scale before use.
+  const ui = { size: SIZE, stroke: STROKE, button: px('--ring-control-size') }; // button default 160px
+
+  function layout() {
+    const scale = ui.size / SIZE;
+    STROKE = ui.stroke / scale;
+    STROKE_TRK = STROKE * TRK_RATIO;
+    R = SIZE / 2 - STROKE / 2 - AMP;
+    GAP_RAD = (GAP_PX + STROKE / 2 + STROKE_TRK / 2) / R;
+    root.setProperty('--ring-size', ui.size + 'px');
+    root.setProperty('--ring-scale', scale);
+    root.setProperty('--ring-stroke-fill', STROKE + 'px');
+    root.setProperty('--ring-stroke-track', STROKE_TRK + 'px');
+    root.setProperty('--ring-control-px', ui.button + 'px');
+  }
+
+  resets.push(bindNumber('size',   ui.size,   (v) => { ui.size = v;   layout(); }));
+  resets.push(bindNumber('stroke', ui.stroke, (v) => { ui.stroke = v; layout(); }));
+  resets.push(bindNumber('button', ui.button, (v) => { ui.button = v; layout(); }));
+  resets.push(bindNumber('speed', CYCLE_MS / 1000, (v) => { CYCLE_MS = v * 1000; }));
+  resets.push(bindColor('color-track', '--ring-color-track'));
+  resets.push(bindColor('color-fill',  '--ring-color-fill'));
+  document.getElementById('reset').addEventListener('click', () => resets.forEach((r) => r()));
 })();
 </script>
+<script type="module" src="/src/back-to-menu.ts"></script>
 </body>
 </html>

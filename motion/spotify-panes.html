@@ -97,10 +97,12 @@
   }
 
   * { box-sizing: border-box; }
+  :root { --back-to-menu-clearance: 68px; } /* 16px inset + 36px "Back to Menu" link + 16px gap */
   html, body { height: 100%; }
   body {
     margin: 0;
     padding: var(--size-space-component-padding-lg);
+    padding-top: var(--back-to-menu-clearance); /* clears the fixed "Back to Menu" link */
     background: var(--color-surface-tag-neutral-surface);
     color: var(--color-text-heading-primary);
     font-family: var(--font-family-body), system-ui, sans-serif;
@@ -162,7 +164,7 @@
   /* ================= WINDOW ================= */
   .window {
     min-width: var(--size-component-width-full);
-    height: calc(100vh - 2 * var(--size-space-component-padding-lg));
+    height: calc(100vh - var(--size-space-component-padding-lg) - var(--back-to-menu-clearance));
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
     gap: var(--size-space-component-gap-sm);
@@ -496,7 +498,6 @@
   }
   .hud button:hover { background: var(--color-surface-card-surface); }
   .hud button.current { background: var(--color-brand-primary); color: var(--color-interactive-button-label-primary-solid-default); }
-  .hud .state { padding: 0 var(--size-space-component-padding-md); font-size: var(--size-typography-xs-font-size); color: var(--color-text-body-secondary); white-space: nowrap; min-width: calc(var(--size-component-width-sm) - var(--size-component-height-lg)); }
   .hud .sep { width: var(--size-border-sm); height: var(--size-component-icon-sm); background: var(--color-interactive-filter-chip-border-default); }
 </style>
 </head>
@@ -687,14 +688,12 @@
 </div>
 
 <div class="hud" id="hud">
-  <button data-preset="wf1">WF 1</button>
-  <button data-preset="wf2">WF 2</button>
-  <button data-preset="wf3">WF 3</button>
-  <button data-preset="wf4">WF 4</button>
-  <button data-preset="wf5">WF 5</button>
-  <button data-preset="wf6">WF 6</button>
-  <span class="sep"></span>
-  <span class="state" id="stateText"></span>
+  <button data-preset="wf1">P1</button>
+  <button data-preset="wf2">P2</button>
+  <button data-preset="wf3">P3</button>
+  <button data-preset="wf4">P4</button>
+  <button data-preset="wf5">P5</button>
+  <button data-preset="wf6">P6</button>
   <span class="sep"></span>
   <button type="button" id="notesBtn">Hide notes</button>
 </div>
@@ -723,7 +722,6 @@
   const handleB = document.getElementById('handleB');
   const fullview = document.getElementById('fullview');
   const gridIcon = document.getElementById('gridIcon');
-  const stateText = document.getElementById('stateText');
 
   // State: lib ∈ rail | list | grid ; right ∈ strip | panel | full
   // 3-pane layout (list + content + panel) is locked to library : content : now playing = 1 : 2 : 1 (NO TOKEN — ratio, not a size)
@@ -788,7 +786,6 @@
     content.dataset.hidden = contentW === 0;
     handleA.dataset.hidden = hA === 0;
     handleB.dataset.hidden = hB === 0;
-    stateText.textContent = `library ${S.lib} ${Math.round(libW)}px · now playing ${S.right} ${S.right === 'full' ? '' : Math.round(rightW) + 'px'}`;
     markPreset();
   }
 
@@ -925,5 +922,6 @@
   layout(false);
 })();
 </script>
+<script type="module" src="/src/back-to-menu.ts"></script>
 </body>
 </html>

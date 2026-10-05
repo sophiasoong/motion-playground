@@ -95,6 +95,7 @@
   html, body { height: 100%; }
   body {
     margin: 0;
+    padding-top: 52px; /* clears the fixed "Back to Menu" link (36px tall, 16px inset) */
     background: var(--page-backdrop);
     font-family: var(--font-family-body), system-ui, sans-serif;
     font-weight: var(--font-weight-regular);
@@ -1105,5 +1106,6 @@
   useStripes();
 })();
 </script>
+<script type="module" src="/src/back-to-menu.ts"></script>
 </body>
 </html>

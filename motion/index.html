@@ -17,8 +17,7 @@
     --color-mms-text-link-default: #5244ee;                    /* color/mms/textLinkDefault — "Open demo" row */
     --color-mms-surface-card-surface: #ffffff;                 /* color/mms/surfaceCardSurface — card background */
     --color-mms-surface-card-shadow: #d9d9d9;                  /* color/mms/surfaceCardShadow — card border + hover shadow */
-    --color-mms-surface-thumbnail-surface: #f7f6ff;            /* color/mms/surfaceThumbnailSurface — page background + icon tile */
-    --color-mms-surface-thumbnail-icon: #5244ee;               /* color/mms/surfaceThumbnailIcon — card icon */
+    --color-mms-surface-thumbnail-surface: #f7f6ff;            /* color/mms/surfaceThumbnailSurface — page background + preview placeholder */
     --color-mms-surface-tag-neutral-surface: #f5f5f5;          /* color/mms/surfaceTagNeutralSurface — stack tag */
     --color-mms-surface-tag-neutral-border: #d9d9d9;           /* color/mms/surfaceTagNeutralBorder — stack tag */
     --color-mms-surface-tag-neutral-label: #5c5c5c;            /* color/mms/surfaceTagNeutralLabel — stack tag */
@@ -34,13 +33,12 @@
     --size-space-component-gap-sm: 8px;                        /* size/spaceComponentGapSm — title → description, title → tag */
     --size-space-component-gap-xs: 4px;                        /* size/spaceComponentGapXs — "Open demo" → arrow */
     --size-radius-xl: 16px;                                    /* size/radiusXl — card corner */
-    --size-radius-lg: 12px;                                    /* size/radiusLg — icon tile corner */
+    --size-radius-lg: 12px;                                    /* size/radiusLg — preview corner */
     --size-radius-full: 9999px;                                /* size/radiusFull — stack tag */
     --size-border-sm: 1px;                                     /* size/borderSm — card and tag border */
     --size-border-md: 2px;                                     /* size/borderMd — focus ring */
     --size-component-height-xl: 48px;                          /* size/componentHeightXl — icon tile */
     --size-component-height-xs: 24px;                          /* size/componentHeightXs — stack tag height */
-    --size-component-icon-md: 24px;                            /* size/componentIconMd — card icon */
     --size-component-icon-sm: 16px;                            /* size/componentIconSm — "Open demo" arrow */
     --size-component-width-sm: 260px;                          /* size/componentWidthSm — minimum card width */
     --size-component-width-2xl: 1104px;                        /* size/componentWidth2xl — content max width */
@@ -99,7 +97,6 @@
   }
   .page-header p {
     margin: 0;
-    max-width: 60ch;
     font: var(--font-weight-regular) var(--size-typography-md-font-size) / var(--size-typography-md-line-height) var(--font-family-body), system-ui, sans-serif;
     color: var(--color-mms-text-body-secondary);
   }
@@ -132,15 +129,24 @@
   }
   .card:focus-visible { outline: var(--size-border-md) solid var(--color-mms-brand-primary); outline-offset: var(--size-border-md); }
 
-  .card__tile {
-    display: grid; place-items: center;
-    width: var(--size-component-height-xl); height: var(--size-component-height-xl);
+  /* Demo preview — fixed 16:10 frame so every card lines up */
+  .card__preview {
+    display: block;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
     border-radius: var(--size-radius-lg);
+    border: var(--size-border-sm) solid var(--color-mms-surface-card-shadow);
     background: var(--color-mms-surface-thumbnail-surface);
-    color: var(--color-mms-surface-thumbnail-icon);
     margin-bottom: calc(var(--size-space-component-gap-lg) - var(--size-space-component-gap-md));
   }
-  .card__tile .material-symbols-rounded { font-size: var(--size-component-icon-md); }
+  .card__preview img {
+    display: block;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform var(--motion-duration-normal) ease-out;
+  }
+  .card:hover .card__preview img, .card:focus-visible .card__preview img { transform: scale(1.03); }
+  @media (prefers-reduced-motion: reduce) { .card__preview img { transition: none; } }
 
   .card__head { display: flex; align-items: center; justify-content: space-between; gap: var(--size-space-component-gap-sm); }
   .card h2 {
@@ -161,6 +167,13 @@
   .card p {
     margin: 0;
     flex: 1 0 auto;
+    /* always exactly two lines so every card is the same height */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    min-height: calc(2 * var(--size-typography-sm-line-height));
     font: var(--font-weight-regular) var(--size-typography-sm-font-size) / var(--size-typography-sm-line-height) var(--font-family-body), system-ui, sans-serif;
     color: var(--color-mms-text-body-secondary);
   }
@@ -203,65 +216,65 @@
     <ul class="grid">
       <li>
         <a class="card" href="cloud-player.html">
-          <span class="card__tile" aria-hidden="true"><span class="material-symbols-rounded">graphic_eq</span></span>
+          <span class="card__preview"><img src="thumbs/cloud-player.jpg" alt="" loading="lazy" width="640" height="400" /></span>
           <div class="card__head"><h2>Cloud 9 Wave Player</h2></div>
-          <p>M3 wavy progress indicator rebuilt from a video reference: spring fill-in, traveling wave, pause flatten and overshoot on complete. The album art ripples in sync.</p>
+          <p>M3 wavy progress bar with spring fill-in; the album art ripples in sync.</p>
           <span class="card__open">Open demo <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
         </a>
       </li>
       <li>
         <a class="card" href="liquid-glass.html">
-          <span class="card__tile" aria-hidden="true"><span class="material-symbols-rounded">blur_on</span></span>
+          <span class="card__preview"><img src="thumbs/liquid-glass.jpg" alt="" loading="lazy" width="640" height="400" /></span>
           <div class="card__head"><h2>Liquid Glass Filter</h2></div>
-          <p>WebGL liquid-glass refraction tiles over your own background, with shape and colour controls. Drag the tiles to reposition them.</p>
+          <p>WebGL glass refraction tiles you can drag, reshape and recolour.</p>
           <span class="card__open">Open demo <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
         </a>
       </li>
       <li>
         <a class="card" href="filter-carousel.html">
-          <span class="card__tile" aria-hidden="true"><span class="material-symbols-rounded">view_carousel</span></span>
+          <span class="card__preview"><img src="thumbs/filter-carousel.jpg" alt="" loading="lazy" width="640" height="400" /></span>
           <div class="card__head"><h2>Filter Carousel</h2></div>
-          <p>Filter carousel where the selected item's thumb dips and springs back as its corners round off, while the artwork parallax-slides inside the narrowing mask.</p>
+          <p>Selected thumb dips and springs back as the artwork parallax-slides in its mask.</p>
           <span class="card__open">Open demo <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
         </a>
       </li>
       <li>
         <a class="card" href="fab-menu.html">
-          <span class="card__tile" aria-hidden="true"><span class="material-symbols-rounded">add_circle</span></span>
+          <span class="card__preview"><img src="thumbs/fab-menu.jpg" alt="" loading="lazy" width="640" height="400" /></span>
           <div class="card__head"><h2>FAB Menu</h2></div>
-          <p>FAB that springs open into pill segments growing leftward from its edge; the icon cross-fades in place so the button is never empty.</p>
+          <p>FAB springs open into pill segments while its icon cross-fades in place.</p>
           <span class="card__open">Open demo <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
         </a>
       </li>
       <li>
         <a class="card" href="spotify-panes.html">
-          <span class="card__tile" aria-hidden="true"><span class="material-symbols-rounded">view_agenda</span></span>
+          <span class="card__preview"><img src="thumbs/spotify-panes.jpg" alt="" loading="lazy" width="640" height="400" /></span>
           <div class="card__head"><h2>Music Player Panes</h2></div>
-          <p>Spotify-style player panes: the side strip widens on hover, panes drag to transition, and the full view sweeps open from the now-playing pane.</p>
+          <p>Spotify-style panes that widen on hover and sweep open from now playing.</p>
           <span class="card__open">Open demo <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
         </a>
       </li>
       <li>
         <a class="card" href="wildflower-walk.html">
-          <span class="card__tile" aria-hidden="true"><span class="material-symbols-rounded">local_florist</span></span>
+          <span class="card__preview"><img src="thumbs/wildflower-walk.jpg" alt="" loading="lazy" width="640" height="400" /></span>
           <div class="card__head"><h2>Wildflower Walk</h2></div>
-          <p>Mobile journal entry with a horizontal photo carousel; large items scale and parallax-slide inside a scalloped mask as you scroll.</p>
+          <p>Journal photo carousel that scales and parallax-slides in a scalloped mask.</p>
           <span class="card__open">Open demo <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
         </a>
       </li>
       <li>
         <a class="card" href="progress-ring-breathing.html">
-          <span class="card__tile" aria-hidden="true"><span class="material-symbols-rounded">donut_large</span></span>
+          <span class="card__preview"><img src="thumbs/progress-ring-breathing.jpg" alt="" loading="lazy" width="640" height="400" /></span>
           <div class="card__head"><h2>Breathing Progress Ring</h2></div>
-          <p>Circular progress ring whose stroke breathes along a wavy crest, with the fill and track caps kept a fixed gap apart.</p>
+          <p>Circular progress whose stroke breathes along a wavy crest, with live settings.</p>
           <span class="card__open">Open demo <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
         </a>
       </li>
       <li>
         <a class="card" href="liquid-action-button.html">
-          <span class="card__tile" aria-hidden="true"><span class="material-symbols-rounded">touch_app</span></span>
+          <span class="card__preview"><img src="thumbs/liquid-action-button.jpg" alt="" loading="lazy" width="640" height="400" /></span>
           <div class="card__head"><h2>Liquid Action Button</h2><span class="tag">React</span></div>
-          <p>Expanding liquid action button and floating action bar built with React and Tailwind.</p>
+          <p>Expanding liquid action button and floating action bar in React + Tailwind.</p>
           <span class="card__open">Open demo <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
         </a>
       </li>
